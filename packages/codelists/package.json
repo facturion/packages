@@ -4,6 +4,13 @@
   "description": "Friendly, multilingual EN 16931 / UN-CEFACT e-invoicing code lists (units, VAT categories, payment means, invoice types, countries, currencies, Peppol EAS schemes) with curated labels and explanatory hints.",
   "keywords": ["en16931", "einvoicing", "peppol", "codelists", "vat", "untdid", "iso-3166", "iso-4217", "i18n"],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/facturion/packages.git",
+    "directory": "packages/codelists"
+  },
+  "homepage": "https://github.com/facturion/packages/tree/main/packages/codelists#readme",
+  "bugs": "https://github.com/facturion/packages/issues",
   "type": "module",
   "sideEffects": false,
   "exports": {
