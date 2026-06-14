@@ -1,0 +1,379 @@
+name: Currencies
+bucket: currencies
+description: >
+  ISO 4217 currency codes. Curated subset covering EUR, the major reserve
+  currencies, Nordics, and CEE markets we see on invoices today. Free-text
+  input is still accepted upstream — this is the picker, not an enum.
+order: preferred (10 reserve / Nordics / CEE) first; rest alphabetical by code
+authority: ISO 4217
+upstream:
+  iso: https://www.iso.org/iso-4217-currency-codes.html
+  cldr: https://github.com/unicode-org/cldr-json
+last_synced: 2026-06-14
+entries:
+  - code: "EUR"
+    preferred: true
+    label: { en: "Euro", de: "Euro" }
+  - code: "USD"
+    preferred: true
+    label: { en: "US Dollar", de: "US-Dollar" }
+  - code: "GBP"
+    preferred: true
+    label: { en: "British Pound", de: "Britisches Pfund" }
+  - code: "CHF"
+    preferred: true
+    label: { en: "Swiss Franc", de: "Schweizer Franken" }
+  - code: "SEK"
+    preferred: true
+    label: { en: "Swedish Krona", de: "Schwedische Krone" }
+  - code: "NOK"
+    preferred: true
+    label: { en: "Norwegian Krone", de: "Norwegische Krone" }
+  - code: "DKK"
+    preferred: true
+    label: { en: "Danish Krone", de: "Dänische Krone" }
+  - code: "PLN"
+    preferred: true
+    label: { en: "Polish Zloty", de: "Polnischer Złoty" }
+  - code: "CZK"
+    preferred: true
+    label: { en: "Czech Koruna", de: "Tschechische Krone" }
+  - code: "HUF"
+    preferred: true
+    label: { en: "Hungarian Forint", de: "Ungarischer Forint" }
+  - code: "AED"
+    label: { en: "United Arab Emirates Dirham", de: "VAE-Dirham" }
+  - code: "AFN"
+    label: { en: "Afghan Afghani", de: "Afghanischer Afghani" }
+  - code: "ALL"
+    label: { en: "Albanian Lek", de: "Albanischer Lek" }
+  - code: "AMD"
+    label: { en: "Armenian Dram", de: "Armenischer Dram" }
+  - code: "AOA"
+    label: { en: "Angolan Kwanza", de: "Angolanischer Kwanza" }
+  - code: "ARS"
+    label: { en: "Argentine Peso", de: "Argentinischer Peso" }
+  - code: "AUD"
+    label: { en: "Australian Dollar", de: "Australischer Dollar" }
+  - code: "AWG"
+    label: { en: "Aruban Florin", de: "Aruba-Florin" }
+  - code: "AZN"
+    label: { en: "Azerbaijani Manat", de: "Aserbaidschan-Manat" }
+  - code: "BAM"
+    label: { en: "Bosnia-Herzegovina Convertible Mark", de: "Konvertible Mark Bosnien und Herzegowina" }
+  - code: "BBD"
+    label: { en: "Barbadian Dollar", de: "Barbados-Dollar" }
+  - code: "BDT"
+    label: { en: "Bangladeshi Taka", de: "Bangladesch-Taka" }
+  - code: "BHD"
+    label: { en: "Bahraini Dinar", de: "Bahrain-Dinar" }
+  - code: "BIF"
+    label: { en: "Burundian Franc", de: "Burundi-Franc" }
+  - code: "BMD"
+    label: { en: "Bermudan Dollar", de: "Bermuda-Dollar" }
+  - code: "BND"
+    label: { en: "Brunei Dollar", de: "Brunei-Dollar" }
+  - code: "BOB"
+    label: { en: "Bolivian Boliviano", de: "Bolivianischer Boliviano" }
+  - code: "BOV"
+    label: { en: "Bolivian Mvdol", de: "Boliviansiche Mvdol" }
+  - code: "BRL"
+    label: { en: "Brazilian Real", de: "Brasilianischer Real" }
+  - code: "BSD"
+    label: { en: "Bahamian Dollar", de: "Bahamas-Dollar" }
+  - code: "BTN"
+    label: { en: "Bhutanese Ngultrum", de: "Bhutan-Ngultrum" }
+  - code: "BWP"
+    label: { en: "Botswanan Pula", de: "Botswanischer Pula" }
+  - code: "BYN"
+    label: { en: "Belarusian Ruble", de: "Weißrussischer Rubel" }
+  - code: "BZD"
+    label: { en: "Belize Dollar", de: "Belize-Dollar" }
+  - code: "CAD"
+    label: { en: "Canadian Dollar", de: "Kanadischer Dollar" }
+  - code: "CDF"
+    label: { en: "Congolese Franc", de: "Kongo-Franc" }
+  - code: "CHE"
+    label: { en: "WIR Euro", de: "WIR-Euro" }
+  - code: "CHW"
+    label: { en: "WIR Franc", de: "WIR Franken" }
+  - code: "CLF"
+    label: { en: "Chilean Unit of Account (UF)", de: "Chilenische Unidades de Fomento" }
+  - code: "CLP"
+    label: { en: "Chilean Peso", de: "Chilenischer Peso" }
+  - code: "CNY"
+    label: { en: "Chinese Yuan", de: "Renminbi Yuan" }
+  - code: "COP"
+    label: { en: "Colombian Peso", de: "Kolumbianischer Peso" }
+  - code: "COU"
+    label: { en: "Colombian Real Value Unit", de: "Kolumbianische Unidades de valor real" }
+  - code: "CRC"
+    label: { en: "Costa Rican Colón", de: "Costa-Rica-Colón" }
+  - code: "CUP"
+    label: { en: "Cuban Peso", de: "Kubanischer Peso" }
+  - code: "CVE"
+    label: { en: "Cape Verdean Escudo", de: "Cabo-Verde-Escudo" }
+  - code: "DJF"
+    label: { en: "Djiboutian Franc", de: "Dschibuti-Franc" }
+  - code: "DOP"
+    label: { en: "Dominican Peso", de: "Dominikanischer Peso" }
+  - code: "DZD"
+    label: { en: "Algerian Dinar", de: "Algerischer Dinar" }
+  - code: "EGP"
+    label: { en: "Egyptian Pound", de: "Ägyptisches Pfund" }
+  - code: "ERN"
+    label: { en: "Eritrean Nakfa", de: "Eritreischer Nakfa" }
+  - code: "ETB"
+    label: { en: "Ethiopian Birr", de: "Äthiopischer Birr" }
+  - code: "FJD"
+    label: { en: "Fijian Dollar", de: "Fidschi-Dollar" }
+  - code: "FKP"
+    label: { en: "Falkland Islands Pound", de: "Falkland-Pfund" }
+  - code: "GEL"
+    label: { en: "Georgian Lari", de: "Georgischer Lari" }
+  - code: "GHS"
+    label: { en: "Ghanaian Cedi", de: "Ghanaischer Cedi" }
+  - code: "GIP"
+    label: { en: "Gibraltar Pound", de: "Gibraltar-Pfund" }
+  - code: "GMD"
+    label: { en: "Gambian Dalasi", de: "Gambia-Dalasi" }
+  - code: "GNF"
+    label: { en: "Guinean Franc", de: "Guinea-Franc" }
+  - code: "GTQ"
+    label: { en: "Guatemalan Quetzal", de: "Guatemaltekischer Quetzal" }
+  - code: "GYD"
+    label: { en: "Guyanaese Dollar", de: "Guyana-Dollar" }
+  - code: "HKD"
+    label: { en: "Hong Kong Dollar", de: "Hongkong-Dollar" }
+  - code: "HNL"
+    label: { en: "Honduran Lempira", de: "Honduras-Lempira" }
+  - code: "HTG"
+    label: { en: "Haitian Gourde", de: "Haitianische Gourde" }
+  - code: "IDR"
+    label: { en: "Indonesian Rupiah", de: "Indonesische Rupiah" }
+  - code: "ILS"
+    label: { en: "Israeli New Shekel", de: "Israelischer Neuer Schekel" }
+  - code: "INR"
+    label: { en: "Indian Rupee", de: "Indische Rupie" }
+  - code: "IQD"
+    label: { en: "Iraqi Dinar", de: "Irakischer Dinar" }
+  - code: "IRR"
+    label: { en: "Iranian Rial", de: "Iranischer Rial" }
+  - code: "ISK"
+    label: { en: "Icelandic Króna", de: "Isländische Krone" }
+  - code: "JMD"
+    label: { en: "Jamaican Dollar", de: "Jamaika-Dollar" }
+  - code: "JOD"
+    label: { en: "Jordanian Dinar", de: "Jordanischer Dinar" }
+  - code: "JPY"
+    label: { en: "Japanese Yen", de: "Japanischer Yen" }
+  - code: "KES"
+    label: { en: "Kenyan Shilling", de: "Kenia-Schilling" }
+  - code: "KGS"
+    label: { en: "Kyrgyz Som", de: "Kirgisischer Som" }
+  - code: "KHR"
+    label: { en: "Cambodian Riel", de: "Kambodschanischer Riel" }
+  - code: "KMF"
+    label: { en: "Comorian Franc", de: "Komoren-Franc" }
+  - code: "KPW"
+    label: { en: "North Korean Won", de: "Nordkoreanischer Won" }
+  - code: "KRW"
+    label: { en: "South Korean Won", de: "Südkoreanischer Won" }
+  - code: "KWD"
+    label: { en: "Kuwaiti Dinar", de: "Kuwait-Dinar" }
+  - code: "KYD"
+    label: { en: "Cayman Islands Dollar", de: "Kaiman-Dollar" }
+  - code: "KZT"
+    label: { en: "Kazakhstani Tenge", de: "Kasachischer Tenge" }
+  - code: "LAK"
+    label: { en: "Laotian Kip", de: "Laotischer Kip" }
+  - code: "LBP"
+    label: { en: "Lebanese Pound", de: "Libanesisches Pfund" }
+  - code: "LKR"
+    label: { en: "Sri Lankan Rupee", de: "Sri-Lanka-Rupie" }
+  - code: "LRD"
+    label: { en: "Liberian Dollar", de: "Liberianischer Dollar" }
+  - code: "LSL"
+    label: { en: "Lesotho Loti", de: "Loti" }
+  - code: "LYD"
+    label: { en: "Libyan Dinar", de: "Libyscher Dinar" }
+  - code: "MAD"
+    label: { en: "Moroccan Dirham", de: "Marokkanischer Dirham" }
+  - code: "MDL"
+    label: { en: "Moldovan Leu", de: "Moldau-Leu" }
+  - code: "MGA"
+    label: { en: "Malagasy Ariary", de: "Madagaskar-Ariary" }
+  - code: "MKD"
+    label: { en: "Macedonian Denar", de: "Mazedonischer Denar" }
+  - code: "MMK"
+    label: { en: "Myanmar Kyat", de: "Myanmarischer Kyat" }
+  - code: "MNT"
+    label: { en: "Mongolian Tugrik", de: "Mongolischer Tögrög" }
+  - code: "MOP"
+    label: { en: "Macanese Pataca", de: "Macao-Pataca" }
+  - code: "MRU"
+    label: { en: "Mauritanian Ouguiya", de: "Mauretanischer Ouguiya" }
+  - code: "MUR"
+    label: { en: "Mauritian Rupee", de: "Mauritius-Rupie" }
+  - code: "MVR"
+    label: { en: "Maldivian Rufiyaa", de: "Malediven-Rufiyaa" }
+  - code: "MWK"
+    label: { en: "Malawian Kwacha", de: "Malawi-Kwacha" }
+  - code: "MXN"
+    label: { en: "Mexican Peso", de: "Mexikanischer Peso" }
+  - code: "MXV"
+    label: { en: "Mexican Investment Unit", de: "Mexicanischer Unidad de Inversion (UDI)" }
+  - code: "MYR"
+    label: { en: "Malaysian Ringgit", de: "Malaysischer Ringgit" }
+  - code: "MZN"
+    label: { en: "Mozambican Metical", de: "Mosambikanischer Metical" }
+  - code: "NAD"
+    label: { en: "Namibian Dollar", de: "Namibia-Dollar" }
+  - code: "NGN"
+    label: { en: "Nigerian Naira", de: "Nigerianischer Naira" }
+  - code: "NIO"
+    label: { en: "Nicaraguan Córdoba", de: "Nicaragua-Córdoba" }
+  - code: "NPR"
+    label: { en: "Nepalese Rupee", de: "Nepalesische Rupie" }
+  - code: "NZD"
+    label: { en: "New Zealand Dollar", de: "Neuseeland-Dollar" }
+  - code: "OMR"
+    label: { en: "Omani Rial", de: "Omanischer Rial" }
+  - code: "PAB"
+    label: { en: "Panamanian Balboa", de: "Panamaischer Balboa" }
+  - code: "PEN"
+    label: { en: "Peruvian Sol", de: "Peruanischer Sol" }
+  - code: "PGK"
+    label: { en: "Papua New Guinean Kina", de: "Papua-neuguineischer Kina" }
+  - code: "PHP"
+    label: { en: "Philippine Peso", de: "Philippinischer Peso" }
+  - code: "PKR"
+    label: { en: "Pakistani Rupee", de: "Pakistanische Rupie" }
+  - code: "PYG"
+    label: { en: "Paraguayan Guarani", de: "Paraguayischer Guaraní" }
+  - code: "QAR"
+    label: { en: "Qatari Riyal", de: "Katar-Riyal" }
+  - code: "RON"
+    label: { en: "Romanian Leu", de: "Rumänischer Leu" }
+  - code: "RSD"
+    label: { en: "Serbian Dinar", de: "Serbischer Dinar" }
+  - code: "RUB"
+    label: { en: "Russian Ruble", de: "Russischer Rubel" }
+  - code: "RWF"
+    label: { en: "Rwandan Franc", de: "Ruanda-Franc" }
+  - code: "SAR"
+    label: { en: "Saudi Riyal", de: "Saudi-Rial" }
+  - code: "SBD"
+    label: { en: "Solomon Islands Dollar", de: "Salomonen-Dollar" }
+  - code: "SCR"
+    label: { en: "Seychellois Rupee", de: "Seychellen-Rupie" }
+  - code: "SDG"
+    label: { en: "Sudanese Pound", de: "Sudanesisches Pfund" }
+  - code: "SGD"
+    label: { en: "Singapore Dollar", de: "Singapur-Dollar" }
+  - code: "SHP"
+    label: { en: "St. Helena Pound", de: "St.-Helena-Pfund" }
+  - code: "SLE"
+    label: { en: "Sierra Leonean Leone", de: "Sierra-leonischer Leone" }
+  - code: "SOS"
+    label: { en: "Somali Shilling", de: "Somalia-Schilling" }
+  - code: "SRD"
+    label: { en: "Surinamese Dollar", de: "Suriname-Dollar" }
+  - code: "SSP"
+    label: { en: "South Sudanese Pound", de: "Südsudanesisches Pfund" }
+  - code: "STN"
+    label: { en: "São Tomé & Príncipe Dobra", de: "São-toméischer Dobra" }
+  - code: "SVC"
+    label: { en: "Salvadoran Colón", de: "El Salvador Colon" }
+  - code: "SYP"
+    label: { en: "Syrian Pound", de: "Syrisches Pfund" }
+  - code: "SZL"
+    label: { en: "Swazi Lilangeni", de: "Swasiländischer Lilangeni" }
+  - code: "THB"
+    label: { en: "Thai Baht", de: "Thailändischer Baht" }
+  - code: "TJS"
+    label: { en: "Tajikistani Somoni", de: "Tadschikistan-Somoni" }
+  - code: "TMT"
+    label: { en: "Turkmenistani Manat", de: "Turkmenistan-Manat" }
+  - code: "TND"
+    label: { en: "Tunisian Dinar", de: "Tunesischer Dinar" }
+  - code: "TOP"
+    label: { en: "Tongan Paʻanga", de: "Tongaischer Paʻanga" }
+  - code: "TRY"
+    label: { en: "Turkish Lira", de: "Türkische Lira" }
+  - code: "TTD"
+    label: { en: "Trinidad & Tobago Dollar", de: "Trinidad-und-Tobago-Dollar" }
+  - code: "TWD"
+    label: { en: "New Taiwan Dollar", de: "Neuer Taiwan-Dollar" }
+  - code: "TZS"
+    label: { en: "Tanzanian Shilling", de: "Tansania-Schilling" }
+  - code: "UAH"
+    label: { en: "Ukrainian Hryvnia", de: "Ukrainische Hrywnja" }
+  - code: "UGX"
+    label: { en: "Ugandan Shilling", de: "Uganda-Schilling" }
+  - code: "USN"
+    label: { en: "US Dollar (Next day)", de: "US Dollar (Nächster Tag)" }
+  - code: "UYI"
+    label: { en: "Uruguayan Peso (Indexed Units)", de: "Uruguayischer Peso (Indexierte Rechnungseinheiten)" }
+  - code: "UYU"
+    label: { en: "Uruguayan Peso", de: "Uruguayischer Peso" }
+  - code: "UYW"
+    label: { en: "Uruguayan Nominal Wage Index Unit", de: "Unidad Previsional" }
+  - code: "UZS"
+    label: { en: "Uzbekistani Som", de: "Usbekistan-Sum" }
+  - code: "VED"
+    label: { en: "Bolívar Soberano", de: "Bolívar Soberano" }
+  - code: "VES"
+    label: { en: "Venezuelan Bolívar", de: "Venezolanischer Bolívar" }
+  - code: "VND"
+    label: { en: "Vietnamese Dong", de: "Vietnamesischer Dong" }
+  - code: "VUV"
+    label: { en: "Vanuatu Vatu", de: "Vanuatu-Vatu" }
+  - code: "WST"
+    label: { en: "Samoan Tala", de: "Samoanischer Tala" }
+  - code: "XAD"
+    label: { en: "Arab Accounting Dinar", de: "Arab Accounting Dinar" }
+  - code: "XAF"
+    label: { en: "Central African CFA Franc", de: "CFA-Franc (BEAC)" }
+  - code: "XAG"
+    label: { en: "Silver", de: "Unze Silber" }
+  - code: "XAU"
+    label: { en: "Gold", de: "Unze Gold" }
+  - code: "XBA"
+    label: { en: "European Composite Unit", de: "Europäische Rechnungseinheit" }
+  - code: "XBB"
+    label: { en: "European Monetary Unit", de: "Europäische Währungseinheit (XBB)" }
+  - code: "XBC"
+    label: { en: "European Unit of Account (XBC)", de: "Europäische Rechnungseinheit (XBC)" }
+  - code: "XBD"
+    label: { en: "European Unit of Account (XBD)", de: "Europäische Rechnungseinheit (XBD)" }
+  - code: "XCD"
+    label: { en: "East Caribbean Dollar", de: "Ostkaribischer Dollar" }
+  - code: "XCG"
+    label: { en: "Caribbean guilder", de: "Karibischer Gulden" }
+  - code: "XDR"
+    label: { en: "Special Drawing Rights", de: "Sonderziehungsrechte" }
+  - code: "XOF"
+    label: { en: "West African CFA Franc", de: "CFA-Franc (BCEAO)" }
+  - code: "XPD"
+    label: { en: "Palladium", de: "Unze Palladium" }
+  - code: "XPF"
+    label: { en: "CFP Franc", de: "CFP-Franc" }
+  - code: "XPT"
+    label: { en: "Platinum", de: "Unze Platin" }
+  - code: "XSU"
+    label: { en: "Sucre", de: "SUCRE" }
+  - code: "XTS"
+    label: { en: "Testing Currency Code", de: "Testwährung" }
+  - code: "XUA"
+    label: { en: "ADB Unit of Account", de: "Rechnungseinheit der AfEB" }
+  - code: "XXX"
+    label: { en: "Unknown Currency", de: "Unbekannte Währung" }
+  - code: "YER"
+    label: { en: "Yemeni Rial", de: "Jemen-Rial" }
+  - code: "ZAR"
+    label: { en: "South African Rand", de: "Südafrikanischer Rand" }
+  - code: "ZMW"
+    label: { en: "Zambian Kwacha", de: "Kwacha" }
+  - code: "ZWG"
+    label: { en: "Zimbabwean Gold", de: "Simbabwe-Gold" }

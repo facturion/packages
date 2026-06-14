@@ -1,0 +1,32 @@
+{
+  "_comment": [
+    "Upstream sources for `npm run sync`. Each entry binds a YAML codelist to",
+    "an upstream + fetcher. Lists without an entry are skipped (UN/CEFACT lists",
+    "have no clean machine-readable upstream and change rarely).",
+    "",
+    "format 'cldr'    — Unicode CLDR JSON (cldr-json on a CDN). Permissive",
+    "                   (Unicode-3.0), MIT-compatible — this is why localized",
+    "                   country/currency names come from here, NOT Debian",
+    "                   iso-codes (LGPL). `kind` selects the extractor; the",
+    "                   fetcher pulls one file per declared locale.",
+    "format 'peppol-codelist' — docs.peppol.eu JSON (Apache-2.0). `values` array."
+  ],
+  "countries.yaml": {
+    "format": "cldr",
+    "kind": "territories",
+    "urlTemplate": "https://cdn.jsdelivr.net/npm/cldr-localenames-full/main/{locale}/territories.json"
+  },
+  "currencies.yaml": {
+    "format": "cldr",
+    "kind": "currencies",
+    "urlTemplate": "https://cdn.jsdelivr.net/npm/cldr-numbers-full/main/{locale}/currencies.json"
+  },
+  "icd-schemes.yaml": {
+    "format": "peppol-codelist",
+    "url": "https://docs.peppol.eu/edelivery/codelists/v9.6/Peppol Code Lists - Participant identifier schemes v9.6.json",
+    "codeField": "iso6523",
+    "labelField": "scheme-name",
+    "stateField": "state",
+    "activeState": "active"
+  }
+}

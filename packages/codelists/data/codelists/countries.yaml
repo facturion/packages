@@ -1,0 +1,759 @@
+name: Countries
+bucket: countries
+description: >
+  ISO 3166-1 alpha-2 country codes. Localized display names sourced from
+  Unicode CLDR (permissive, Unicode-3.0) — refresh with `npm run sync -- --relabel`.
+order: YAML order is not user-facing — codelistOptions(_, sort:"label") sorts at display time using the active locale's collation (Ö interleaves O in DE, sorts after Z in EN).
+authority: ISO 3166-1
+upstream:
+  iso: https://www.iso.org/iso-3166-country-codes.html
+  cldr: https://github.com/unicode-org/cldr-json
+last_synced: 2026-06-14
+entries:
+  - code: "DE"
+    iso3: "DEU"
+    label: { en: "Germany", de: "Deutschland" }
+  - code: "FR"
+    iso3: "FRA"
+    label: { en: "France", de: "Frankreich" }
+  - code: "IT"
+    iso3: "ITA"
+    label: { en: "Italy", de: "Italien" }
+  - code: "ES"
+    iso3: "ESP"
+    label: { en: "Spain", de: "Spanien" }
+  - code: "NL"
+    iso3: "NLD"
+    label: { en: "Netherlands", de: "Niederlande" }
+  - code: "BE"
+    iso3: "BEL"
+    label: { en: "Belgium", de: "Belgien" }
+  - code: "AT"
+    iso3: "AUT"
+    label: { en: "Austria", de: "Österreich" }
+  - code: "PL"
+    iso3: "POL"
+    label: { en: "Poland", de: "Polen" }
+  - code: "SE"
+    iso3: "SWE"
+    label: { en: "Sweden", de: "Schweden" }
+  - code: "DK"
+    iso3: "DNK"
+    label: { en: "Denmark", de: "Dänemark" }
+  - code: "FI"
+    iso3: "FIN"
+    label: { en: "Finland", de: "Finnland" }
+  - code: "IE"
+    iso3: "IRL"
+    label: { en: "Ireland", de: "Irland" }
+  - code: "PT"
+    iso3: "PRT"
+    label: { en: "Portugal", de: "Portugal" }
+  - code: "CZ"
+    iso3: "CZE"
+    label: { en: "Czechia", de: "Tschechien" }
+  - code: "GR"
+    iso3: "GRC"
+    label: { en: "Greece", de: "Griechenland" }
+  - code: "HU"
+    iso3: "HUN"
+    label: { en: "Hungary", de: "Ungarn" }
+  - code: "RO"
+    iso3: "ROU"
+    label: { en: "Romania", de: "Rumänien" }
+  - code: "BG"
+    iso3: "BGR"
+    label: { en: "Bulgaria", de: "Bulgarien" }
+  - code: "HR"
+    iso3: "HRV"
+    label: { en: "Croatia", de: "Kroatien" }
+  - code: "SK"
+    iso3: "SVK"
+    label: { en: "Slovakia", de: "Slowakei" }
+  - code: "SI"
+    iso3: "SVN"
+    label: { en: "Slovenia", de: "Slowenien" }
+  - code: "LT"
+    iso3: "LTU"
+    label: { en: "Lithuania", de: "Litauen" }
+  - code: "LV"
+    iso3: "LVA"
+    label: { en: "Latvia", de: "Lettland" }
+  - code: "EE"
+    iso3: "EST"
+    label: { en: "Estonia", de: "Estland" }
+  - code: "LU"
+    iso3: "LUX"
+    label: { en: "Luxembourg", de: "Luxemburg" }
+  - code: "MT"
+    iso3: "MLT"
+    label: { en: "Malta", de: "Malta" }
+  - code: "CY"
+    iso3: "CYP"
+    label: { en: "Cyprus", de: "Zypern" }
+  - code: "GB"
+    iso3: "GBR"
+    label: { en: "United Kingdom", de: "Vereinigtes Königreich" }
+  - code: "CH"
+    iso3: "CHE"
+    label: { en: "Switzerland", de: "Schweiz" }
+  - code: "NO"
+    iso3: "NOR"
+    label: { en: "Norway", de: "Norwegen" }
+  - code: "IS"
+    iso3: "ISL"
+    label: { en: "Iceland", de: "Island" }
+  - code: "US"
+    iso3: "USA"
+    label: { en: "United States", de: "Vereinigte Staaten" }
+  - code: "CA"
+    iso3: "CAN"
+    label: { en: "Canada", de: "Kanada" }
+  - code: "MX"
+    iso3: "MEX"
+    label: { en: "Mexico", de: "Mexiko" }
+  - code: "BR"
+    iso3: "BRA"
+    label: { en: "Brazil", de: "Brasilien" }
+  - code: "AR"
+    iso3: "ARG"
+    label: { en: "Argentina", de: "Argentinien" }
+  - code: "CL"
+    iso3: "CHL"
+    label: { en: "Chile", de: "Chile" }
+  - code: "CO"
+    iso3: "COL"
+    label: { en: "Colombia", de: "Kolumbien" }
+  - code: "AU"
+    iso3: "AUS"
+    label: { en: "Australia", de: "Australien" }
+  - code: "NZ"
+    iso3: "NZL"
+    label: { en: "New Zealand", de: "Neuseeland" }
+  - code: "JP"
+    iso3: "JPN"
+    label: { en: "Japan", de: "Japan" }
+  - code: "CN"
+    iso3: "CHN"
+    label: { en: "China", de: "China" }
+  - code: "KR"
+    iso3: "KOR"
+    label: { en: "South Korea", de: "Südkorea" }
+  - code: "IN"
+    iso3: "IND"
+    label: { en: "India", de: "Indien" }
+  - code: "SG"
+    iso3: "SGP"
+    label: { en: "Singapore", de: "Singapur" }
+  - code: "HK"
+    iso3: "HKG"
+    label: { en: "Hong Kong SAR China", de: "Sonderverwaltungsregion Hongkong" }
+  - code: "TW"
+    iso3: "TWN"
+    label: { en: "Taiwan", de: "Taiwan" }
+  - code: "TH"
+    iso3: "THA"
+    label: { en: "Thailand", de: "Thailand" }
+  - code: "TR"
+    iso3: "TUR"
+    label: { en: "Türkiye", de: "Türkei" }
+  - code: "IL"
+    iso3: "ISR"
+    label: { en: "Israel", de: "Israel" }
+  - code: "AE"
+    iso3: "ARE"
+    label: { en: "United Arab Emirates", de: "Vereinigte Arabische Emirate" }
+  - code: "SA"
+    iso3: "SAU"
+    label: { en: "Saudi Arabia", de: "Saudi-Arabien" }
+  - code: "ZA"
+    iso3: "ZAF"
+    label: { en: "South Africa", de: "Südafrika" }
+  - code: "EG"
+    iso3: "EGY"
+    label: { en: "Egypt", de: "Ägypten" }
+  - code: "MA"
+    iso3: "MAR"
+    label: { en: "Morocco", de: "Marokko" }
+  - code: "NG"
+    iso3: "NGA"
+    label: { en: "Nigeria", de: "Nigeria" }
+  - code: "RU"
+    iso3: "RUS"
+    label: { en: "Russia", de: "Russland" }
+  - code: "UA"
+    iso3: "UKR"
+    label: { en: "Ukraine", de: "Ukraine" }
+  - code: "RS"
+    iso3: "SRB"
+    label: { en: "Serbia", de: "Serbien" }
+  - code: "AD"
+    iso3: "AND"
+    label: { en: "Andorra", de: "Andorra" }
+  - code: "AF"
+    iso3: "AFG"
+    label: { en: "Afghanistan", de: "Afghanistan" }
+  - code: "AG"
+    iso3: "ATG"
+    label: { en: "Antigua & Barbuda", de: "Antigua und Barbuda" }
+  - code: "AI"
+    iso3: "AIA"
+    label: { en: "Anguilla", de: "Anguilla" }
+  - code: "AL"
+    iso3: "ALB"
+    label: { en: "Albania", de: "Albanien" }
+  - code: "AM"
+    iso3: "ARM"
+    label: { en: "Armenia", de: "Armenien" }
+  - code: "AO"
+    iso3: "AGO"
+    label: { en: "Angola", de: "Angola" }
+  - code: "AQ"
+    iso3: "ATA"
+    label: { en: "Antarctica", de: "Antarktis" }
+  - code: "AS"
+    iso3: "ASM"
+    label: { en: "American Samoa", de: "Amerikanisch-Samoa" }
+  - code: "AW"
+    iso3: "ABW"
+    label: { en: "Aruba", de: "Aruba" }
+  - code: "AX"
+    iso3: "ALA"
+    label: { en: "Åland Islands", de: "Ålandinseln" }
+  - code: "AZ"
+    iso3: "AZE"
+    label: { en: "Azerbaijan", de: "Aserbaidschan" }
+  - code: "BA"
+    iso3: "BIH"
+    label: { en: "Bosnia & Herzegovina", de: "Bosnien und Herzegowina" }
+  - code: "BB"
+    iso3: "BRB"
+    label: { en: "Barbados", de: "Barbados" }
+  - code: "BD"
+    iso3: "BGD"
+    label: { en: "Bangladesh", de: "Bangladesch" }
+  - code: "BF"
+    iso3: "BFA"
+    label: { en: "Burkina Faso", de: "Burkina Faso" }
+  - code: "BH"
+    iso3: "BHR"
+    label: { en: "Bahrain", de: "Bahrain" }
+  - code: "BI"
+    iso3: "BDI"
+    label: { en: "Burundi", de: "Burundi" }
+  - code: "BJ"
+    iso3: "BEN"
+    label: { en: "Benin", de: "Benin" }
+  - code: "BL"
+    iso3: "BLM"
+    label: { en: "St. Barthélemy", de: "St. Barthélemy" }
+  - code: "BM"
+    iso3: "BMU"
+    label: { en: "Bermuda", de: "Bermuda" }
+  - code: "BN"
+    iso3: "BRN"
+    label: { en: "Brunei", de: "Brunei Darussalam" }
+  - code: "BO"
+    iso3: "BOL"
+    label: { en: "Bolivia", de: "Bolivien" }
+  - code: "BQ"
+    iso3: "BES"
+    label: { en: "Caribbean Netherlands", de: "Karibische Niederlande" }
+  - code: "BS"
+    iso3: "BHS"
+    label: { en: "Bahamas", de: "Bahamas" }
+  - code: "BT"
+    iso3: "BTN"
+    label: { en: "Bhutan", de: "Bhutan" }
+  - code: "BV"
+    iso3: "BVT"
+    label: { en: "Bouvet Island", de: "Bouvetinsel" }
+  - code: "BW"
+    iso3: "BWA"
+    label: { en: "Botswana", de: "Botsuana" }
+  - code: "BY"
+    iso3: "BLR"
+    label: { en: "Belarus", de: "Belarus" }
+  - code: "BZ"
+    iso3: "BLZ"
+    label: { en: "Belize", de: "Belize" }
+  - code: "CC"
+    iso3: "CCK"
+    label: { en: "Cocos (Keeling) Islands", de: "Kokosinseln" }
+  - code: "CD"
+    iso3: "COD"
+    label: { en: "Congo - Kinshasa", de: "Kongo-Kinshasa" }
+  - code: "CF"
+    iso3: "CAF"
+    label: { en: "Central African Republic", de: "Zentralafrikanische Republik" }
+  - code: "CG"
+    iso3: "COG"
+    label: { en: "Congo - Brazzaville", de: "Kongo-Brazzaville" }
+  - code: "CI"
+    iso3: "CIV"
+    label: { en: "Côte d’Ivoire", de: "Côte d’Ivoire" }
+  - code: "CK"
+    iso3: "COK"
+    label: { en: "Cook Islands", de: "Cookinseln" }
+  - code: "CM"
+    iso3: "CMR"
+    label: { en: "Cameroon", de: "Kamerun" }
+  - code: "CR"
+    iso3: "CRI"
+    label: { en: "Costa Rica", de: "Costa Rica" }
+  - code: "CU"
+    iso3: "CUB"
+    label: { en: "Cuba", de: "Kuba" }
+  - code: "CV"
+    iso3: "CPV"
+    label: { en: "Cape Verde", de: "Cabo Verde" }
+  - code: "CW"
+    iso3: "CUW"
+    label: { en: "Curaçao", de: "Curaçao" }
+  - code: "CX"
+    iso3: "CXR"
+    label: { en: "Christmas Island", de: "Weihnachtsinsel" }
+  - code: "DJ"
+    iso3: "DJI"
+    label: { en: "Djibouti", de: "Dschibuti" }
+  - code: "DM"
+    iso3: "DMA"
+    label: { en: "Dominica", de: "Dominica" }
+  - code: "DO"
+    iso3: "DOM"
+    label: { en: "Dominican Republic", de: "Dominikanische Republik" }
+  - code: "DZ"
+    iso3: "DZA"
+    label: { en: "Algeria", de: "Algerien" }
+  - code: "EC"
+    iso3: "ECU"
+    label: { en: "Ecuador", de: "Ecuador" }
+  - code: "EH"
+    iso3: "ESH"
+    label: { en: "Western Sahara", de: "Westsahara" }
+  - code: "ER"
+    iso3: "ERI"
+    label: { en: "Eritrea", de: "Eritrea" }
+  - code: "ET"
+    iso3: "ETH"
+    label: { en: "Ethiopia", de: "Äthiopien" }
+  - code: "FJ"
+    iso3: "FJI"
+    label: { en: "Fiji", de: "Fidschi" }
+  - code: "FK"
+    iso3: "FLK"
+    label: { en: "Falkland Islands", de: "Falklandinseln" }
+  - code: "FM"
+    iso3: "FSM"
+    label: { en: "Micronesia", de: "Mikronesien" }
+  - code: "FO"
+    iso3: "FRO"
+    label: { en: "Faroe Islands", de: "Färöer" }
+  - code: "GA"
+    iso3: "GAB"
+    label: { en: "Gabon", de: "Gabun" }
+  - code: "GD"
+    iso3: "GRD"
+    label: { en: "Grenada", de: "Grenada" }
+  - code: "GE"
+    iso3: "GEO"
+    label: { en: "Georgia", de: "Georgien" }
+  - code: "GF"
+    iso3: "GUF"
+    label: { en: "French Guiana", de: "Französisch-Guayana" }
+  - code: "GG"
+    iso3: "GGY"
+    label: { en: "Guernsey", de: "Guernsey" }
+  - code: "GH"
+    iso3: "GHA"
+    label: { en: "Ghana", de: "Ghana" }
+  - code: "GI"
+    iso3: "GIB"
+    label: { en: "Gibraltar", de: "Gibraltar" }
+  - code: "GL"
+    iso3: "GRL"
+    label: { en: "Greenland", de: "Grönland" }
+  - code: "GM"
+    iso3: "GMB"
+    label: { en: "Gambia", de: "Gambia" }
+  - code: "GN"
+    iso3: "GIN"
+    label: { en: "Guinea", de: "Guinea" }
+  - code: "GP"
+    iso3: "GLP"
+    label: { en: "Guadeloupe", de: "Guadeloupe" }
+  - code: "GQ"
+    iso3: "GNQ"
+    label: { en: "Equatorial Guinea", de: "Äquatorialguinea" }
+  - code: "GS"
+    iso3: "SGS"
+    label: { en: "South Georgia & South Sandwich Islands", de: "Südgeorgien und die Südlichen Sandwichinseln" }
+  - code: "GT"
+    iso3: "GTM"
+    label: { en: "Guatemala", de: "Guatemala" }
+  - code: "GU"
+    iso3: "GUM"
+    label: { en: "Guam", de: "Guam" }
+  - code: "GW"
+    iso3: "GNB"
+    label: { en: "Guinea-Bissau", de: "Guinea-Bissau" }
+  - code: "GY"
+    iso3: "GUY"
+    label: { en: "Guyana", de: "Guyana" }
+  - code: "HM"
+    iso3: "HMD"
+    label: { en: "Heard & McDonald Islands", de: "Heard und McDonaldinseln" }
+  - code: "HN"
+    iso3: "HND"
+    label: { en: "Honduras", de: "Honduras" }
+  - code: "HT"
+    iso3: "HTI"
+    label: { en: "Haiti", de: "Haiti" }
+  - code: "ID"
+    iso3: "IDN"
+    label: { en: "Indonesia", de: "Indonesien" }
+  - code: "IM"
+    iso3: "IMN"
+    label: { en: "Isle of Man", de: "Isle of Man" }
+  - code: "IO"
+    iso3: "IOT"
+    label: { en: "British Indian Ocean Territory", de: "Britisches Territorium im Indischen Ozean" }
+  - code: "IQ"
+    iso3: "IRQ"
+    label: { en: "Iraq", de: "Irak" }
+  - code: "IR"
+    iso3: "IRN"
+    label: { en: "Iran", de: "Iran" }
+  - code: "JE"
+    iso3: "JEY"
+    label: { en: "Jersey", de: "Jersey" }
+  - code: "JM"
+    iso3: "JAM"
+    label: { en: "Jamaica", de: "Jamaika" }
+  - code: "JO"
+    iso3: "JOR"
+    label: { en: "Jordan", de: "Jordanien" }
+  - code: "KE"
+    iso3: "KEN"
+    label: { en: "Kenya", de: "Kenia" }
+  - code: "KG"
+    iso3: "KGZ"
+    label: { en: "Kyrgyzstan", de: "Kirgisistan" }
+  - code: "KH"
+    iso3: "KHM"
+    label: { en: "Cambodia", de: "Kambodscha" }
+  - code: "KI"
+    iso3: "KIR"
+    label: { en: "Kiribati", de: "Kiribati" }
+  - code: "KM"
+    iso3: "COM"
+    label: { en: "Comoros", de: "Komoren" }
+  - code: "KN"
+    iso3: "KNA"
+    label: { en: "St. Kitts & Nevis", de: "St. Kitts und Nevis" }
+  - code: "KP"
+    iso3: "PRK"
+    label: { en: "North Korea", de: "Nordkorea" }
+  - code: "KW"
+    iso3: "KWT"
+    label: { en: "Kuwait", de: "Kuwait" }
+  - code: "KY"
+    iso3: "CYM"
+    label: { en: "Cayman Islands", de: "Kaimaninseln" }
+  - code: "KZ"
+    iso3: "KAZ"
+    label: { en: "Kazakhstan", de: "Kasachstan" }
+  - code: "LA"
+    iso3: "LAO"
+    label: { en: "Laos", de: "Laos" }
+  - code: "LB"
+    iso3: "LBN"
+    label: { en: "Lebanon", de: "Libanon" }
+  - code: "LC"
+    iso3: "LCA"
+    label: { en: "St. Lucia", de: "St. Lucia" }
+  - code: "LI"
+    iso3: "LIE"
+    label: { en: "Liechtenstein", de: "Liechtenstein" }
+  - code: "LK"
+    iso3: "LKA"
+    label: { en: "Sri Lanka", de: "Sri Lanka" }
+  - code: "LR"
+    iso3: "LBR"
+    label: { en: "Liberia", de: "Liberia" }
+  - code: "LS"
+    iso3: "LSO"
+    label: { en: "Lesotho", de: "Lesotho" }
+  - code: "LY"
+    iso3: "LBY"
+    label: { en: "Libya", de: "Libyen" }
+  - code: "MC"
+    iso3: "MCO"
+    label: { en: "Monaco", de: "Monaco" }
+  - code: "MD"
+    iso3: "MDA"
+    label: { en: "Moldova", de: "Republik Moldau" }
+  - code: "ME"
+    iso3: "MNE"
+    label: { en: "Montenegro", de: "Montenegro" }
+  - code: "MF"
+    iso3: "MAF"
+    label: { en: "St. Martin", de: "St. Martin" }
+  - code: "MG"
+    iso3: "MDG"
+    label: { en: "Madagascar", de: "Madagaskar" }
+  - code: "MH"
+    iso3: "MHL"
+    label: { en: "Marshall Islands", de: "Marshallinseln" }
+  - code: "MK"
+    iso3: "MKD"
+    label: { en: "North Macedonia", de: "Nordmazedonien" }
+  - code: "ML"
+    iso3: "MLI"
+    label: { en: "Mali", de: "Mali" }
+  - code: "MM"
+    iso3: "MMR"
+    label: { en: "Myanmar (Burma)", de: "Myanmar" }
+  - code: "MN"
+    iso3: "MNG"
+    label: { en: "Mongolia", de: "Mongolei" }
+  - code: "MO"
+    iso3: "MAC"
+    label: { en: "Macao SAR China", de: "Sonderverwaltungsregion Macau" }
+  - code: "MP"
+    iso3: "MNP"
+    label: { en: "Northern Mariana Islands", de: "Nördliche Marianen" }
+  - code: "MQ"
+    iso3: "MTQ"
+    label: { en: "Martinique", de: "Martinique" }
+  - code: "MR"
+    iso3: "MRT"
+    label: { en: "Mauritania", de: "Mauretanien" }
+  - code: "MS"
+    iso3: "MSR"
+    label: { en: "Montserrat", de: "Montserrat" }
+  - code: "MU"
+    iso3: "MUS"
+    label: { en: "Mauritius", de: "Mauritius" }
+  - code: "MV"
+    iso3: "MDV"
+    label: { en: "Maldives", de: "Malediven" }
+  - code: "MW"
+    iso3: "MWI"
+    label: { en: "Malawi", de: "Malawi" }
+  - code: "MY"
+    iso3: "MYS"
+    label: { en: "Malaysia", de: "Malaysia" }
+  - code: "MZ"
+    iso3: "MOZ"
+    label: { en: "Mozambique", de: "Mosambik" }
+  - code: "NA"
+    iso3: "NAM"
+    label: { en: "Namibia", de: "Namibia" }
+  - code: "NC"
+    iso3: "NCL"
+    label: { en: "New Caledonia", de: "Neukaledonien" }
+  - code: "NE"
+    iso3: "NER"
+    label: { en: "Niger", de: "Niger" }
+  - code: "NF"
+    iso3: "NFK"
+    label: { en: "Norfolk Island", de: "Norfolkinsel" }
+  - code: "NI"
+    iso3: "NIC"
+    label: { en: "Nicaragua", de: "Nicaragua" }
+  - code: "NP"
+    iso3: "NPL"
+    label: { en: "Nepal", de: "Nepal" }
+  - code: "NR"
+    iso3: "NRU"
+    label: { en: "Nauru", de: "Nauru" }
+  - code: "NU"
+    iso3: "NIU"
+    label: { en: "Niue", de: "Niue" }
+  - code: "OM"
+    iso3: "OMN"
+    label: { en: "Oman", de: "Oman" }
+  - code: "PA"
+    iso3: "PAN"
+    label: { en: "Panama", de: "Panama" }
+  - code: "PE"
+    iso3: "PER"
+    label: { en: "Peru", de: "Peru" }
+  - code: "PF"
+    iso3: "PYF"
+    label: { en: "French Polynesia", de: "Französisch-Polynesien" }
+  - code: "PG"
+    iso3: "PNG"
+    label: { en: "Papua New Guinea", de: "Papua-Neuguinea" }
+  - code: "PH"
+    iso3: "PHL"
+    label: { en: "Philippines", de: "Philippinen" }
+  - code: "PK"
+    iso3: "PAK"
+    label: { en: "Pakistan", de: "Pakistan" }
+  - code: "PM"
+    iso3: "SPM"
+    label: { en: "St. Pierre & Miquelon", de: "St. Pierre und Miquelon" }
+  - code: "PN"
+    iso3: "PCN"
+    label: { en: "Pitcairn Islands", de: "Pitcairninseln" }
+  - code: "PR"
+    iso3: "PRI"
+    label: { en: "Puerto Rico", de: "Puerto Rico" }
+  - code: "PS"
+    iso3: "PSE"
+    label: { en: "Palestinian Territories", de: "Palästinensische Autonomiegebiete" }
+  - code: "PW"
+    iso3: "PLW"
+    label: { en: "Palau", de: "Palau" }
+  - code: "PY"
+    iso3: "PRY"
+    label: { en: "Paraguay", de: "Paraguay" }
+  - code: "QA"
+    iso3: "QAT"
+    label: { en: "Qatar", de: "Katar" }
+  - code: "RE"
+    iso3: "REU"
+    label: { en: "Réunion", de: "Réunion" }
+  - code: "RW"
+    iso3: "RWA"
+    label: { en: "Rwanda", de: "Ruanda" }
+  - code: "SB"
+    iso3: "SLB"
+    label: { en: "Solomon Islands", de: "Salomonen" }
+  - code: "SC"
+    iso3: "SYC"
+    label: { en: "Seychelles", de: "Seychellen" }
+  - code: "SD"
+    iso3: "SDN"
+    label: { en: "Sudan", de: "Sudan" }
+  - code: "SH"
+    iso3: "SHN"
+    label: { en: "St. Helena", de: "St. Helena" }
+  - code: "SJ"
+    iso3: "SJM"
+    label: { en: "Svalbard & Jan Mayen", de: "Spitzbergen und Jan Mayen" }
+  - code: "SL"
+    iso3: "SLE"
+    label: { en: "Sierra Leone", de: "Sierra Leone" }
+  - code: "SM"
+    iso3: "SMR"
+    label: { en: "San Marino", de: "San Marino" }
+  - code: "SN"
+    iso3: "SEN"
+    label: { en: "Senegal", de: "Senegal" }
+  - code: "SO"
+    iso3: "SOM"
+    label: { en: "Somalia", de: "Somalia" }
+  - code: "SR"
+    iso3: "SUR"
+    label: { en: "Suriname", de: "Suriname" }
+  - code: "SS"
+    iso3: "SSD"
+    label: { en: "South Sudan", de: "Südsudan" }
+  - code: "ST"
+    iso3: "STP"
+    label: { en: "São Tomé & Príncipe", de: "São Tomé und Príncipe" }
+  - code: "SV"
+    iso3: "SLV"
+    label: { en: "El Salvador", de: "El Salvador" }
+  - code: "SX"
+    iso3: "SXM"
+    label: { en: "Sint Maarten", de: "Sint Maarten" }
+  - code: "SY"
+    iso3: "SYR"
+    label: { en: "Syria", de: "Syrien" }
+  - code: "SZ"
+    iso3: "SWZ"
+    label: { en: "Eswatini", de: "Eswatini" }
+  - code: "TC"
+    iso3: "TCA"
+    label: { en: "Turks & Caicos Islands", de: "Turks- und Caicosinseln" }
+  - code: "TD"
+    iso3: "TCD"
+    label: { en: "Chad", de: "Tschad" }
+  - code: "TF"
+    iso3: "ATF"
+    label: { en: "French Southern Territories", de: "Französische Süd- und Antarktisgebiete" }
+  - code: "TG"
+    iso3: "TGO"
+    label: { en: "Togo", de: "Togo" }
+  - code: "TJ"
+    iso3: "TJK"
+    label: { en: "Tajikistan", de: "Tadschikistan" }
+  - code: "TK"
+    iso3: "TKL"
+    label: { en: "Tokelau", de: "Tokelau" }
+  - code: "TL"
+    iso3: "TLS"
+    label: { en: "Timor-Leste", de: "Timor-Leste" }
+  - code: "TM"
+    iso3: "TKM"
+    label: { en: "Turkmenistan", de: "Turkmenistan" }
+  - code: "TN"
+    iso3: "TUN"
+    label: { en: "Tunisia", de: "Tunesien" }
+  - code: "TO"
+    iso3: "TON"
+    label: { en: "Tonga", de: "Tonga" }
+  - code: "TT"
+    iso3: "TTO"
+    label: { en: "Trinidad & Tobago", de: "Trinidad und Tobago" }
+  - code: "TV"
+    iso3: "TUV"
+    label: { en: "Tuvalu", de: "Tuvalu" }
+  - code: "TZ"
+    iso3: "TZA"
+    label: { en: "Tanzania", de: "Tansania" }
+  - code: "UG"
+    iso3: "UGA"
+    label: { en: "Uganda", de: "Uganda" }
+  - code: "UM"
+    iso3: "UMI"
+    label: { en: "U.S. Outlying Islands", de: "Amerikanische Überseeinseln" }
+  - code: "UY"
+    iso3: "URY"
+    label: { en: "Uruguay", de: "Uruguay" }
+  - code: "UZ"
+    iso3: "UZB"
+    label: { en: "Uzbekistan", de: "Usbekistan" }
+  - code: "VA"
+    iso3: "VAT"
+    label: { en: "Vatican City", de: "Vatikanstadt" }
+  - code: "VC"
+    iso3: "VCT"
+    label: { en: "St. Vincent & Grenadines", de: "St. Vincent und die Grenadinen" }
+  - code: "VE"
+    iso3: "VEN"
+    label: { en: "Venezuela", de: "Venezuela" }
+  - code: "VG"
+    iso3: "VGB"
+    label: { en: "British Virgin Islands", de: "Britische Jungferninseln" }
+  - code: "VI"
+    iso3: "VIR"
+    label: { en: "U.S. Virgin Islands", de: "Amerikanische Jungferninseln" }
+  - code: "VN"
+    iso3: "VNM"
+    label: { en: "Vietnam", de: "Vietnam" }
+  - code: "VU"
+    iso3: "VUT"
+    label: { en: "Vanuatu", de: "Vanuatu" }
+  - code: "WF"
+    iso3: "WLF"
+    label: { en: "Wallis & Futuna", de: "Wallis und Futuna" }
+  - code: "WS"
+    iso3: "WSM"
+    label: { en: "Samoa", de: "Samoa" }
+  - code: "YE"
+    iso3: "YEM"
+    label: { en: "Yemen", de: "Jemen" }
+  - code: "YT"
+    iso3: "MYT"
+    label: { en: "Mayotte", de: "Mayotte" }
+  - code: "ZM"
+    iso3: "ZMB"
+    label: { en: "Zambia", de: "Sambia" }
+  - code: "ZW"
+    iso3: "ZWE"
+    label: { en: "Zimbabwe", de: "Simbabwe" }

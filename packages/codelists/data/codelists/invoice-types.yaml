@@ -1,0 +1,169 @@
+name: Invoice types
+bucket: invoiceTypes
+description: >
+  UNCL 1001 / EN 16931 invoice document type codes (BT-3). This is the full
+  EN 16931 allowed subset of UN/EDIFACT 1001, not just the everyday three.
+  The common outgoing-invoice types are marked `preferred` so a picker can float
+  them above the long tail: 380 commercial (the default), 381 credit note, 383
+  debit note, 384 corrected, 386 prepayment, 326 partial, 389 self-billed.
+  English names follow the
+  UN/CEFACT standard; German labels are provided for the codes a German SMB or
+  Steuerberater realistically meets, and the rest fall back to English (the
+  N-locale fallback is intentional — better an English standard name than an
+  invented German one). Hints cover the common cases.
+order: numeric by code
+authority: UN/CEFACT UNCL 1001, constrained to the EN 16931 BT-3 code list
+upstream:
+  unece: https://unece.org/trade/cefact/unppc
+  en16931: https://github.com/ConnectingEurope/eInvoicing-EN16931
+last_synced: 2026-06-14
+entries:
+  - code: "71"
+    label: { en: Request for payment }
+  - code: "80"
+    label: { en: Debit note related to goods or services }
+  - code: "82"
+    label: { en: Metered services invoice }
+  - code: "84"
+    label: { en: Debit note related to financial adjustments }
+  - code: "102"
+    label: { en: Tax notification }
+  - code: "130"
+    label: { en: Invoicing data sheet }
+  - code: "202"
+    label: { en: Direct payment valuation }
+  - code: "203"
+    label: { en: Provisional payment valuation }
+  - code: "204"
+    label: { en: Payment valuation }
+  - code: "211"
+    label: { en: Interim application for payment }
+  - code: "218"
+    label: { en: Final payment request based on completion of work }
+  - code: "219"
+    label: { en: Payment request for completed units }
+  - code: "261"
+    label: { en: Self billed credit note, de: Gutschrift im Gutschriftverfahren }
+    hint:
+      en: A credit note issued by the buyer under a self-billing agreement.
+      de: Vom Käufer ausgestellte Gutschrift im Rahmen einer Gutschriftvereinbarung.
+  - code: "262"
+    label: { en: Consolidated credit note - goods and services }
+  - code: "295"
+    label: { en: Price variation invoice }
+  - code: "296"
+    label: { en: Credit note for price variation }
+  - code: "308"
+    label: { en: Delcredere credit note }
+  - code: "325"
+    label: { en: Proforma invoice, de: Proformarechnung }
+    hint:
+      en: A non-binding draft for customs, prepayment or quotation purposes — not a VAT invoice and not booked as revenue.
+      de: Unverbindlicher Beleg für Zoll, Vorauszahlung oder Angebot — keine umsatzsteuerliche Rechnung, kein Ertragsausweis.
+  - code: "326"
+    label: { en: Partial invoice, de: Teilrechnung }
+    preferred: true
+    hint:
+      en: Bills part of an order or project before completion. The final invoice later settles the remainder.
+      de: Rechnet einen Teil eines Auftrags oder Projekts vor Fertigstellung ab. Die Schlussrechnung gleicht den Rest aus.
+  - code: "331"
+    label: { en: Commercial invoice which includes a packing list }
+  - code: "380"
+    label: { en: Commercial invoice, de: Handelsrechnung }
+    preferred: true
+    hint:
+      en: The standard outgoing invoice. The right pick for almost every B2B and B2G sale under EN 16931.
+      de: Die übliche Ausgangsrechnung. Für nahezu jeden B2B- und B2G-Verkauf nach EN 16931 die richtige Wahl.
+  - code: "381"
+    label: { en: Credit note, de: Gutschrift (Korrektur) }
+    preferred: true
+    hint:
+      en: Reduces or reverses an earlier invoice (return, discount, error fix). Amounts stay positive — the credit-note semantics handle the sign.
+      de: Mindert oder storniert eine frühere Rechnung (Rücknahme, Rabatt, Fehlerkorrektur). Beträge bleiben positiv — die Gutschriftslogik regelt das Vorzeichen.
+  - code: "383"
+    label: { en: Debit note, de: Belastungsanzeige }
+    preferred: true
+    hint:
+      en: Increases the amount the buyer owes, separately from the original invoice.
+      de: Erhöht den vom Käufer geschuldeten Betrag, getrennt von der ursprünglichen Rechnung.
+  - code: "384"
+    label: { en: Corrected invoice, de: Rechnungskorrektur }
+    preferred: true
+    hint:
+      en: A complete replacement that corrects a previously issued invoice; references the invoice it supersedes.
+      de: Vollständig ersetzende Korrektur einer bereits ausgestellten Rechnung; verweist auf die ersetzte Rechnung.
+  - code: "385"
+    label: { en: Consolidated invoice, de: Sammelrechnung }
+    hint:
+      en: One invoice covering several deliveries or earlier documents in a period.
+      de: Eine Rechnung über mehrere Lieferungen oder frühere Belege eines Zeitraums.
+  - code: "386"
+    label: { en: Prepayment invoice, de: Vorauszahlungsrechnung }
+    preferred: true
+    hint:
+      en: Invoices a payment due before delivery. Later netted off by the final invoice.
+      de: Rechnet eine vor der Lieferung fällige Zahlung ab. Wird später mit der Schlussrechnung verrechnet.
+  - code: "387"
+    label: { en: Hire invoice, de: Mietrechnung }
+  - code: "388"
+    label: { en: Tax invoice }
+  - code: "389"
+    label: { en: Self-billed invoice, de: Gutschrift (Selbstabrechnung) }
+    preferred: true
+    hint:
+      en: The buyer issues the invoice on the seller's behalf, under a prior written agreement. Common for affiliate/commission payouts.
+      de: Der Käufer stellt die Rechnung im Namen des Verkäufers aus, auf Grundlage einer vorab getroffenen schriftlichen Vereinbarung. Verbreitet bei Partner- und Provisionsabrechnungen.
+  - code: "390"
+    label: { en: Delcredere invoice }
+  - code: "393"
+    label: { en: Factored invoice, de: Factoring-Rechnung }
+    hint:
+      en: An invoice whose receivable has been assigned to a factor; payment goes to the factor.
+      de: Rechnung, deren Forderung an einen Factor abgetreten wurde; die Zahlung geht an den Factor.
+  - code: "394"
+    label: { en: Lease invoice, de: Leasingrechnung }
+  - code: "395"
+    label: { en: Consignment invoice, de: Konsignationsrechnung }
+  - code: "396"
+    label: { en: Factored credit note }
+  - code: "420"
+    label: { en: Optical Character Reading (OCR) payment credit note }
+  - code: "456"
+    label: { en: Debit advice }
+  - code: "457"
+    label: { en: Reversal of debit }
+  - code: "458"
+    label: { en: Reversal of credit }
+  - code: "527"
+    label: { en: Self billed debit note }
+  - code: "575"
+    label: { en: Insurer's invoice, de: Versicherungsrechnung }
+  - code: "623"
+    label: { en: Forwarder's invoice, de: Speditionsrechnung }
+  - code: "633"
+    label: { en: Port charges documents }
+  - code: "751"
+    label: { en: Invoice information for accounting purposes, de: Rechnungsinformation für Buchhaltungszwecke }
+    hint:
+      en: Carries invoice data for booking only — not a payable invoice itself. Used in some accounting integrations.
+      de: Überträgt Rechnungsdaten nur zur Verbuchung — selbst keine zahlbare Rechnung. In manchen Buchhaltungsintegrationen genutzt.
+  - code: "780"
+    label: { en: Freight invoice, de: Frachtrechnung }
+  - code: "817"
+    label: { en: Claim notification }
+  - code: "870"
+    label: { en: Consignment invoice }
+  - code: "875"
+    label: { en: Partial construction invoice, de: Bauabschlagsrechnung }
+    hint:
+      en: An interim invoice for a construction project (German Abschlagsrechnung).
+      de: Abschlagsrechnung für ein Bauvorhaben.
+  - code: "876"
+    label: { en: Partial final construction invoice, de: Bauteilschlussrechnung }
+  - code: "877"
+    label: { en: Final construction invoice, de: Bauschlussrechnung }
+    hint:
+      en: The closing invoice of a construction project, settling all prior partial invoices.
+      de: Schlussrechnung eines Bauvorhabens, die alle vorherigen Abschlagsrechnungen ausgleicht.
+  - code: "935"
+    label: { en: Customs invoice, de: Zollrechnung }

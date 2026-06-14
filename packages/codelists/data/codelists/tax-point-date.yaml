@@ -1,0 +1,25 @@
+name: Tax point date codes
+bucket: taxPointDateCode
+description: >
+  UNTDID 2005 tax-point date codes used by EN 16931 (BT-8).
+order: numeric by code (3 entries — order isn't meaningful)
+authority: UN/CEFACT UNTDID 2005
+upstream:
+  unece: https://unece.org/trade/cefact/unppc
+last_synced: 2026-05-19
+entries:
+  - code: "3"
+    label: { en: Invoice date,      de: Rechnungsdatum }
+    hint:
+      en: VAT becomes payable on the day the invoice is issued (the default in most jurisdictions).
+      de: Die USt. entsteht am Ausstellungstag der Rechnung (Standardfall in den meisten Ländern).
+  - code: "35"
+    label: { en: Delivery date,     de: Lieferdatum }
+    hint:
+      en: VAT becomes payable when the goods or services are delivered. Common when delivery and invoicing diverge in time.
+      de: Die USt. entsteht mit der Lieferung oder Leistungserbringung. Üblich, wenn Leistung und Rechnung zeitlich auseinanderfallen.
+  - code: "432"
+    label: { en: Payment due date,  de: Fälligkeitsdatum }
+    hint:
+      en: VAT becomes payable when payment falls due (cash-accounting schemes). Only valid in some countries — check local rules.
+      de: Die USt. entsteht zum Fälligkeitstag (Ist-Versteuerung). Nur in bestimmten Ländern zulässig — nationale Regeln prüfen.

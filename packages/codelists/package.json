@@ -1,0 +1,38 @@
+{
+  "name": "@facturion/codelists",
+  "version": "0.1.0",
+  "description": "Friendly, multilingual EN 16931 / UN-CEFACT e-invoicing code lists (units, VAT categories, payment means, invoice types, countries, currencies, Peppol EAS schemes) with curated labels and explanatory hints.",
+  "keywords": ["en16931", "einvoicing", "peppol", "codelists", "vat", "untdid", "iso-3166", "iso-4217", "i18n"],
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    },
+    "./generate": {
+      "types": "./dist/src/generate.d.ts",
+      "default": "./dist/src/generate.js"
+    }
+  },
+  "files": ["dist", "data", "generated/buckets/*.json", "README.md", "LICENSE", "NOTICE"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "generate": "tsx src/generate.ts",
+    "sync": "tsx src/sync.ts",
+    "test": "node --import tsx --test test/*.test.ts",
+    "prepare": "npm run generate && npm run build",
+    "prepublishOnly": "npm test"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.0.0",
+    "js-yaml": "^4.1.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,37 @@
+@facturion/codelists
+=====================
+
+This package is licensed under the MIT License (see LICENSE).
+
+It incorporates or derives data from the following upstream sources. The code
+values and English names of standardized code lists are facts drawn from public
+standards; the curated subsets, the multilingual labels sourced as noted below,
+and all explanatory "hint" text are the original contribution of this package.
+
+--------------------------------------------------------------------------------
+Unicode CLDR (Common Locale Data Repository)
+  Used for: localized country and currency display names (all locales).
+  Source:   https://github.com/unicode-org/cldr-json
+  License:  Unicode License v3 (SPDX: Unicode-3.0) — permissive, MIT-compatible.
+            https://www.unicode.org/license.txt
+
+--------------------------------------------------------------------------------
+OpenPEPPOL eDEC Code Lists
+  Used for: Peppol participant identifier (EAS) scheme codes, names and the
+            per-scheme country association.
+  Source:   https://github.com/OpenPEPPOL/edec-codelists
+  License:  Apache License 2.0.
+            https://www.apache.org/licenses/LICENSE-2.0
+
+--------------------------------------------------------------------------------
+UN/CEFACT code lists
+  Used for: units of measure (Rec 20/21), payment means (UNTDID 4461), VAT
+            category codes (UNTDID 5305), invoice type codes (UNCL 1001),
+            tax-point date codes (UNTDID 2005), item classification schemes
+            (UNTDID 7143).
+  Codes and standard names are published international-standard data.
+  Reference: https://unece.org/trade/uncefact/
+
+--------------------------------------------------------------------------------
+ISO 3166-1 (country codes) and ISO 4217 (currency codes)
+  Code values are published ISO standard identifiers.

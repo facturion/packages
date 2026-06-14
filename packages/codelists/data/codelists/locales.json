@@ -1,0 +1,5 @@
+{
+  "_comment": "Declared locales for every codelist label/hint/plural. `default` MUST be present on every entry's label; other locales are optional and fall back to the default at lookup time. Add a locale here, then fill labels (or let the sync tool pull localized country/currency names from CLDR).",
+  "locales": ["en", "de"],
+  "default": "en"
+}

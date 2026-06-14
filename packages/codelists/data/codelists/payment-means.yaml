@@ -1,0 +1,75 @@
+name: Payment means
+bucket: paymentMeans
+description: >
+  UNTDID 4461 payment means codes — subset commonly seen on European
+  e-invoices. Used when payment.means_text is absent.
+order: curated by frequency (credit transfer + SEPA first, "not defined" last)
+authority: UN/CEFACT UNTDID 4461
+upstream:
+  unece: https://unece.org/trade/cefact/unppc
+last_synced: 2026-05-19
+entries:
+  - code: "30"
+    label: { en: Credit transfer,                 de: Überweisung }
+    hint:
+      en: Generic bank transfer. Use 58 if you specifically want to signal a SEPA transfer.
+      de: Allgemeine Banküberweisung. Für ausdrücklich SEPA-Zahlungen 58 verwenden.
+  - code: "58"
+    label: { en: SEPA credit transfer,            de: SEPA-Überweisung }
+    hint:
+      en: SEPA-area euro transfer. The most common code on EU B2B invoices.
+      de: Euro-Überweisung im SEPA-Raum. Üblichster Code auf EU-B2B-Rechnungen.
+  - code: "59"
+    label: { en: SEPA direct debit,               de: SEPA-Lastschrift }
+    hint:
+      en: SEPA direct debit; requires a signed mandate from the buyer.
+      de: SEPA-Lastschrift; erfordert ein unterzeichnetes Mandat des Zahlungspflichtigen.
+  - code: "49"
+    label: { en: Direct debit,                    de: Lastschrift }
+    hint:
+      en: Non-SEPA direct debit. Use 59 for euro/SEPA mandates.
+      de: Lastschrift außerhalb von SEPA. Für SEPA-Mandate 59 verwenden.
+  - code: "48"
+    label: { en: Bank card,                       de: Bankkarte }
+    hint:
+      en: Generic payment card (when the card type isn't being distinguished).
+      de: Allgemeine Zahlungskarte (wenn der Kartentyp nicht unterschieden wird).
+  - code: "54"
+    label: { en: Credit card,                     de: Kreditkarte }
+    hint:
+      en: Specifically a credit card (Visa, Mastercard, Amex, …).
+      de: Ausdrücklich Kreditkarte (Visa, Mastercard, Amex …).
+  - code: "55"
+    label: { en: Debit card,                      de: Debitkarte }
+    hint:
+      en: Specifically a debit card (incl. EC/Girocard).
+      de: Ausdrücklich Debitkarte (z. B. EC-/Girocard).
+  - code: "57"
+    label: { en: Standing order,                  de: Dauerauftrag }
+    hint:
+      en: Recurring transfer set up by the payer at their bank.
+      de: Wiederkehrender Auftrag, vom Zahler bei seiner Bank eingerichtet.
+  - code: "42"
+    label: { en: Credit transfer to bank account, de: Überweisung auf Bankkonto }
+    hint:
+      en: Legacy "transfer to bank account" code. Most invoicing software now uses 30 or 58 instead.
+      de: Veralteter Code "Überweisung auf Bankkonto". Heute meist durch 30 oder 58 ersetzt.
+  - code: "10"
+    label: { en: Cash,                            de: Barzahlung }
+  - code: "20"
+    label: { en: Cheque,                          de: Scheck }
+  - code: "68"
+    label: { en: Online payment,                  de: Online-Zahlung }
+    hint:
+      en: Web payment service or wallet (PayPal, Stripe Checkout, …). The free-text field usually names the provider.
+      de: Online-Bezahldienst oder Wallet (PayPal, Stripe Checkout …). Der Anbieter steht meist im Freitextfeld.
+  - code: "97"
+    label: { en: Clearing between partners,       de: Verrechnung }
+    hint:
+      en: Mutual offset of receivables and payables — no money actually moves.
+      de: Verrechnung gegenseitiger Forderungen und Verbindlichkeiten — es fließt kein Geld.
+  - code: "1"
+    label: { en: Instrument not defined,          de: Nicht definiert }
+    hint:
+      en: Fallback when none of the other codes fits. Use sparingly — most software prefers a concrete code.
+      de: Ausweichoption, wenn keiner der anderen Codes passt. Sparsam einsetzen — Software bevorzugt konkrete Codes.

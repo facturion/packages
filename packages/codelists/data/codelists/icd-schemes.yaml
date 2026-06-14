@@ -1,0 +1,359 @@
+name: ICD / EAS schemes
+bucket: icdSchemes
+description: >
+  ISO/IEC 6523 ICD codes (a.k.a. PEPPOL EAS list). Used wherever EN 16931
+  expects a "scheme identifier" beside an issuer identifier (BT-34 buyer
+  electronic address, BT-29 / BT-46 party identifier, BT-30 / BT-47 legal
+  registration, BT-157 item standard ID). Curated subset weighted toward
+  codes seen on EU B2B and B2G invoices; the form accepts free input for
+  anything outside the list.
+order: numeric by code (4-digit, zero-padded — string sort matches numeric here)
+authority: ISO/IEC 6523 + PEPPOL EAS
+upstream:
+  peppol: https://github.com/OpenPEPPOL/peppol-codelists
+  iso: https://www.iso.org/standard/14409.html
+last_synced: 2026-05-19
+entries:
+  - code: "0002"
+    country: "FR"
+    label: { en: "System Information et Repertoire des Entreprise et des Etablissements: SIRENE", de: "System Information et Repertoire des Entreprise et des Etablissements: SIRENE" }
+    hint:
+      en: 9-digit French legal-entity identifier (SIREN). Use SIRET (0009) when the establishment-level suffix matters.
+      de: 9-stellige französische Kennung der juristischen Person (SIREN). Für die etablissementbezogene Variante SIRET (0009) wählen.
+  - code: "0007"
+    country: "SE"
+    label: { en: "Organisationsnummer (SE)", de: "Organisationsnummer (SE)" }
+  - code: "0009"
+    country: "FR"
+    label: { en: "SIRET (FR)", de: "SIRET (FR)" }
+    preferred: true
+    hint:
+      en: 14-digit French establishment identifier (SIREN + 5-digit suffix). Identifies a specific site, not just the legal entity.
+      de: 14-stellige französische Etablissement-Kennung (SIREN + 5-stelliger Zusatz). Identifiziert einen konkreten Standort, nicht nur die juristische Person.
+  - code: "0037"
+    country: "FI"
+    label: { en: "LY-tunnus (FI)", de: "LY-tunnus (FI)" }
+  - code: "0060"
+    country: "international"
+    label: { en: "D-U-N-S Number", de: "D-U-N-S-Nummer" }
+    preferred: true
+    hint:
+      en: Dun & Bradstreet global business identifier. Frequently requested by US and large international buyers.
+      de: Globale Unternehmenskennung von Dun & Bradstreet. Häufig von US-amerikanischen und internationalen Großkunden verlangt.
+  - code: "0088"
+    country: "international"
+    label: { en: "GLN (Global Location Number)", de: "GLN (Global Location Number)" }
+    preferred: true
+    hint:
+      en: GS1 location identifier; the standard pick in retail, logistics, and healthcare supply chains.
+      de: GS1-Standortkennung; Standard im Einzelhandel, in der Logistik und in Gesundheits-Lieferketten.
+  - code: "0096"
+    country: "DK"
+    label: { en: "DK Chamber of Commerce", de: "Dänische Handelskammer" }
+  - code: "0097"
+    country: "IT"
+    label: { en: "FTI - Ediforum Italia", de: "FTI - Ediforum Italia" }
+  - code: "0106"
+    country: "NL"
+    label: { en: "KVK (NL Chamber of Commerce)", de: "KVK (Niederländische Handelskammer)" }
+    hint:
+      en: Dutch chamber-of-commerce registration number — the standard B2B identifier in the Netherlands.
+      de: Niederländische Handelskammer-Registrierungsnummer — übliche B2B-Kennung in den Niederlanden.
+  - code: "0130"
+    country: "international"
+    label: { en: "Directorates of the European Commission", de: "Directorates of the European Commission" }
+  - code: "0135"
+    country: "IT"
+    label: { en: "SIA Object Identifiers", de: "SIA Object Identifiers" }
+  - code: "0142"
+    country: "IT"
+    label: { en: "SECETI Object Identifiers", de: "SECETI Object Identifiers" }
+  - code: "0151"
+    country: "AU"
+    label: { en: "ABN (Australia)", de: "ABN (Australien)" }
+  - code: "0160"
+    label: { en: "GTIN", de: "GTIN" }
+    preferred: true
+    hint:
+      en: GS1 product barcode (EAN/UPC superset). Use for retail items, not for parties or locations.
+      de: GS1-Produkt-Barcode (Obermenge von EAN/UPC). Für Handelsware geeignet, nicht für Parteien oder Standorte.
+  - code: "0183"
+    country: "CH"
+    label: { en: "IDE / UID (CH)", de: "IDE / UID (CH)" }
+    preferred: true
+    hint:
+      en: Swiss enterprise identification number (UID/IDE). Mandatory on Swiss commercial invoices.
+      de: Schweizer Unternehmens-Identifikationsnummer (UID/IDE). Auf Schweizer Handelsrechnungen vorgeschrieben.
+  - code: "0184"
+    country: "DK"
+    label: { en: "CVR (DK)", de: "CVR (DK)" }
+    preferred: true
+    hint:
+      en: Danish central business register number — the standard B2B identifier in Denmark.
+      de: Dänische zentrale Unternehmensregisternummer — übliche B2B-Kennung in Dänemark.
+  - code: "0188"
+    country: "JP"
+    label: { en: "Corporate Number of The Social Security and Tax Number System", de: "Corporate Number of The Social Security and Tax Number System" }
+  - code: "0190"
+    country: "NL"
+    label: { en: "OIN (NL)", de: "OIN (NL)" }
+    hint:
+      en: Dutch public-sector identifier. Required when invoicing Dutch government bodies.
+      de: Niederländische Kennung des öffentlichen Sektors. Bei Rechnungen an niederländische Behörden erforderlich.
+  - code: "0191"
+    country: "EE"
+    label: { en: "Registry code (EE)", de: "Registrierungscode (EE)" }
+  - code: "0192"
+    country: "NO"
+    label: { en: "Enhetsregisteret (NO)", de: "Enhetsregisteret (NO)" }
+    preferred: true
+    hint:
+      en: Norwegian central enterprise register number — the standard B2B identifier in Norway.
+      de: Norwegische zentrale Unternehmensregisternummer — übliche B2B-Kennung in Norwegen.
+  - code: "0193"
+    country: "BE"
+    label: { en: "UBL.BE party identifier", de: "UBL.BE-Parteikennung" }
+  - code: "0195"
+    country: "SG"
+    label: { en: "UEN (Singapore)", de: "UEN (Singapur)" }
+  - code: "0196"
+    country: "IS"
+    label: { en: "Kennitala (IS)", de: "Kennitala (IS)" }
+  - code: "0198"
+    country: "DK"
+    label: { en: "ERSTORG (DK)", de: "ERSTORG (DK)" }
+  - code: "0199"
+    country: "international"
+    label: { en: "LEI (Legal Entity Identifier)", de: "LEI (Legal Entity Identifier)" }
+    preferred: true
+    hint:
+      en: 20-character ISO identifier for legal entities. Required by EU regulations for financial counterparties (banks, insurers, funds).
+      de: 20-stellige ISO-Kennung für juristische Personen. Nach EU-Vorgaben für Finanzgegenparteien (Banken, Versicherer, Fonds) verpflichtend.
+  - code: "0200"
+    country: "LT"
+    label: { en: "Legal entity code", de: "Legal entity code" }
+  - code: "0201"
+    country: "IT"
+    label: { en: "Codice Univoco UO (IT)", de: "Codice Univoco UO (IT)" }
+  - code: "0202"
+    label: { en: "PEC of public administration (IT)", de: "PEC der öffentlichen Verwaltung (IT)" }
+  - code: "0204"
+    country: "DE"
+    label: { en: "Leitweg-ID (DE)", de: "Leitweg-ID (DE)" }
+    preferred: true
+    hint:
+      en: Required by German federal and most state public-sector buyers — it routes the invoice to the correct receiving office.
+      de: Erforderlich bei Bund und den meisten Ländern in Deutschland — leitet die Rechnung an die richtige Empfangsstelle.
+  - code: "0205"
+    country: "IT"
+    label: { en: "CODDEST", de: "CODDEST" }
+  - code: "0208"
+    country: "BE"
+    label: { en: "Enterprise number (BE)", de: "Unternehmensnummer (BE)" }
+    hint:
+      en: Belgian KBO/BCE enterprise number — the standard B2B identifier in Belgium.
+      de: Belgische KBO/BCE-Unternehmensnummer — übliche B2B-Kennung in Belgien.
+  - code: "0209"
+    country: "international"
+    label: { en: "GS1 identification key", de: "GS1-Identifikationsschlüssel" }
+  - code: "0210"
+    country: "IT"
+    label: { en: "Codice Fiscale (IT)", de: "Codice Fiscale (IT)" }
+    hint:
+      en: Italian fiscal code (16 alphanumeric for individuals, 11 digits for companies). Different from Partita IVA — use 0211 for the VAT number.
+      de: Italienische Steuernummer (16 alphanumerisch für Personen, 11-stellig für Unternehmen). Für die USt-IdNr. 0211 verwenden.
+  - code: "0211"
+    country: "IT"
+    label: { en: "Partita IVA (IT)", de: "Partita IVA (IT)" }
+    preferred: true
+    hint:
+      en: 11-digit Italian VAT number. Use 0210 for the Codice Fiscale.
+      de: 11-stellige italienische USt-IdNr. Für den Codice Fiscale 0210 verwenden.
+  - code: "0212"
+    country: "FI"
+    label: { en: "Organization identifier (FI)", de: "Organisationskennung (FI)" }
+  - code: "0213"
+    country: "FI"
+    label: { en: "Organization VAT identifier (FI)", de: "Umsatzsteuerkennung der Organisation (FI)" }
+  - code: "0216"
+    country: "FI"
+    label: { en: "OVTcode", de: "OVTcode" }
+  - code: "0218"
+    country: "LV"
+    label: { en: "Unified registration number", de: "Unified registration number" }
+  - code: "0221"
+    country: "JP"
+    label: { en: "The registered number of the qualified invoice issuer", de: "The registered number of the qualified invoice issuer" }
+  - code: "0225"
+    country: "FR"
+    label: { en: "FRCTC Electronic Address", de: "FRCTC Electronic Address" }
+  - code: "0230"
+    country: "MY"
+    label: { en: "National e-Invoicing Framework", de: "National e-Invoicing Framework" }
+  - code: "0235"
+    country: "AE"
+    label: { en: "UAE Tax Identification Number (TIN)", de: "UAE Tax Identification Number (TIN)" }
+  - code: "0240"
+    country: "LU"
+    label: { en: "Register of legal persons", de: "Register of legal persons" }
+  - code: "0242"
+    country: "international"
+    label: { en: "OpenPeppol Service Provider Identification Scheme", de: "OpenPeppol Service Provider Identification Scheme" }
+  - code: "0244"
+    country: "NG"
+    label: { en: "Tax Identification (Tax ID)", de: "Tax Identification (Tax ID)" }
+  - code: "0245"
+    country: "SK"
+    label: { en: "Tax identification number (DIČ)", de: "Tax identification number (DIČ)" }
+  - code: "0246"
+    country: "DE"
+    label: { en: "German Electronic Business Address", de: "German Electronic Business Address" }
+    hint:
+      en: Electronic business address for German B2B routing. Use 0204 (Leitweg-ID) for German public-sector buyers.
+      de: Elektronische Geschäftsadresse für deutsches B2B-Routing. Für deutsche öffentliche Auftraggeber stattdessen 0204 (Leitweg-ID) verwenden.
+  - code: "0248"
+    country: "OM"
+    label: { en: "Oman Value Added Tax Identification Number (VATIN)", de: "Oman Value Added Tax Identification Number (VATIN)" }
+  - code: "9906"
+    country: "IT"
+    label: { en: "Italy VAT number", de: "USt-IdNr. Italien" }
+  - code: "9907"
+    country: "IT"
+    label: { en: "Italy fiscal code", de: "Steuernummer Italien" }
+  - code: "9910"
+    country: "HU"
+    label: { en: "Hungary VAT number", de: "USt-IdNr. Ungarn" }
+  - code: "9913"
+    country: "international"
+    label: { en: "Business Registers Network", de: "Business Registers Network" }
+  - code: "9914"
+    country: "AT"
+    label: { en: "Austria VAT number", de: "USt-IdNr. Österreich" }
+    preferred: true
+    hint:
+      en: Austrian VAT identification number (UID). Format starts with "ATU" followed by 8 digits.
+      de: Österreichische Umsatzsteuer-Identifikationsnummer (UID). Format "ATU" plus 8 Ziffern.
+  - code: "9915"
+    country: "AT"
+    label: { en: "Austria org. identifier (PA)", de: "Org.-Kennung Österreich (öff. Verwaltung)" }
+  - code: "9918"
+    country: "international"
+    label: { en: "SOCIETY FOR WORLDWIDE INTERBANK FINANCIAL, TELECOMMUNICATION S.W.I.F.T", de: "SOCIETY FOR WORLDWIDE INTERBANK FINANCIAL, TELECOMMUNICATION S.W.I.F.T" }
+  - code: "9919"
+    country: "AT"
+    label: { en: "Kennziffer des Unternehmensregisters", de: "Kennziffer des Unternehmensregisters" }
+  - code: "9920"
+    country: "ES"
+    label: { en: "Spain VAT number", de: "USt-IdNr. Spanien" }
+  - code: "9922"
+    country: "AD"
+    label: { en: "Andorra VAT number", de: "USt-IdNr. Andorra" }
+  - code: "9923"
+    country: "AL"
+    label: { en: "Albania VAT number", de: "USt-IdNr. Albanien" }
+  - code: "9924"
+    country: "BA"
+    label: { en: "Bosnia and Herzegovina VAT number", de: "Bosnia and Herzegovina VAT number" }
+  - code: "9925"
+    country: "BE"
+    label: { en: "Belgium VAT number", de: "Belgium VAT number" }
+  - code: "9926"
+    country: "BG"
+    label: { en: "Bulgaria VAT number", de: "Bulgaria VAT number" }
+  - code: "9927"
+    country: "CH"
+    label: { en: "Switzerland VAT number", de: "Switzerland VAT number" }
+  - code: "9928"
+    country: "CY"
+    label: { en: "Cyprus VAT number", de: "Cyprus VAT number" }
+  - code: "9929"
+    country: "CZ"
+    label: { en: "Czech Republic VAT number", de: "Czech Republic VAT number" }
+  - code: "9930"
+    country: "DE"
+    label: { en: "Germany VAT number", de: "USt-IdNr. Deutschland" }
+    preferred: true
+    hint:
+      en: German VAT identification number (USt-IdNr.). Use 0204 (Leitweg-ID) instead when invoicing German public-sector buyers.
+      de: Deutsche Umsatzsteuer-Identifikationsnummer. Für deutsche öffentliche Auftraggeber stattdessen 0204 (Leitweg-ID) verwenden.
+  - code: "9931"
+    country: "EE"
+    label: { en: "Greece VAT number", de: "USt-IdNr. Griechenland" }
+  - code: "9932"
+    country: "GB"
+    label: { en: "Hungary VAT number (alt)", de: "USt-IdNr. Ungarn (alt)" }
+  - code: "9933"
+    country: "GR"
+    label: { en: "Italy VAT number (alt)", de: "USt-IdNr. Italien (alt)" }
+  - code: "9934"
+    country: "HR"
+    label: { en: "Croatia VAT number", de: "Croatia VAT number" }
+  - code: "9935"
+    country: "IE"
+    label: { en: "Ireland VAT number", de: "Ireland VAT number" }
+  - code: "9936"
+    country: "LI"
+    label: { en: "Liechtenstein VAT number", de: "Liechtenstein VAT number" }
+  - code: "9937"
+    country: "LT"
+    label: { en: "Lithuania VAT number", de: "Lithuania VAT number" }
+  - code: "9938"
+    country: "LU"
+    label: { en: "Luxemburg VAT number", de: "Luxemburg VAT number" }
+  - code: "9939"
+    country: "LV"
+    label: { en: "Latvia VAT number", de: "Latvia VAT number" }
+  - code: "9940"
+    country: "MC"
+    label: { en: "Monaco VAT number", de: "Monaco VAT number" }
+  - code: "9941"
+    country: "ME"
+    label: { en: "Montenegro VAT number", de: "Montenegro VAT number" }
+  - code: "9942"
+    country: "MK"
+    label: { en: "Macedonia, the former Yugoslav Republic of VAT number", de: "Macedonia, the former Yugoslav Republic of VAT number" }
+  - code: "9943"
+    country: "MT"
+    label: { en: "Malta VAT number", de: "Malta VAT number" }
+  - code: "9944"
+    country: "NL"
+    label: { en: "Netherlands VAT number", de: "USt-IdNr. Niederlande" }
+  - code: "9945"
+    country: "PL"
+    label: { en: "Poland VAT number", de: "Poland VAT number" }
+  - code: "9946"
+    country: "PT"
+    label: { en: "Poland VAT number", de: "USt-IdNr. Polen" }
+  - code: "9947"
+    country: "RO"
+    label: { en: "Portugal VAT number", de: "USt-IdNr. Portugal" }
+  - code: "9948"
+    country: "RS"
+    label: { en: "Romania VAT number", de: "USt-IdNr. Rumänien" }
+  - code: "9949"
+    country: "SI"
+    label: { en: "Slovenia VAT number", de: "Slovenia VAT number" }
+  - code: "9950"
+    country: "SK"
+    label: { en: "Slovakia VAT number", de: "Slovakia VAT number" }
+  - code: "9951"
+    country: "SM"
+    label: { en: "San Marino VAT number", de: "San Marino VAT number" }
+  - code: "9952"
+    country: "TR"
+    label: { en: "Sweden VAT number", de: "USt-IdNr. Schweden" }
+  - code: "9953"
+    country: "VA"
+    label: { en: "Holy See (Vatican City State) VAT number", de: "Holy See (Vatican City State) VAT number" }
+  - code: "9955"
+    country: "SE"
+    label: { en: "Slovenia VAT number", de: "USt-IdNr. Slowenien" }
+  - code: "9956"
+    country: "BE"
+    label: { en: "Belgium VAT number", de: "USt-IdNr. Belgien" }
+  - code: "9957"
+    country: "FR"
+    label: { en: "France VAT number", de: "USt-IdNr. Frankreich" }
+  - code: "9959"
+    country: "US"
+    label: { en: "US Employer ID Number", de: "US Employer ID Number" }

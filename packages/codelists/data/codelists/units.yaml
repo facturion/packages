@@ -1,0 +1,129 @@
+name: Units of measure
+bucket: units
+description: >
+  UN/ECE Rec 20 + Rec 21 unit codes — the subset realistic for business
+  invoices. Unknown codes fall back to the raw code at render time.
+order: curated groups by physical kind (counts, time, mass, length, area/volume, energy)
+authority: UN/CEFACT Rec 20 / Rec 21
+upstream:
+  peppol: https://github.com/OpenPEPPOL/peppol-codelists
+  unece: https://unece.org/trade/cefact/recommendations
+last_synced: 2026-05-19
+entries:
+  # Counts
+  - code: C62
+    label:  { en: Unitless,  de: Ohne Einheit }
+    plural: { en: Unitless,  de: Ohne Einheit }
+    hint:
+      en: Dimensionless count — fits services, flat fees and abstract units of work (e.g. a lump-sum travel allowance).
+      de: Stückzahl ohne Maßeinheit — passend für Dienstleistungen, Pauschalen und abstrakte Leistungseinheiten (z. B. eine Reisekostenpauschale).
+  - code: EA
+    label:  { en: Each,     de: Stück }
+    plural: { en: Each,     de: Stück }
+    hint:
+      en: Common in US and legacy systems. Use H87 for new records unless a receiver requires EA.
+      de: Üblich in US- und Altsystemen. Für neue Datensätze H87 verwenden, sofern der Empfänger nicht EA verlangt.
+  - code: H87
+    label:  { en: Piece,    de: Stück }
+    plural: { en: Pieces,   de: Stück }
+    hint:
+      en: Recommended for discrete countable items.
+      de: Empfohlen für zählbare Einzelartikel.
+  - code: NAR
+    label:  { en: Article,  de: Artikel }
+    plural: { en: Articles, de: Artikel }
+  - code: NPR
+    label:  { en: Pair,     de: Paar }
+    plural: { en: Pairs,    de: Paar }
+  - code: PCE
+    label:  { en: Piece,    de: Stück }
+    plural: { en: Pieces,   de: Stück }
+    hint:
+      en: Legacy alias of H87. Some bookkeeping systems still emit PCE; prefer H87 for new records.
+      de: Veralteter Alias für H87. Einige Buchhaltungssysteme nutzen weiterhin PCE; für neue Datensätze H87 bevorzugen.
+  - code: SET
+    label:  { en: Set,      de: Satz }
+    plural: { en: Sets,     de: Sätze }
+  - code: DZN
+    label:  { en: Dozen,    de: Dutzend }
+    plural: { en: Dozen,    de: Dutzend }
+  - code: XPP
+    label:  { en: Package,  de: Packung }
+    plural: { en: Packages, de: Packungen }
+  - code: XBX
+    label:  { en: Box,      de: Karton }
+    plural: { en: Boxes,    de: Kartons }
+  # Time
+  - code: ANN
+    label:  { en: Year,     de: Jahr }
+    plural: { en: Years,    de: Jahre }
+  - code: MON
+    label:  { en: Month,    de: Monat }
+    plural: { en: Months,   de: Monate }
+  - code: WEE
+    label:  { en: Week,     de: Woche }
+    plural: { en: Weeks,    de: Wochen }
+  - code: DAY
+    label:  { en: Day,      de: Tag }
+    plural: { en: Days,     de: Tage }
+  - code: HUR
+    label:  { en: Hour,     de: Stunde }
+    plural: { en: Hours,    de: Stunden }
+  - code: MIN
+    label:  { en: Minute,   de: Minute }
+    plural: { en: Minutes,  de: Minuten }
+  - code: SEC
+    label:  { en: Second,   de: Sekunde }
+    plural: { en: Seconds,  de: Sekunden }
+  # Mass
+  - code: TNE
+    label:  { en: Tonne,      de: Tonne }
+    plural: { en: Tonnes,     de: Tonnen }
+  - code: KGM
+    label:  { en: Kilogram,   de: Kilogramm }
+    plural: { en: Kilograms,  de: Kilogramm }
+  - code: GRM
+    label:  { en: Gram,       de: Gramm }
+    plural: { en: Grams,      de: Gramm }
+  - code: MGM
+    label:  { en: Milligram,  de: Milligramm }
+    plural: { en: Milligrams, de: Milligramm }
+  # Length
+  - code: KMT
+    label:  { en: Kilometre,   de: Kilometer }
+    plural: { en: Kilometres,  de: Kilometer }
+  - code: MTR
+    label:  { en: Metre,       de: Meter }
+    plural: { en: Metres,      de: Meter }
+  - code: CMT
+    label:  { en: Centimetre,  de: Zentimeter }
+    plural: { en: Centimetres, de: Zentimeter }
+  - code: MMT
+    label:  { en: Millimetre,  de: Millimeter }
+    plural: { en: Millimetres, de: Millimeter }
+  # Area / volume
+  - code: MTK
+    label:  { en: "m²", de: "m²" }
+    plural: { en: "m²", de: "m²" }
+  - code: MTQ
+    label:  { en: "m³", de: "m³" }
+    plural: { en: "m³", de: "m³" }
+  - code: LTR
+    label:  { en: Litre,       de: Liter }
+    plural: { en: Litres,      de: Liter }
+  - code: HLT
+    label:  { en: Hectolitre,  de: Hektoliter }
+    plural: { en: Hectolitres, de: Hektoliter }
+  - code: MLT
+    label:  { en: Millilitre,  de: Milliliter }
+    plural: { en: Millilitres, de: Milliliter }
+  # Energy / frequency
+  - code: KWH
+    label:  { en: kWh, de: kWh }
+    plural: { en: kWh, de: kWh }
+  - code: MWH
+    label:  { en: MWh, de: MWh }
+    plural: { en: MWh, de: MWh }
+  - code: D30
+    label:  { en: Megajoule,  de: Megajoule }
+    plural: { en: Megajoules, de: Megajoule }

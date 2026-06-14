@@ -1,0 +1,55 @@
+name: VAT categories
+bucket: vatCategory
+description: >
+  UNTDID 5305 VAT category codes — subset relevant to EN 16931 invoices.
+order: curated by frequency (S standard rate first, then Z/E/AE for the cross-border common cases)
+authority: UN/CEFACT UNTDID 5305
+upstream:
+  unece: https://unece.org/trade/cefact/unppc
+last_synced: 2026-05-19
+entries:
+  - code: S
+    label: { en: Standard rate,            de: Standardsatz }
+    hint:
+      en: The normal VAT rate that applies in your country (e.g. 19 % in Germany).
+      de: Der normale USt.-Satz Ihres Landes (z. B. 19 % in Deutschland).
+  - code: Z
+    label: { en: Zero rated,               de: Nullsatz }
+    hint:
+      en: Taxable at 0 %; the transaction is still in the VAT system. Different from "exempt" — input VAT can still be deducted.
+      de: Steuerbar zum Satz 0 %; der Vorgang bleibt im USt.-System. Anders als "befreit" — Vorsteuerabzug bleibt möglich.
+  - code: E
+    label: { en: Exempt from VAT,          de: Steuerbefreit }
+    hint:
+      en: Outside the VAT system altogether (e.g. medical, education, some financial services). Input VAT is generally not deductible.
+      de: Außerhalb des USt.-Systems (z. B. medizinische Leistungen, Bildung, bestimmte Finanzdienstleistungen). Vorsteuerabzug i. d. R. ausgeschlossen.
+  - code: AE
+    label: { en: Reverse charge,           de: Reverse-Charge }
+    hint:
+      en: The buyer reports and pays the VAT, not you. Common for cross-border B2B services within the EU.
+      de: Der Empfänger schuldet die USt., nicht Sie. Üblich bei grenzüberschreitenden B2B-Dienstleistungen innerhalb der EU.
+  - code: K
+    label: { en: Intra-community supply,   de: Innergemeinschaftliche Lieferung }
+    hint:
+      en: EU B2B goods crossing a border; the buyer accounts for VAT in their country. Both parties need valid EU VAT IDs.
+      de: Innergemeinschaftliche Warenlieferung im EU-B2B; der Empfänger versteuert in seinem Land. Gültige USt-IdNrn. auf beiden Seiten erforderlich.
+  - code: G
+    label: { en: Export outside EU,        de: Ausfuhr außerhalb der EU }
+    hint:
+      en: Goods or services delivered outside the EU. Usually zero-rated; keep customs/export documentation.
+      de: Lieferungen oder Leistungen außerhalb der EU. Üblicherweise steuerfrei; Ausfuhrnachweise aufbewahren.
+  - code: O
+    label: { en: Out of scope of VAT,      de: Nicht im Geltungsbereich der USt. }
+    hint:
+      en: The transaction is not a VAT-relevant supply at all (e.g. salary recharges, dividends). Rare on commercial invoices.
+      de: Der Vorgang ist überhaupt keine umsatzsteuerbare Leistung (z. B. Gehaltsweiterberechnung, Dividenden). Auf Handelsrechnungen selten.
+  - code: L
+    label: { en: Canary Islands IGIC,      de: Kanarische Inseln IGIC }
+    hint:
+      en: Spanish Canary Islands indirect tax (not VAT). Only use if your business is established there.
+      de: Indirekte Steuer der Kanarischen Inseln (kein USt.-Pendant). Nur verwenden, wenn Ihr Betrieb dort ansässig ist.
+  - code: M
+    label: { en: Ceuta and Melilla IPSI,   de: Ceuta und Melilla IPSI }
+    hint:
+      en: Production/services tax of Spain's Ceuta and Melilla enclaves. Only use if your business is established there.
+      de: Steuer auf Produktion und Dienstleistungen in Ceuta und Melilla. Nur verwenden, wenn Ihr Betrieb dort ansässig ist.

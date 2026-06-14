@@ -1,0 +1,111 @@
+name: Item classification schemes
+bucket: classificationSchemes
+description: >
+  UNTDID 7143 item classification scheme identifiers (BT-158). The list
+  version is captured in a separate free-text field beside the scheme.
+order: YAML order is not user-facing — codelistOptions(_, sort:"label") sorts at display time. Users know these by name (UNSPSC, eCl@ss).
+authority: UN/CEFACT UNTDID 7143
+upstream:
+  unece: https://unece.org/trade/cefact/unppc
+last_synced: 2026-05-19
+entries:
+  - code: STI
+    label: { en: "UNSPSC (UN Standard Products and Services Code)", de: "UNSPSC (Standardklassifikation der UN)" }
+    hint:
+      en: Broad multi-industry taxonomy maintained by the UN. Good general-purpose choice when no industry-specific scheme applies.
+      de: Breit aufgestellte, branchenübergreifende Klassifikation der UN. Gute Allzwecklösung, wenn keine branchenspezifische Klassifikation passt.
+  - code: ECLASS
+    label: { en: "eCl@ss",                                  de: "eCl@ss" }
+    hint:
+      en: Industrial and technical product classification, widely used in DACH manufacturing supply chains.
+      de: Industrielle und technische Produktklassifikation, in der Fertigungslieferkette im DACH-Raum weit verbreitet.
+  - code: HS
+    label: { en: "Harmonised System (WCO)",                 de: "Harmonisiertes System (WZO)" }
+    hint:
+      en: WCO customs nomenclature (HS codes). Required on cross-border goods invoices for customs clearance.
+      de: WZO-Zollnomenklatur (HS-Codes). Bei grenzüberschreitenden Warenlieferungen für die Zollabfertigung erforderlich.
+  - code: BDNS
+    label: { en: "Belgian Defence Numbering System",        de: "Belgian Defence Numbering System" }
+    hint:
+      en: Specialist scheme used by the Belgian defence ministry. Unlikely outside that context.
+      de: Spezialklassifikation des belgischen Verteidigungsministeriums. Außerhalb dieses Kontextes selten relevant.
+  - code: CPV
+    label: { en: "Common Procurement Vocabulary (EU)",      de: "Common Procurement Vocabulary (EU)" }
+    hint:
+      en: Required for EU public-sector procurement; identifies the kind of goods or services in tender contracts.
+      de: Für EU-Vergabeverfahren vorgeschrieben; klassifiziert Art der Lieferung oder Leistung im Ausschreibungskontext.
+  - code: CV
+    label: { en: "Customs Tariff Vocabulary",               de: "Zollnomenklatur" }
+    hint:
+      en: National customs tariff codes. Use when local customs rules require a country-specific scheme rather than HS.
+      de: Nationale Zolltarifnummern. Verwenden, wenn die örtliche Zollvorschrift ein länderspezifisches Schema statt HS verlangt.
+  - code: GMN
+    label: { en: "Global Model Number (GS1)",               de: "Global Model Number (GS1)" }
+    hint:
+      en: GS1 identifier for a product model (across variants) — broader than GTIN, which is per-SKU.
+      de: GS1-Kennung für ein Produktmodell (über Varianten hinweg) — umfassender als GTIN, das pro Variante vergeben wird.
+  - code: GS1
+    label: { en: "GS1 Identification Keys",                 de: "GS1-Identifikationsschlüssel" }
+    hint:
+      en: Generic GS1 identifier (GLN, GTIN, SSCC, …) when none of the more specific codes here apply.
+      de: Allgemeiner GS1-Identifikator (GLN, GTIN, SSCC …), wenn keiner der spezifischeren Codes hier passt.
+  - code: GTIN
+    label: { en: "Global Trade Item Number",                de: "Global Trade Item Number" }
+    hint:
+      en: Per-SKU barcode (EAN/UPC). Identifies a specific item, not a category — use this if the line is a barcoded retail item.
+      de: SKU-spezifischer Barcode (EAN/UPC). Identifiziert einen konkreten Artikel, keine Kategorie — passend für barcodierte Handelsware.
+  - code: ICC
+    label: { en: "Industry Commodity Classification",       de: "Industry Commodity Classification" }
+    hint:
+      en: Industry-specific commodity coding. Rare in general commerce; check whether your buyer requires it.
+      de: Branchenspezifische Warenklassifikation. Im allgemeinen Handel selten; nur verwenden, wenn der Empfänger es ausdrücklich verlangt.
+  - code: MA
+    label: { en: "Manufacturer's Article Number",           de: "Herstellerartikelnummer" }
+    hint:
+      en: The manufacturer's catalog number. Differs from VN (seller's catalog number) when the manufacturer and seller are different parties.
+      de: Katalognummer des Herstellers. Unterscheidet sich von VN (Katalognummer des Lieferanten), wenn Hersteller und Verkäufer nicht identisch sind.
+  - code: PV
+    label: { en: "Promotion Variant Number",                de: "Promotion-Variantennummer" }
+    hint:
+      en: Identifies a campaign-specific variant of a base product. Used in retail promotion management.
+      de: Kennzeichnet eine kampagnenspezifische Variante eines Basisprodukts. Im Promotion-Management des Einzelhandels verwendet.
+  - code: SA
+    label: { en: "Standard Article Number",                 de: "Standardartikelnummer" }
+    hint:
+      en: An industry-agreed standard article number, sitting between manufacturer-private and globally unique schemes.
+      de: Branchenweit vereinbarte Standardartikelnummer; liegt zwischen herstellerprivaten und weltweit eindeutigen Schemata.
+  - code: SRT
+    label: { en: "Standard Reporting Code",                 de: "Standard Reporting Code" }
+    hint:
+      en: Industry reporting code used in some statistical or regulatory contexts. Niche.
+      de: Branchenreporting-Code für statistische oder regulatorische Auswertungen. Selten verwendet.
+  - code: SRV
+    label: { en: "Service Code",                            de: "Servicecode" }
+    hint:
+      en: Identifier for service offerings (rather than physical goods).
+      de: Kennung für Dienstleistungen (im Gegensatz zu physischen Waren).
+  - code: TSP
+    label: { en: "Trade Service Profile",                   de: "Trade Service Profile" }
+    hint:
+      en: References a pre-defined trade-service profile between two trading partners. Rarely used.
+      de: Verweist auf ein zwischen Handelspartnern hinterlegtes Service-Profil. Selten verwendet.
+  - code: UA
+    label: { en: "Ultimate Customer's Article Number",      de: "Artikelnummer des Endkunden" }
+    hint:
+      en: The end customer's own article number — used when the line passes through a reseller and the end buyer's catalog number is what matters.
+      de: Eigene Artikelnummer des Endkunden — relevant, wenn die Position über einen Reseller läuft und die Kataloggrundlage beim Endabnehmer liegt.
+  - code: UPC
+    label: { en: "Universal Product Code",                  de: "Universal Product Code" }
+    hint:
+      en: North American retail barcode. Mostly superseded by GTIN (which is the global superset).
+      de: Nordamerikanischer Einzelhandels-Barcode. Weitgehend durch GTIN (globale Übermenge) abgelöst.
+  - code: VN
+    label: { en: "Vendor Article Number",                   de: "Lieferantenartikelnummer" }
+    hint:
+      en: The seller's own catalog number for this item. Distinct from MA (manufacturer's number) and UA (end-customer's number).
+      de: Eigene Katalognummer des Lieferanten für diese Position. Unterscheidet sich von MA (Hersteller) und UA (Endkunde).
+  - code: VP
+    label: { en: "Vendor Part Number",                      de: "Lieferantenteilenummer" }
+    hint:
+      en: The seller's part number for a sub-component (vs VN, which is the catalog item).
+      de: Teilenummer des Lieferanten für eine Unterkomponente (im Gegensatz zu VN, das den Katalogartikel kennzeichnet).
