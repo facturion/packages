@@ -21,7 +21,8 @@
     "./generate": {
       "types": "./dist/src/generate.d.ts",
       "default": "./dist/src/generate.js"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "files": ["dist", "data", "generated/buckets/*.json", "README.md", "LICENSE", "NOTICE"],
   "scripts": {
