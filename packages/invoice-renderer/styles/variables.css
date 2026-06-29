@@ -1,0 +1,89 @@
+/* ── Design tokens ─────────────────────────────────────────────────────────── */
+
+:root {
+  /* Primary */
+  --primary:        #5a7fbf;
+  --primary-light:  #7fa0d8;
+  --primary-dim:    #47659c;
+  --primary-ghost:  rgba(90, 127, 191, 0.13);
+
+  /* Surfaces (calm product-slate — luminance-only depth steps) */
+  --bg-base:        #0d1422;
+  --bg-2:           #111a2c;
+  --bg-card:        #18223a;
+  --bg-elevated:    #1d2742;
+  --bg-input:       #131c2e;
+  --bg-hover:       rgba(255, 255, 255, 0.04);
+
+  /* Borders — translucent-white hairlines (calm) */
+  --border:         rgba(255, 255, 255, 0.08);
+  --border-light:   rgba(255, 255, 255, 0.14);
+  --border-focus:   var(--primary);
+
+  /* Text */
+  --text:           #e7ecf6;
+  --text-secondary: #99a6bf;
+  --text-muted:     #647190;
+  --text-inverse:   #0d1422;
+
+  /* Semantic — calm muted (green = valid only; blue = info/action) */
+  --success:        #36c08b;
+  --success-dim:    rgba(54, 192, 139, 0.13);
+  --warning:        #e0a73c;
+  --warning-dim:    rgba(224, 167, 60, 0.13);
+  --error:          #e0606e;
+  --error-dim:      rgba(224, 96, 110, 0.13);
+  --info:           #7fa0d8;
+  --info-dim:       rgba(127, 160, 216, 0.13);
+
+  /* Typography — calm direction: Geist (display) / Hanken Grotesk (body) / JetBrains Mono (code) */
+  --font-display:   'Geist', 'Hanken Grotesk', system-ui, sans-serif;
+  --font-sans:      'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-mono:      'JetBrains Mono', ui-monospace, 'Cascadia Code', 'Fira Mono', 'Consolas', monospace;
+
+  --text-xs:   0.8125rem;
+  --text-sm:   0.875rem;
+  --text-base: 1rem;
+  --text-lg:   1.1875rem;
+  --text-xl:   1.3rem;
+  --text-2xl:  1.75rem;
+  --text-3xl:  2.25rem;
+
+  /* Spacing */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.25rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* Radii */
+  --radius-sm:  4px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+  --radius-xl:  16px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm:  0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md:  0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-lg:  0 4px 16px rgba(0, 0, 0, 0.4);
+
+  /* Transitions */
+  --ease-out:   cubic-bezier(0.16, 1, 0.3, 1);
+  --duration:   180ms;
+
+  /* Layout */
+  --nav-height: 3.5rem;
+  --max-width:  1600px;
+
+  /* Shared dropdown caret — reused by both native <select> and the custom
+     listbox button so the closed trigger looks identical across them. The
+     stroke colour is hard-coded to --text-muted (#647190); changing one
+     means changing both. */
+  --caret-svg: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6' fill='none' stroke='%23647190' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M1 1l4 4 4-4'/></svg>");
+}

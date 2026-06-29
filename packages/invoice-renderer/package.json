@@ -1,0 +1,55 @@
+{
+  "name": "@facturion/invoice-renderer",
+  "version": "0.1.0",
+  "description": "Render the @facturion/invoice simplified-JSON model to a human-readable HTML invoice — the presentation layer behind Facturion's invoice PDFs.",
+  "keywords": [
+    "en16931",
+    "einvoicing",
+    "invoice",
+    "html",
+    "pdf",
+    "renderer",
+    "zugferd",
+    "xrechnung",
+    "factur-x"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/facturion/packages.git",
+    "directory": "packages/invoice-renderer"
+  },
+  "homepage": "https://github.com/facturion/packages/tree/main/packages/invoice-renderer#readme",
+  "bugs": "https://github.com/facturion/packages/issues",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./styles/view.css": "./styles/view.css",
+    "./styles/utilities.css": "./styles/utilities.css",
+    "./styles/variables.css": "./styles/variables.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "styles",
+    "index.d.ts",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "prepublishOnly": "npm test"
+  },
+  "dependencies": {
+    "@facturion/codelists": "^0.1.1",
+    "@facturion/invoice": "^0.1.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

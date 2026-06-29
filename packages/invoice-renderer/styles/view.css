@@ -1,0 +1,902 @@
+/* ── View page ──────────────────────────────────────────────────────────────── */
+
+.view-layout {
+  max-width: 880px;
+  margin: 0 auto;
+}
+
+.view-drop-card {
+  margin-bottom: var(--space-5);
+}
+
+/* Modeled on .validate-tabs: the toolbar acts as the tab bar — the active
+   tab's underline overlaps the toolbar's border-bottom for a unified strip. */
+.view-toolbar {
+  display: flex;
+  align-items: end;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.view-toolbar .mode-tabs { margin-right: auto; }
+
+/* Action buttons sit centered against the bar so they don't touch the
+   separator line — same treatment as .tab-download-btn in /validate. */
+.view-toolbar .print-btn { align-self: center; }
+
+/* ── Invoice paper ─────────────────────────────────────────────────────────── */
+
+.invoice-paper {
+  background: #fdf8f0;
+  color: #111;
+  border-radius: var(--radius-md);
+  padding: var(--space-10);
+  box-shadow: var(--shadow-lg);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+/* ── Invoice header ────────────────────────────────────────────────────────── */
+
+.inv-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-8);
+  padding-bottom: var(--space-6);
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.inv-type {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #64748b;
+  margin-bottom: var(--space-1);
+}
+
+.inv-id {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.inv-header-right {
+  text-align: right;
+  color: #475569;
+}
+
+.inv-header-right > div {
+  margin-bottom: var(--space-1);
+}
+
+/* ── Parties ───────────────────────────────────────────────────────────────── */
+
+.inv-parties {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-8);
+  margin-bottom: var(--space-8);
+}
+
+.inv-party-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-bottom: var(--space-2);
+}
+
+.inv-party-name {
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: var(--space-1);
+}
+
+.inv-party > div {
+  color: #475569;
+}
+
+.inv-party-trading {
+  font-style: italic;
+  color: #64748b !important;
+  margin-bottom: var(--space-1);
+}
+
+.inv-party-legal {
+  margin-top: var(--space-2);
+  font-size: var(--text-xs);
+  color: #64748b !important;
+  line-height: 1.4;
+}
+
+.inv-party-contact {
+  margin-top: var(--space-2);
+  font-size: var(--text-xs);
+  color: #475569 !important;
+}
+
+.inv-parties-secondary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+}
+
+/* ── References ────────────────────────────────────────────────────────────── */
+
+.inv-references {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-1) var(--space-6);
+  margin-bottom: var(--space-6);
+  padding: var(--space-3) var(--space-4);
+  background: #f5ede0;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+}
+
+.inv-ref {
+  display: flex;
+  gap: var(--space-2);
+  color: #475569;
+}
+
+.inv-ref-label {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.inv-ref-value {
+  color: #0f172a;
+  word-break: break-all;
+}
+
+/* ── Period / delivery strip ───────────────────────────────────────────────── */
+
+.inv-period {
+  margin-bottom: var(--space-6);
+  padding: var(--space-2) var(--space-4);
+  background: #f5ede0;
+  border-left: 3px solid #94a3b8;
+  border-radius: var(--radius-sm);
+  color: #334155;
+  font-size: var(--text-sm);
+}
+
+/* ── Notes / payment ───────────────────────────────────────────────────────── */
+
+.inv-notes,
+.inv-payment {
+  margin-bottom: var(--space-6);
+  padding: var(--space-4);
+  background: #f5ede0;
+  border-radius: var(--radius-sm);
+  color: #334155;
+}
+
+/* Keep coherent cards, the totals block, table rows, and short labels on a
+ * single page in PDF output — Chromium's paginator respects break-inside. */
+.inv-references,
+.inv-period,
+.inv-notes,
+.inv-payment,
+.inv-payment-terms,
+.inv-totals-wrap,
+.inv-lines tr {
+  break-inside: avoid;
+}
+
+.inv-notes p {
+  margin: 0 0 var(--space-2) 0;
+}
+
+.inv-notes p:last-child {
+  margin-bottom: 0;
+}
+
+.inv-payment > div {
+  margin-bottom: var(--space-1);
+}
+
+.inv-section-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+  margin-bottom: var(--space-2);
+}
+
+.inv-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-right: 0.3em;
+}
+
+/* ── Line items ────────────────────────────────────────────────────────────── */
+
+.inv-lines-wrap {
+  margin-bottom: var(--space-6);
+  overflow-x: auto;
+}
+
+.inv-lines {
+  color: #1e293b;
+}
+
+.inv-lines thead th {
+  background: #f5ede0;
+  color: #64748b;
+}
+
+.inv-col-id {
+  width: 3rem;
+  color: #94a3b8;
+}
+
+.inv-col-desc {
+  /* takes remaining space */
+}
+
+.inv-col-num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* ── Line cell internals ───────────────────────────────────────────────────── */
+
+.inv-line-name {
+  font-weight: 500;
+  color: #0f172a;
+}
+
+.inv-line-desc,
+.inv-line-meta,
+.inv-line-allowance,
+.inv-line-charge {
+  font-size: var(--text-xs);
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.inv-line-meta {
+  margin-top: var(--space-1);
+}
+
+.inv-line-allowance {
+  color: #b45309;  /* amber-700 */
+}
+
+.inv-line-charge {
+  color: #475569;
+}
+
+.inv-line-price-gross {
+  font-size: var(--text-xs);
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+
+/* ── VAT breakdown sub-rows in the totals table ───────────────────────────── */
+
+.inv-vat-base {
+  font-size: var(--text-xs);
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.inv-vat-reason td {
+  padding-top: 0 !important;
+  padding-bottom: var(--space-2) !important;
+  font-size: var(--text-xs);
+  font-style: italic;
+  color: #64748b;
+  line-height: 1.3;
+}
+
+/* ── Totals ────────────────────────────────────────────────────────────────── */
+
+.inv-totals-wrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-6);
+}
+
+.inv-totals {
+  min-width: 280px;
+  border-collapse: collapse;
+  color: #1e293b;
+}
+
+.inv-totals td {
+  padding: var(--space-1) var(--space-3);
+}
+
+.inv-totals td:first-child {
+  color: #475569;
+}
+
+.inv-totals td.inv-col-num {
+  font-variant-numeric: tabular-nums;
+}
+
+.inv-totals tr:first-child td {
+  padding-top: var(--space-3);
+  border-top: 1px solid #e2e8f0;
+}
+
+.inv-totals-payable td {
+  padding-top: var(--space-3);
+  border-top: 2px solid #e2e8f0;
+  font-weight: 700;
+  font-size: var(--text-base);
+  color: #0f172a;
+}
+
+/* ── Invoice paper dark mode ────────────────────────────────────────────────── */
+
+.invoice-paper--dark {
+  background: var(--bg-elevated);
+  color: var(--text);
+}
+
+/* Header */
+.invoice-paper--dark .inv-header {
+  border-bottom-color: var(--border);
+}
+.invoice-paper--dark .inv-type {
+  color: var(--text-secondary);
+}
+.invoice-paper--dark .inv-id {
+  color: var(--text);
+}
+.invoice-paper--dark .inv-header-right {
+  color: var(--text-secondary);
+}
+
+/* Parties */
+.invoice-paper--dark .inv-party-name {
+  color: var(--text);
+}
+.invoice-paper--dark .inv-party > div {
+  color: var(--text-secondary);
+}
+.invoice-paper--dark .inv-party-label,
+.invoice-paper--dark .inv-label {
+  color: var(--text-secondary);
+}
+
+/* Lines */
+.invoice-paper--dark .inv-lines {
+  color: var(--text);
+}
+.invoice-paper--dark .inv-lines thead th {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+}
+.invoice-paper--dark .data-table td {
+  color: var(--text-secondary);
+}
+.invoice-paper--dark .inv-col-id {
+  color: var(--text-muted);
+}
+
+/* Totals */
+.invoice-paper--dark .inv-totals {
+  color: var(--text);
+}
+.invoice-paper--dark .inv-totals td:first-child {
+  color: var(--text-secondary);
+}
+.invoice-paper--dark .inv-totals tr:first-child td {
+  border-top-color: var(--border);
+}
+.invoice-paper--dark .inv-totals-payable td {
+  border-top-color: var(--border-light);
+  color: var(--text);
+}
+
+/* Payment terms */
+.invoice-paper--dark .inv-payment-terms {
+  color: var(--text-secondary);
+}
+
+/* Secondary party cards + labels */
+.invoice-paper--dark .inv-party-trading,
+.invoice-paper--dark .inv-party-legal,
+.invoice-paper--dark .inv-party-contact {
+  color: var(--text-secondary) !important;
+}
+
+/* References / period / notes / payment — neutral info cards */
+.invoice-paper--dark .inv-references,
+.invoice-paper--dark .inv-period,
+.invoice-paper--dark .inv-notes,
+.invoice-paper--dark .inv-payment {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+}
+.invoice-paper--dark .inv-ref {
+  color: var(--text-secondary);
+}
+.invoice-paper--dark .inv-ref-label,
+.invoice-paper--dark .inv-section-label {
+  color: var(--text-secondary);
+}
+.invoice-paper--dark .inv-ref-value {
+  color: var(--text);
+}
+.invoice-paper--dark .inv-period {
+  border-left-color: var(--border-light);
+  color: var(--text-secondary);
+}
+
+/* Line cell internals */
+.invoice-paper--dark .inv-line-name {
+  color: var(--text);
+}
+.invoice-paper--dark .inv-line-desc,
+.invoice-paper--dark .inv-line-meta,
+.invoice-paper--dark .inv-line-charge {
+  color: var(--text-secondary);
+}
+.invoice-paper--dark .inv-line-price-gross {
+  color: var(--text-secondary);
+}
+
+/* VAT breakdown sub-rows */
+.invoice-paper--dark .inv-vat-base,
+.invoice-paper--dark .inv-vat-reason td {
+  color: var(--text-secondary);
+}
+
+/* ── Detailed view ─────────────────────────────────────────────────────────── */
+
+/* Power-user / educational rendering: every populated EN 16931 field beside
+   its BT/BG code + DE/EN human label. Grouped by BG group. Styled with the
+   site's dark theme tokens — deliberately not document-shaped. */
+
+.inv-detailed {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  color: var(--text);
+}
+
+.inv-d-group {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.inv-d-group-title {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Two-column auto-flow: rows pair up side-by-side once there's enough room
+   (>= ~720px container), otherwise collapse to a single column. The 360px
+   minimum is tuned so the create-view's narrower preview pane stays single
+   column. */
+.inv-d-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  column-gap: 1px;        /* hairline divider between columns via background */
+  background: var(--border);
+}
+
+.inv-d-row {
+  display: grid;
+  grid-template-columns: minmax(11rem, max-content) 1fr;
+  column-gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-2) var(--space-4);
+  background: var(--bg-card);
+  font-size: var(--text-sm);
+  border-bottom: 1px solid var(--border);
+}
+
+.inv-d-key {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  word-break: break-word;
+}
+
+.inv-d-code {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--primary-light);
+  letter-spacing: 0.04em;
+}
+
+.inv-d-name {
+  font-size: var(--text-sm);
+  color: var(--text);
+}
+
+.inv-d-value {
+  color: var(--text-secondary);
+  text-align: left;
+  word-break: break-word;
+}
+
+/* Empty rows: muted, italic placeholder. Used when "Show empty fields" is
+   on so users debugging or building an invoice can see the full structure. */
+.inv-d-row--empty .inv-d-name,
+.inv-d-row--empty .inv-d-code {
+  color: var(--text-muted);
+}
+
+.inv-d-row--empty .inv-d-value {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* "Show empty fields" toggle — embedded as a checkbox label in the first
+   section header. Sits flush right via margin-left: auto. */
+.inv-d-show-empty {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: 400;
+  color: var(--text-secondary);
+  text-transform: none;
+  letter-spacing: normal;
+  cursor: pointer;
+  user-select: none;
+}
+
+.inv-d-show-empty input {
+  accent-color: var(--primary);
+  cursor: pointer;
+  margin: 0;
+}
+
+.inv-d-hint {
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  margin-left: var(--space-1);
+}
+
+.inv-d-scheme {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+.inv-d-line {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--text-muted);
+  border-radius: var(--radius-md);
+  padding: 0;
+  margin-bottom: var(--space-3);
+  overflow: hidden;
+}
+
+.inv-d-lines .inv-d-line {
+  border-radius: var(--radius-md);
+  margin: var(--space-3) var(--space-4);
+}
+
+.inv-d-line summary {
+  cursor: pointer;
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+  list-style: none;
+}
+
+.inv-d-line summary::-webkit-details-marker { display: none; }
+
+.inv-d-line summary::before {
+  content: "▸";
+  color: var(--text-muted);
+  transition: transform var(--duration) var(--ease-out);
+}
+
+.inv-d-line[open] summary::before {
+  transform: rotate(90deg);
+  display: inline-block;
+}
+
+.inv-d-line > .inv-d-grid {
+  margin: var(--space-3) var(--space-4);
+}
+
+.inv-d-line > .inv-d-subgroup {
+  margin: var(--space-3) 0 0;
+}
+
+/* Subgroup separation: matches the top-level array-item pattern — only the
+   title strip is tonally elevated; the body inherits the line card's tone.
+   A top border above each subgroup gives a clean structural break without
+   the body re-shading that previously felt visually busy on deep nests. */
+.inv-d-subgroup {
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-3);
+}
+
+.inv-d-subgroup-title {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--bg-elevated);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.inv-d-subgroup .inv-d-row:last-child {
+  border-bottom: 0;
+}
+
+/* Mode tabs — reuse .tab-btn from validate.css. The natural margin-bottom:
+   -1px on .tab-btn lets the active 2px underline overlap the parent's 1px
+   border-bottom for a unified tab-bar look. */
+.mode-tabs {
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: end;
+}
+
+.mode-tabs .tab-btn {
+  padding: var(--space-2) var(--space-3);
+}
+
+/* ── Print ─────────────────────────────────────────────────────────────────── */
+
+@media print {
+  @page {
+    margin: 1.5cm;
+  }
+
+  nav,
+  .site-footer,
+  .view-drop-card,
+  .view-toolbar,
+  #view-error,
+  .mode-tabs,
+  .inv-detailed {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+  }
+
+  .view-layout {
+    max-width: 100%;
+  }
+
+  .invoice-paper {
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+    background: #fff;
+  }
+}
+
+/* ── Editor (editable detailed view) ─────────────────────────────────────── */
+/* The detailed renderer's editable mode replaces value cells with inputs.
+   Styling keeps the inputs visually flush with the read-only mode — same
+   typography, no chrome — so the BT-code / label / value alignment stays
+   intact. The whole row is a <label>, so clicking anywhere in the row
+   focuses the input. */
+
+.inv-detailed--editable label.inv-d-row {
+  cursor: text;
+}
+
+.inv-detailed--editable .inv-d-value input,
+.inv-detailed--editable .inv-d-value select {
+  font: inherit;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 2px 4px;
+  margin: -3px -4px;          /* keep baseline alignment with surrounding rows */
+  width: 100%;
+  min-width: 0;
+}
+
+/* Vacant style: muted text for empty fields so populated content stands
+   out at scanning distance. Driven by `.inv-d-row--vacant`, which the
+   state listener keeps in sync as the user edits. */
+.inv-detailed--editable .inv-d-row--vacant .inv-d-name,
+.inv-detailed--editable .inv-d-row--vacant .inv-d-code {
+  color: var(--text-muted);
+}
+
+.inv-detailed--editable .inv-d-row--vacant .inv-d-value input,
+.inv-detailed--editable .inv-d-row--vacant .inv-d-value select {
+  color: var(--text-muted);
+}
+
+.inv-detailed--editable .inv-d-value input:hover,
+.inv-detailed--editable .inv-d-value select:hover {
+  border-color: var(--border);
+}
+
+.inv-detailed--editable .inv-d-value input:focus,
+.inv-detailed--editable .inv-d-value select:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: var(--bg-card);
+  color: var(--text);
+}
+
+.inv-detailed--editable .inv-d-row--derived .inv-d-value input,
+.inv-detailed--editable .inv-d-row--derived .inv-d-value select {
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+/* Array item subcards (top-level array members: notes, allowances, credit
+   transfers, VAT breakdown rows, …). Mirror the line-item card treatment:
+   each item gets its own bordered card with a 3px neutral left accent so
+   it reads as a discrete unit within the section. */
+.inv-d-arr-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+}
+
+.inv-d-arr-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--text-muted);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+/* Title strip uses the elevated tone so it visually mirrors a line item's
+   summary header. Body rows below stay on the card tone. */
+.inv-d-arr-item-title {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Drop the divider line on the last row of a card (the card's own bottom
+   border already terminates the stack — the row border would just create
+   a doubled line). Field-row padding is preserved; the trailing-gap
+   tightening happens at the container level below. */
+.inv-d-arr-item > .inv-d-grid > .inv-d-row:last-child,
+.inv-d-group > .inv-d-grid:last-child > .inv-d-row:last-child,
+.inv-d-line > .inv-d-grid:last-child > .inv-d-row:last-child {
+  border-bottom: 0;
+}
+
+/* Standalone + Add row used after a line's per-item subgroups (allowances,
+   charges, attributes), where there's no enclosing _group to host the
+   button. */
+.inv-d-subgroup-add {
+  padding: var(--space-2) var(--space-4);
+}
+
+/* When the +Add button trails an .inv-d-arr-items list (e.g. credit
+   transfers), the parent already supplies horizontal padding — strip the
+   inner padding so the button aligns flush with the cards above. */
+.inv-d-arr-items > .inv-d-subgroup-add {
+  padding: 0;
+}
+
+/* Suggestion popup for codelist-driven inputs (BT-130 unit, country,
+   VAT category, …). Reuses the .listbox-panel / .listbox-option visual
+   styles from create.css; this block only adds combobox-specific bits:
+   a scrollable max-height for long lists and a monospace "code" column
+   so cryptic UN/CEFACT codes line up next to their friendly labels. */
+.bt-suggest-panel {
+  max-height: 280px;
+  overflow-y: auto;
+  min-width: 240px;
+}
+
+.bt-suggest-panel:hover .listbox-option:not(:hover) {
+  background: transparent;
+}
+
+.bt-suggest-panel .listbox-option:hover {
+  background: var(--bg-elevated);
+}
+
+.bt-suggest-code {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  min-width: 4em;
+}
+
+/* + Add / × Remove buttons. Small, secondary visual weight — they live
+   alongside group titles and item headers, so they should fade into the
+   structure when not hovered. */
+.inv-d-group-add,
+.inv-d-row-remove {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: var(--text-xs);
+  padding: 2px 8px;
+  cursor: pointer;
+  margin-left: auto;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.inv-d-group-add:hover {
+  background: var(--bg-elevated);
+  color: var(--text);
+  border-color: var(--text-secondary);
+}
+
+.inv-d-row-remove {
+  padding: 0 6px;
+  line-height: 1.6;
+}
+
+.inv-d-row-remove:hover {
+  background: var(--error-dim, rgba(220, 53, 53, 0.08));
+  color: var(--error);
+  border-color: var(--error);
+}
+
+/* ── Mobile ────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .inv-parties {
+    grid-template-columns: 1fr;
+  }
+
+  .inv-header {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .inv-header-right {
+    text-align: left;
+  }
+}

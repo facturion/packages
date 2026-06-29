@@ -1,0 +1,227 @@
+/* ── Utilities ─────────────────────────────────────────────────────────────── */
+
+/* Data table */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.data-table th,
+.data-table td {
+  text-align: left;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.data-table th {
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.data-table td {
+  color: var(--text-secondary);
+}
+
+.data-table code {
+  font-size: var(--text-xs);
+  color: var(--primary-light);
+}
+
+/* Alert */
+.alert {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-4);
+  font-size: var(--text-sm);
+}
+
+.alert-info {
+  background: var(--info-dim);
+  color: var(--info);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.alert-error {
+  background: var(--error-dim);
+  color: var(--error);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.alert code {
+  display: block;
+  margin-top: var(--space-2);
+  word-break: break-all;
+  font-size: var(--text-xs);
+}
+
+/* Transitions for interactive elements */
+.card {
+  transition: border-color var(--duration) var(--ease-out);
+}
+
+.btn {
+  transition: background var(--duration) var(--ease-out),
+              border-color var(--duration) var(--ease-out),
+              opacity var(--duration) var(--ease-out),
+              transform 80ms var(--ease-out);
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Inline spinner (for buttons) */
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  vertical-align: middle;
+}
+
+/* ── Info tooltip ─────────────────────────────────────────────────────────
+   Shared component for inline help affordances. Markup pattern:
+
+     <span class="info-tip" tabindex="0" role="button" aria-label="More info">
+       <span class="info-tip-icon" aria-hidden="true">i</span>
+       <span class="info-tip-popover" role="tooltip">…content…</span>
+     </span>
+
+   Hover or focus on the wrapper reveals the popover. The popover sits flush
+   against the icon's bottom edge so the cursor doesn't cross a non-hovered
+   gap on its way from the icon down into the popover (which would close it
+   prematurely). Content can be plain text or include rich children
+   (links, source notes, etc.). */
+.info-tip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  cursor: help;
+  outline: none;
+  vertical-align: middle;
+}
+
+.info-tip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: var(--radius-full);
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  font-size: 10px;
+  font-style: italic;
+  font-weight: 700;
+  /* Pin line-height to font-size so the character sits at the geometric
+     center of the circle. Without this, the line-box inherits the parent's
+     line-height (~1.5) and the "i" rides high inside the icon, looking
+     misaligned with adjacent text. */
+  line-height: 1;
+  user-select: none;
+}
+
+.info-tip:hover .info-tip-icon,
+.info-tip:focus-visible .info-tip-icon {
+  background: var(--border);
+  color: var(--text);
+}
+
+/* Popover is `position: fixed` so it escapes any parent overflow/clip
+   context (cards, scroll containers, etc.) and can be JS-positioned in
+   viewport coordinates. `installInfoTipPositioning` in `$lib/info-tip.ts`
+   computes top/left/max-width on mouseover/focusin and on scroll/resize.
+   Hidden state uses opacity + visibility (not display:none) so the
+   popover always has measurable dimensions for the positioning math. */
+.info-tip-popover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 240px;
+  max-width: 340px;
+  padding: var(--space-3);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.18);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text);
+  text-align: left;
+  white-space: normal;
+  cursor: default;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.1s ease;
+}
+
+.info-tip:hover .info-tip-popover,
+.info-tip:focus-within .info-tip-popover {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Subdued source line + KB link inside an info-tip popover (used by the
+   step-annotation tooltips). Optional. */
+.info-tip-source {
+  color: var(--text-secondary);
+}
+
+.info-tip-link {
+  color: var(--primary-light);
+  text-decoration: none;
+}
+
+.info-tip-link:hover {
+  text-decoration: underline;
+}
+
+/* Site footer */
+.site-footer {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-6);
+  padding: var(--space-6) var(--space-4);
+  border-top: 1px solid var(--border);
+  font-size: var(--text-xs);
+}
+
+.site-footer a {
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  color: var(--text-secondary);
+}
+
+.site-footer-note {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Responsive helpers */
+@media (max-width: 640px) {
+  #app {
+    padding: var(--space-4) var(--space-4);
+  }
+}

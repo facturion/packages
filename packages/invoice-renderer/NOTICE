@@ -1,0 +1,20 @@
+@facturion/invoice-renderer
+===========================
+
+This package is licensed under the MIT License (see LICENSE).
+
+The renderer, layout, stylesheet, and the `view.*` document strings are the
+original work of this package. It builds on:
+
+--------------------------------------------------------------------------------
+@facturion/invoice
+  The simplified-invoice JSON data model, validation, and the net/total
+  computation helpers (lineNet, computeTotals).
+
+--------------------------------------------------------------------------------
+@facturion/codelists
+  Friendly multilingual labels for unit-of-measure (UN/ECE Rec 20/21) and
+  payment-means (UNTDID 4461) codes referenced by the rendered document.
+
+The EN 16931 business terms the layout reflects are defined by CEN
+(EN 16931-1).
