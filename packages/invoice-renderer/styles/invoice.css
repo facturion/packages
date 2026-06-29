@@ -1,0 +1,509 @@
+/* @facturion/invoice-renderer — invoice render stylesheet.
+ * The traditional invoice rendering (.invoice-paper / .inv-*), self-contained:
+ * design tokens are scoped to .invoice-paper (not :root) so importing this into
+ * a host app neither depends on nor collides with the app's global tokens.
+ * Light is the default; .invoice-paper--dark is the dark theme (preview only). */
+
+.invoice-paper {
+  --bg-card: #18223a;
+  --bg-elevated: #1d2742;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-light: rgba(255, 255, 255, 0.14);
+  --primary-light: #7fa0d8;
+  --radius-md: 8px;
+  --radius-sm: 4px;
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --space-1: 0.25rem;
+  --space-10: 2.5rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --text: #e7ecf6;
+  --text-base: 1rem;
+  --text-muted: #647190;
+  --text-secondary: #99a6bf;
+  --text-sm: 0.875rem;
+  --text-xl: 1.3rem;
+  --text-xs: 0.8125rem;
+}
+
+/* Table base (scoped) */
+.invoice-paper .data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.invoice-paper .data-table th,
+.invoice-paper .data-table td {
+  text-align: left;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.invoice-paper .data-table th {
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.invoice-paper .data-table td {
+  color: var(--text-secondary);
+}
+
+.invoice-paper .data-table code {
+  font-size: var(--text-xs);
+  color: var(--primary-light);
+}
+
+/* Invoice render rules */
+.invoice-paper {
+  background: #fdf8f0;
+  color: #111;
+  border-radius: var(--radius-md);
+  padding: var(--space-10);
+  box-shadow: var(--shadow-lg);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.inv-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-8);
+  padding-bottom: var(--space-6);
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.inv-type {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #64748b;
+  margin-bottom: var(--space-1);
+}
+
+.inv-id {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.inv-header-right {
+  text-align: right;
+  color: #475569;
+}
+
+.inv-header-right > div {
+  margin-bottom: var(--space-1);
+}
+
+.inv-parties {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-8);
+  margin-bottom: var(--space-8);
+}
+
+.inv-party-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-bottom: var(--space-2);
+}
+
+.inv-party-name {
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: var(--space-1);
+}
+
+.inv-party > div {
+  color: #475569;
+}
+
+.inv-party-trading {
+  font-style: italic;
+  color: #64748b !important;
+  margin-bottom: var(--space-1);
+}
+
+.inv-party-legal {
+  margin-top: var(--space-2);
+  font-size: var(--text-xs);
+  color: #64748b !important;
+  line-height: 1.4;
+}
+
+.inv-party-contact {
+  margin-top: var(--space-2);
+  font-size: var(--text-xs);
+  color: #475569 !important;
+}
+
+.inv-parties-secondary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+}
+
+.inv-references {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-1) var(--space-6);
+  margin-bottom: var(--space-6);
+  padding: var(--space-3) var(--space-4);
+  background: #f5ede0;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+}
+
+.inv-ref {
+  display: flex;
+  gap: var(--space-2);
+  color: #475569;
+}
+
+.inv-ref-label {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.inv-ref-value {
+  color: #0f172a;
+  word-break: break-all;
+}
+
+.inv-period {
+  margin-bottom: var(--space-6);
+  padding: var(--space-2) var(--space-4);
+  background: #f5ede0;
+  border-left: 3px solid #94a3b8;
+  border-radius: var(--radius-sm);
+  color: #334155;
+  font-size: var(--text-sm);
+}
+
+.inv-notes,
+.inv-payment {
+  margin-bottom: var(--space-6);
+  padding: var(--space-4);
+  background: #f5ede0;
+  border-radius: var(--radius-sm);
+  color: #334155;
+}
+
+.inv-references,
+.inv-period,
+.inv-notes,
+.inv-payment,
+.inv-payment-terms,
+.inv-totals-wrap,
+.inv-lines tr {
+  break-inside: avoid;
+}
+
+.inv-notes p {
+  margin: 0 0 var(--space-2) 0;
+}
+
+.inv-notes p:last-child {
+  margin-bottom: 0;
+}
+
+.inv-payment > div {
+  margin-bottom: var(--space-1);
+}
+
+.inv-section-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+  margin-bottom: var(--space-2);
+}
+
+.inv-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-right: 0.3em;
+}
+
+.inv-lines-wrap {
+  margin-bottom: var(--space-6);
+  overflow-x: auto;
+}
+
+.inv-lines {
+  color: #1e293b;
+}
+
+.inv-lines thead th {
+  background: #f5ede0;
+  color: #64748b;
+}
+
+.inv-col-id {
+  width: 3rem;
+  color: #94a3b8;
+}
+
+.inv-col-desc {
+  /* takes remaining space */
+}
+
+.inv-col-num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.inv-line-name {
+  font-weight: 500;
+  color: #0f172a;
+}
+
+.inv-line-desc,
+.inv-line-meta,
+.inv-line-allowance,
+.inv-line-charge {
+  font-size: var(--text-xs);
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.inv-line-meta {
+  margin-top: var(--space-1);
+}
+
+.inv-line-allowance {
+  color: #b45309;  /* amber-700 */
+}
+
+.inv-line-charge {
+  color: #475569;
+}
+
+.inv-line-price-gross {
+  font-size: var(--text-xs);
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+
+.inv-vat-base {
+  font-size: var(--text-xs);
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.inv-vat-reason td {
+  padding-top: 0 !important;
+  padding-bottom: var(--space-2) !important;
+  font-size: var(--text-xs);
+  font-style: italic;
+  color: #64748b;
+  line-height: 1.3;
+}
+
+.inv-totals-wrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-6);
+}
+
+.inv-totals {
+  min-width: 280px;
+  border-collapse: collapse;
+  color: #1e293b;
+}
+
+.inv-totals td {
+  padding: var(--space-1) var(--space-3);
+}
+
+.inv-totals td:first-child {
+  color: #475569;
+}
+
+.inv-totals td.inv-col-num {
+  font-variant-numeric: tabular-nums;
+}
+
+.inv-totals tr:first-child td {
+  padding-top: var(--space-3);
+  border-top: 1px solid #e2e8f0;
+}
+
+.inv-totals-payable td {
+  padding-top: var(--space-3);
+  border-top: 2px solid #e2e8f0;
+  font-weight: 700;
+  font-size: var(--text-base);
+  color: #0f172a;
+}
+
+.invoice-paper--dark {
+  background: var(--bg-elevated);
+  color: var(--text);
+}
+
+.invoice-paper--dark .inv-header {
+  border-bottom-color: var(--border);
+}
+
+.invoice-paper--dark .inv-type {
+  color: var(--text-secondary);
+}
+
+.invoice-paper--dark .inv-id {
+  color: var(--text);
+}
+
+.invoice-paper--dark .inv-header-right {
+  color: var(--text-secondary);
+}
+
+.invoice-paper--dark .inv-party-name {
+  color: var(--text);
+}
+
+.invoice-paper--dark .inv-party > div {
+  color: var(--text-secondary);
+}
+
+.invoice-paper--dark .inv-party-label,
+.invoice-paper--dark .inv-label {
+  color: var(--text-secondary);
+}
+
+.invoice-paper--dark .inv-lines {
+  color: var(--text);
+}
+
+.invoice-paper--dark .inv-lines thead th {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+}
+
+.invoice-paper--dark .data-table td {
+  color: var(--text-secondary);
+}
+
+.invoice-paper--dark .inv-col-id {
+  color: var(--text-muted);
+}
+
+.invoice-paper--dark .inv-totals {
+  color: var(--text);
+}
+
+.invoice-paper--dark .inv-totals td:first-child {
+  color: var(--text-secondary);
+}
+
+.invoice-paper--dark .inv-totals tr:first-child td {
+  border-top-color: var(--border);
+}
+
+.invoice-paper--dark .inv-totals-payable td {
+  border-top-color: var(--border-light);
+  color: var(--text);
+}
+
+.invoice-paper--dark .inv-payment-terms {
+  color: var(--text-secondary);
+}
+
+.invoice-paper--dark .inv-party-trading,
+.invoice-paper--dark .inv-party-legal,
+.invoice-paper--dark .inv-party-contact {
+  color: var(--text-secondary) !important;
+}
+
+.invoice-paper--dark .inv-references,
+.invoice-paper--dark .inv-period,
+.invoice-paper--dark .inv-notes,
+.invoice-paper--dark .inv-payment {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+}
+
+.invoice-paper--dark .inv-ref {
+  color: var(--text-secondary);
+}
+
+.invoice-paper--dark .inv-ref-label,
+.invoice-paper--dark .inv-section-label {
+  color: var(--text-secondary);
+}
+
+.invoice-paper--dark .inv-ref-value {
+  color: var(--text);
+}
+
+.invoice-paper--dark .inv-period {
+  border-left-color: var(--border-light);
+  color: var(--text-secondary);
+}
+
+.invoice-paper--dark .inv-line-name {
+  color: var(--text);
+}
+
+.invoice-paper--dark .inv-line-desc,
+.invoice-paper--dark .inv-line-meta,
+.invoice-paper--dark .inv-line-charge {
+  color: var(--text-secondary);
+}
+
+.invoice-paper--dark .inv-line-price-gross {
+  color: var(--text-secondary);
+}
+
+.invoice-paper--dark .inv-vat-base,
+.invoice-paper--dark .inv-vat-reason td {
+  color: var(--text-secondary);
+}
+
+@media print {
+@page {
+    margin: 1.5cm;
+  }
+
+.invoice-paper {
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+    background: #fff;
+  }
+}
+
+@media (max-width: 600px) {
+.inv-parties {
+    grid-template-columns: 1fr;
+  }
+
+.inv-header {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+.inv-header-right {
+    text-align: left;
+  }
+}

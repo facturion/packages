@@ -8,7 +8,7 @@
 
 import { renderInvoice } from "./render.js";
 import { makeT, DEFAULT_LANG } from "./i18n.js";
-import { variablesCss, utilitiesCss, viewCss } from "./styles.js";
+import { invoiceCss } from "./styles.js";
 
 const _HTML_LANG = { en: "en", de: "de" };
 
@@ -29,9 +29,7 @@ export function renderInvoiceDocument(invoice, { lang = DEFAULT_LANG, t } = {}) 
 <head>
 <meta charset="utf-8">
 <style>
-${variablesCss}
-${utilitiesCss}
-${viewCss}
+${invoiceCss}
 body { margin: 0; padding: 0; background: #fff; }
 </style>
 </head>

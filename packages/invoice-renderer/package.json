@@ -28,9 +28,7 @@
       "types": "./index.d.ts",
       "default": "./src/index.js"
     },
-    "./styles/view.css": "./styles/view.css",
-    "./styles/utilities.css": "./styles/utilities.css",
-    "./styles/variables.css": "./styles/variables.css",
+    "./styles/invoice.css": "./styles/invoice.css",
     "./package.json": "./package.json"
   },
   "files": [
