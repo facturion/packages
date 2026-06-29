@@ -1,6 +1,6 @@
 {
   "name": "@facturion/invoice",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "The Facturion simplified-JSON invoice data model: the EN 16931 simplified-invoice JSON Schema, strict + partial validators, derived TypeScript types, and the canonical net/total computation helpers.",
   "keywords": [
     "en16931",

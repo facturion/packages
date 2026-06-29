@@ -1,6 +1,6 @@
 {
   "name": "@facturion/invoice-renderer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Render the @facturion/invoice simplified-JSON model to a human-readable HTML invoice — the presentation layer behind Facturion's invoice PDFs.",
   "keywords": [
     "en16931",
@@ -50,7 +50,7 @@
   },
   "dependencies": {
     "@facturion/codelists": "^0.1.1",
-    "@facturion/invoice": "^0.1.0"
+    "@facturion/invoice": "^0.1.1"
   },
   "engines": {
     "node": ">=20"
