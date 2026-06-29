@@ -2,3 +2,7 @@ node_modules/
 dist/
 *.tgz
 .DS_Store
+
+# Generated build artifacts (produced by each package's `generate` step on
+# prepare/pretest; included in the published tarball via the `files` allowlist).
+packages/invoice-renderer/src/styles.js

@@ -5,7 +5,7 @@ export type Lang = "en" | "de";
 /** Label resolver: `(key, vars?) => string`, returning the key unchanged on a miss. */
 export type TFunction = (key: string, vars?: Record<string, unknown>) => string;
 
-export { lineNet, computeTotals } from "@facturion/invoice";
+export { lineNet, computeTotals } from "@facturion/invoice/model";
 
 /** HTML-escape a value (`&`, `<`, `>`, `"`). */
 export function esc(s: unknown): string;

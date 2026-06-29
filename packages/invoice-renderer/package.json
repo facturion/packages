@@ -42,12 +42,15 @@
     "NOTICE"
   ],
   "scripts": {
+    "generate": "node scripts/generate-styles.mjs",
+    "prepare": "npm run generate",
+    "pretest": "npm run generate",
     "test": "node --test test/*.test.js",
     "prepublishOnly": "npm test"
   },
   "dependencies": {
     "@facturion/codelists": "^0.1.1",
-    "@facturion/invoice": "^0.1.0"
+    "@facturion/invoice": "^0.1.1"
   },
   "engines": {
     "node": ">=20"

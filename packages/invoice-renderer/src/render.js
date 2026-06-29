@@ -10,7 +10,10 @@
 // and `units.*` / `paymentMeans.*` vocabulary. `renderInvoiceDocument` supplies
 // a default `t` (bundled strings + @facturion/codelists); advanced callers pass
 // their own. The net/total math comes from @facturion/invoice.
-import { computeTotals, lineNet } from "@facturion/invoice";
+// Import from the pure ./model subpath, not the package root — the root eagerly
+// compiles Ajv validators at load, which we don't want dragged into the renderer
+// (and, transitively, the browser) bundle just for the net/total math.
+import { computeTotals, lineNet } from "@facturion/invoice/model";
 
 export { computeTotals, lineNet };
 
