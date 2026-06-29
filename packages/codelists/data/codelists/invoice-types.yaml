@@ -19,17 +19,17 @@ upstream:
 last_synced: 2026-06-14
 entries:
   - code: "71"
-    label: { en: Request for payment }
+    label: { en: Request for payment, de: Zahlungsaufforderung }
   - code: "80"
-    label: { en: Debit note related to goods or services }
+    label: { en: Debit note related to goods or services, de: Belastungsanzeige für Waren oder Dienstleistungen }
   - code: "82"
-    label: { en: Metered services invoice }
+    label: { en: Metered services invoice, de: Verbrauchsabrechnung }
   - code: "84"
-    label: { en: Debit note related to financial adjustments }
+    label: { en: Debit note related to financial adjustments, de: Belastungsanzeige für finanzielle Anpassungen }
   - code: "102"
-    label: { en: Tax notification }
+    label: { en: Tax notification, de: Steuermitteilung }
   - code: "130"
-    label: { en: Invoicing data sheet }
+    label: { en: Invoicing data sheet, de: Rechnungsdatenblatt }
   - code: "202"
     label: { en: Direct payment valuation }
   - code: "203"
@@ -48,13 +48,13 @@ entries:
       en: A credit note issued by the buyer under a self-billing agreement.
       de: Vom Käufer ausgestellte Gutschrift im Rahmen einer Gutschriftvereinbarung.
   - code: "262"
-    label: { en: Consolidated credit note - goods and services }
+    label: { en: Consolidated credit note - goods and services, de: Sammelgutschrift – Waren und Dienstleistungen }
   - code: "295"
-    label: { en: Price variation invoice }
+    label: { en: Price variation invoice, de: Preisanpassungsrechnung }
   - code: "296"
-    label: { en: Credit note for price variation }
+    label: { en: Credit note for price variation, de: Gutschrift für Preisanpassung }
   - code: "308"
-    label: { en: Delcredere credit note }
+    label: { en: Delcredere credit note, de: Delkredere-Gutschrift }
   - code: "325"
     label: { en: Proforma invoice, de: Proformarechnung }
     hint:
@@ -67,7 +67,7 @@ entries:
       en: Bills part of an order or project before completion. The final invoice later settles the remainder.
       de: Rechnet einen Teil eines Auftrags oder Projekts vor Fertigstellung ab. Die Schlussrechnung gleicht den Rest aus.
   - code: "331"
-    label: { en: Commercial invoice which includes a packing list }
+    label: { en: Commercial invoice which includes a packing list, de: Handelsrechnung mit Packliste }
   - code: "380"
     label: { en: Commercial invoice, de: Handelsrechnung }
     preferred: true
@@ -114,7 +114,7 @@ entries:
       en: The buyer issues the invoice on the seller's behalf, under a prior written agreement. Common for affiliate/commission payouts.
       de: Der Käufer stellt die Rechnung im Namen des Verkäufers aus, auf Grundlage einer vorab getroffenen schriftlichen Vereinbarung. Verbreitet bei Partner- und Provisionsabrechnungen.
   - code: "390"
-    label: { en: Delcredere invoice }
+    label: { en: Delcredere invoice, de: Delkredere-Rechnung }
   - code: "393"
     label: { en: Factored invoice, de: Factoring-Rechnung }
     hint:
@@ -125,23 +125,23 @@ entries:
   - code: "395"
     label: { en: Consignment invoice, de: Konsignationsrechnung }
   - code: "396"
-    label: { en: Factored credit note }
+    label: { en: Factored credit note, de: Factoring-Gutschrift }
   - code: "420"
     label: { en: Optical Character Reading (OCR) payment credit note }
   - code: "456"
     label: { en: Debit advice }
   - code: "457"
-    label: { en: Reversal of debit }
+    label: { en: Reversal of debit, de: Stornierung einer Belastung }
   - code: "458"
-    label: { en: Reversal of credit }
+    label: { en: Reversal of credit, de: Stornierung einer Gutschrift }
   - code: "527"
-    label: { en: Self billed debit note }
+    label: { en: Self billed debit note, de: Belastungsanzeige im Gutschriftverfahren }
   - code: "575"
     label: { en: Insurer's invoice, de: Versicherungsrechnung }
   - code: "623"
     label: { en: Forwarder's invoice, de: Speditionsrechnung }
   - code: "633"
-    label: { en: Port charges documents }
+    label: { en: Port charges documents, de: Hafengebührenbeleg }
   - code: "751"
     label: { en: Invoice information for accounting purposes, de: Rechnungsinformation für Buchhaltungszwecke }
     hint:
@@ -150,9 +150,9 @@ entries:
   - code: "780"
     label: { en: Freight invoice, de: Frachtrechnung }
   - code: "817"
-    label: { en: Claim notification }
+    label: { en: Claim notification, de: Schadensmeldung }
   - code: "870"
-    label: { en: Consignment invoice }
+    label: { en: Consignment invoice, de: Konsignationsrechnung }
   - code: "875"
     label: { en: Partial construction invoice, de: Bauabschlagsrechnung }
     hint:
