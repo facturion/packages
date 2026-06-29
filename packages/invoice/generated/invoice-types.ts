@@ -640,7 +640,7 @@ export interface EN16931SimplifiedInvoice {
    */
   rounding_amount?: number | string;
   /**
-   * BG-22 | Document totals | Computed by the transformation layer; populated on extraction, ignored on input. BT-113 (prepaid_amount) and BT-114 (rounding_amount) are top-level inputs that feed amount_due.
+   * BG-22 | Document totals | Computed by the transformation layer; populated on extraction, ignored on input. prepaid_amount (BT-113) and rounding_amount (BT-114) are supplied as top-level inputs and echoed here read-only on output, so this group is a complete BG-22 restatement; both feed amount_due.
    */
   totals?: {
     /**
@@ -671,6 +671,14 @@ export interface EN16931SimplifiedInvoice {
      * BT-112 | Invoice total amount with VAT | tax_exclusive_amount + tax_amount
      */
     tax_inclusive_amount?: number | string;
+    /**
+     * BT-113 | Prepaid amount | Read-only echo of top-level prepaid_amount; populated on extraction, ignored on input
+     */
+    prepaid_amount?: number | string;
+    /**
+     * BT-114 | Rounding amount | Read-only echo of top-level rounding_amount; populated on extraction, ignored on input
+     */
+    rounding_amount?: number | string;
     /**
      * BT-115 | Amount due for payment | tax_inclusive_amount − prepaid_amount + rounding_amount
      */
