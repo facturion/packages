@@ -1,8 +1,18 @@
 {
   "name": "@facturion/codelists",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Friendly, multilingual EN 16931 / UN-CEFACT e-invoicing code lists (units, VAT categories, payment means, invoice types, countries, currencies, Peppol EAS schemes) with curated labels and explanatory hints.",
-  "keywords": ["en16931", "einvoicing", "peppol", "codelists", "vat", "untdid", "iso-3166", "iso-4217", "i18n"],
+  "keywords": [
+    "en16931",
+    "einvoicing",
+    "peppol",
+    "codelists",
+    "vat",
+    "untdid",
+    "iso-3166",
+    "iso-4217",
+    "i18n"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -24,7 +34,14 @@
     },
     "./package.json": "./package.json"
   },
-  "files": ["dist", "data", "generated/buckets/*.json", "README.md", "LICENSE", "NOTICE"],
+  "files": [
+    "dist",
+    "data",
+    "generated/buckets/*.json",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "generate": "tsx src/generate.ts",
