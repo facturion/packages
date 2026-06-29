@@ -1,0 +1,66 @@
+{
+  "name": "@facturion/invoice",
+  "version": "0.1.0",
+  "description": "The Facturion simplified-JSON invoice data model: the EN 16931 simplified-invoice JSON Schema, strict + partial validators, derived TypeScript types, and the canonical net/total computation helpers.",
+  "keywords": [
+    "en16931",
+    "einvoicing",
+    "invoice",
+    "json-schema",
+    "validation",
+    "data-model",
+    "vat",
+    "zugferd",
+    "xrechnung",
+    "factur-x"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/facturion/packages.git",
+    "directory": "packages/invoice"
+  },
+  "homepage": "https://github.com/facturion/packages/tree/main/packages/invoice#readme",
+  "bugs": "https://github.com/facturion/packages/issues",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    },
+    "./schema": {
+      "types": "./dist/generated/schema.d.ts",
+      "default": "./dist/generated/schema.js"
+    },
+    "./invoice-schema.json": "./data/invoice-schema.json",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "data/invoice-schema.json",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "generate": "tsx src/generate.ts",
+    "test": "node --import tsx --test test/*.test.ts",
+    "prepare": "npm run generate && npm run build",
+    "prepublishOnly": "npm test"
+  },
+  "dependencies": {
+    "ajv": "^8.17.0",
+    "ajv-formats": "^3.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "json-schema-to-typescript": "^15.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

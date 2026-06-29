@@ -1,0 +1,335 @@
+{
+  "invoice_number": "INV-2026-0042",
+  "issue_date": "2026-03-31",
+  "invoice_type_code": "380",
+  "currency_code": "EUR",
+  "due_date": "2026-04-30",
+  "tax_point_date": "2026-03-31",
+  "buyer_reference": "04011000-12345-03",
+  "project_reference": "PRJ-2026-007",
+  "contract_reference": "CT-2025-100",
+  "purchase_order_reference": "PO-2026-0100",
+  "sales_order_reference": "SO-2026-0050",
+  "despatch_advice_reference": "DESP-2026-300",
+  "tender_or_lot_reference": "TENDER-2025-42",
+  "buyer_accounting_reference": "4711",
+  "payment_terms": "Net 30 days. 2% discount if paid within 10 days.",
+
+  "object_identifier": {
+    "id": "SUB-2026-1234",
+    "scheme_id": "AUN"
+  },
+
+  "notes": [
+    {
+      "subject_code": "AAI",
+      "text": "This invoice covers consulting services rendered in March 2026."
+    },
+    {
+      "text": "Please direct billing questions to invoice@acme-gmbh.de."
+    }
+  ],
+
+  "process_control": {
+    "business_process_type": "urn:fdc:peppol.eu:2017:poacc:billing:01:1.0",
+    "specification_id": "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0"
+  },
+
+  "preceding_invoices": [
+    {
+      "reference": "INV-2026-0038",
+      "issue_date": "2026-02-28"
+    }
+  ],
+
+  "seller": {
+    "name": "Acme GmbH",
+    "trading_name": "Acme Solutions",
+    "identifiers": [
+      {
+        "id": "4000001123452",
+        "scheme_id": "0088"
+      }
+    ],
+    "legal_registration_id": {
+      "id": "HRB 12345",
+      "scheme_id": "0002"
+    },
+    "vat_id": "DE123456789",
+    "tax_registration_id": "27/641/01234",
+    "additional_legal_info": "Geschaeftsfuehrer: Max Mustermann. Amtsgericht Berlin HRB 12345.",
+    "electronic_address": {
+      "id": "DE123456789",
+      "scheme_id": "9930"
+    },
+    "address": {
+      "line1": "Musterstr. 1",
+      "line2": "Gebaeude B, 3. OG",
+      "city": "Berlin",
+      "post_code": "10115",
+      "country_subdivision": "Berlin",
+      "country_code": "DE"
+    },
+    "contact": {
+      "name": "Max Mustermann",
+      "phone": "+49 30 12345678",
+      "email": "invoice@acme-gmbh.de"
+    }
+  },
+
+  "buyer": {
+    "name": "Beispiel AG",
+    "trading_name": "Beispiel Group",
+    "identifier": {
+      "id": "BSPAG-001",
+      "scheme_id": "0088"
+    },
+    "legal_registration_id": {
+      "id": "HRB 98765",
+      "scheme_id": "0002"
+    },
+    "vat_id": "DE987654321",
+    "electronic_address": {
+      "id": "DE987654321",
+      "scheme_id": "9930"
+    },
+    "address": {
+      "line1": "Hauptstr. 42",
+      "line2": "Postfach 100",
+      "city": "Munich",
+      "post_code": "80331",
+      "country_subdivision": "Bayern",
+      "country_code": "DE"
+    },
+    "contact": {
+      "name": "Erika Mustermann",
+      "phone": "+49 89 98765432",
+      "email": "ap@beispiel-ag.de"
+    }
+  },
+
+  "payee": {
+    "name": "Acme Factoring GmbH",
+    "identifier": {
+      "id": "FACT-001",
+      "scheme_id": "0088"
+    },
+    "legal_registration_id": {
+      "id": "HRB 55555"
+    }
+  },
+
+  "seller_tax_representative": {
+    "name": "Tax Consultants Berlin GmbH",
+    "vat_id": "DE111222333",
+    "address": {
+      "line1": "Steuerweg 10",
+      "city": "Berlin",
+      "post_code": "10117",
+      "country_code": "DE"
+    }
+  },
+
+  "delivery": {
+    "name": "Beispiel AG — Warehouse Munich",
+    "location_id": {
+      "id": "LOCID-42",
+      "scheme_id": "0088"
+    },
+    "date": "2026-03-28",
+    "period": {
+      "start_date": "2026-03-01",
+      "end_date": "2026-03-31"
+    },
+    "address": {
+      "line1": "Lagerstr. 5",
+      "city": "Munich",
+      "post_code": "80339",
+      "country_code": "DE"
+    }
+  },
+
+  "payment": {
+    "means_code": "58",
+    "means_text": "SEPA Credit Transfer",
+    "remittance_information": "INV-2026-0042",
+    "credit_transfers": [
+      {
+        "account_id": "DE89370400440532013000",
+        "account_name": "Acme GmbH",
+        "service_provider_id": "COBADEFFXXX"
+      }
+    ]
+  },
+
+  "document_allowances": [
+    {
+      "amount": 50.00,
+      "base_amount": 1000.00,
+      "percentage": 5,
+      "vat_category_code": "S",
+      "vat_rate": 19,
+      "reason": "Loyalty discount",
+      "reason_code": "95"
+    }
+  ],
+
+  "document_charges": [
+    {
+      "amount": 25.00,
+      "vat_category_code": "S",
+      "vat_rate": 19,
+      "reason": "Packaging",
+      "reason_code": "ABL"
+    }
+  ],
+
+  "vat_breakdown": [
+    {
+      "category_code": "E",
+      "rate": 0,
+      "reason": "Exempt under Article 132(1)(f) Directive 2006/112/EC",
+      "reason_code": "VATEX-EU-132-1F"
+    }
+  ],
+
+  "prepaid_amount": 200.00,
+
+  "supporting_documents": [
+    {
+      "reference": "TSH-2026-03",
+      "description": "Timesheet March 2026",
+      "attached_document": {
+        "content": "JVBERi0xLjcKMSAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwo+PgplbmRvYmo=",
+        "mime_code": "application/pdf",
+        "filename": "timesheet-march-2026.pdf"
+      }
+    },
+    {
+      "reference": "SLA-2025",
+      "description": "Service Level Agreement",
+      "external_location": "https://acme-gmbh.de/docs/sla-2025.pdf"
+    }
+  ],
+
+  "lines": [
+    {
+      "id": "1",
+      "note": "Senior developer, on-site",
+      "quantity": 120,
+      "unit_code": "HUR",
+      "order_line_reference": "PO-2026-0100-01",
+      "buyer_accounting_reference": "4711-DEV",
+      "period": {
+        "start_date": "2026-03-01",
+        "end_date": "2026-03-31"
+      },
+      "price": {
+        "net_price": 95.00,
+        "discount": 5.00,
+        "gross_price": 100.00
+      },
+      "vat": {
+        "category_code": "S",
+        "rate": 19
+      },
+      "item": {
+        "name": "Software development — senior",
+        "description": "Full-stack development services for Project Phoenix, including code review and architecture consulting.",
+        "seller_id": "SVC-DEV-SR",
+        "buyer_id": "ACME-DEV-01",
+        "standard_id": {
+          "id": "8512101",
+          "scheme_id": "0160"
+        },
+        "classifications": [
+          {
+            "id": "62.01",
+            "scheme_id": "STI",
+            "version": "2"
+          }
+        ],
+        "country_of_origin": "DE",
+        "attributes": [
+          { "name": "Seniority", "value": "Senior" },
+          { "name": "Location", "value": "On-site Munich" }
+        ]
+      },
+      "allowances": [
+        {
+          "amount": 99.98,
+          "base_amount": 11400.00,
+          "percentage": 0.877,
+          "reason": "Volume discount for >100h",
+          "reason_code": "95"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "quantity": 40,
+      "unit_code": "HUR",
+      "order_line_reference": "PO-2026-0100-02",
+      "price": {
+        "net_price": 75.00
+      },
+      "vat": {
+        "category_code": "S",
+        "rate": 19
+      },
+      "item": {
+        "name": "Software development — junior",
+        "seller_id": "SVC-DEV-JR"
+      }
+    },
+    {
+      "id": "3",
+      "quantity": 2,
+      "unit_code": "DAY",
+      "price": {
+        "net_price": 450.00
+      },
+      "vat": {
+        "category_code": "S",
+        "rate": 19
+      },
+      "item": {
+        "name": "Workshop: Cloud Architecture",
+        "description": "Two-day hands-on workshop for the Beispiel AG infrastructure team."
+      }
+    },
+    {
+      "id": "4",
+      "quantity": 50,
+      "unit_code": "C62",
+      "price": {
+        "net_price": 12.00,
+        "base_quantity": 10
+      },
+      "vat": {
+        "category_code": "S",
+        "rate": 7
+      },
+      "item": {
+        "name": "Printed training manual",
+        "seller_id": "PUB-MANUAL-01"
+      }
+    },
+    {
+      "id": "5",
+      "quantity": 1,
+      "unit_code": "C62",
+      "price": {
+        "net_price": 0.00
+      },
+      "vat": {
+        "category_code": "E",
+        "rate": 0
+      },
+      "item": {
+        "name": "Pro-bono consulting — nonprofit integration",
+        "description": "Donated hours for nonprofit partner integration, exempt under services to members."
+      }
+    }
+  ]
+}

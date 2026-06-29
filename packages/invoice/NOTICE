@@ -1,0 +1,23 @@
+@facturion/invoice
+==================
+
+This package is licensed under the MIT License (see LICENSE).
+
+The JSON Schema in `data/invoice-schema.json` is the original work of this
+package: a simplified JSON input format that covers the full EN 16931 semantic
+model. It references the following public standards.
+
+--------------------------------------------------------------------------------
+EN 16931 (European e-invoicing semantic data model)
+  Used for: the business terms (BT/BG) the simplified format maps onto, and the
+            field-level semantics documented in the schema.
+  Reference: EN 16931-1 — the standard text itself is published by CEN and the
+            national standards bodies (e.g. DIN EN 16931-1).
+
+--------------------------------------------------------------------------------
+UN/CEFACT and ISO code lists
+  Used for: the code values referenced by the schema's enums and patterns
+            (UNTDID 1001 invoice types, UNTDID 5305 VAT categories, UN/ECE
+            Rec 20/21 units, ISO 3166 countries, ISO 4217 currencies).
+  Friendly labels and curated subsets for these live in @facturion/codelists.
+  Reference: https://unece.org/trade/uncefact/
