@@ -18,5 +18,8 @@ export {
   InvoiceValidationError,
 } from "./validate.js";
 
-export { lineNet, computeTotals } from "./model.js";
+// `round2` is exported deliberately: any consumer that computes an Amount of
+// its own needs the same rounding these totals were built with, or its figures
+// drift from ours. EN 16931 Amounts are 2dp everywhere, not just in here.
+export { lineNet, computeTotals, round2 } from "./model.js";
 export type { ComputableInvoice, InvoiceTotals, TaxSubtotal } from "./model.js";
