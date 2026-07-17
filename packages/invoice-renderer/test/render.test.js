@@ -342,3 +342,24 @@ test("renderInvoiceDocument: partial invoice (no seller) still renders", () => {
   assert.match(doc, /^<!DOCTYPE html>/);
   assert.match(doc, /invoice-paper/);
 });
+
+test("renderInvoice: codelist lookups degrade to the code with a minimal t", () => {
+  // A custom resolver that only knows view.* strings — the contract says it
+  // returns the key on a miss. Codelist-backed labels must fall back to the
+  // raw code, never leak "vatCategory.AE"-style keys into the document.
+  const bundled = makeT("en");
+  const minimalT = (key, vars) => (key.startsWith("view.") ? bundled(key, vars) : key);
+  const html = renderInvoice(
+    {
+      ...invoice,
+      tax_point_date_code: "35",
+      lines: [{ ...invoice.lines[0], vat: { category_code: "AE", rate: "0" } }],
+      vat_breakdown: [{ category_code: "AE", rate: "0" }],
+    },
+    { t: minimalT },
+  );
+  assert.doesNotMatch(html, /vatCategory\./);
+  assert.doesNotMatch(html, /taxPointDateCode\./);
+  assert.match(html, /· AE/);   // breakdown shows the bare category code
+  assert.match(html, /> 35</);  // tax point code shown raw
+});

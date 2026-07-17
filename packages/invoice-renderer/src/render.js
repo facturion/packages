@@ -110,6 +110,16 @@ function addressLines(addr) {
   return lines;
 }
 
+/** Codelist label with the raw code as fallback: a custom `t` that misses
+ *  returns the KEY unchanged ("vatCategory.AE"), which must never reach the
+ *  document — degrade to the code itself, like every other codelist lookup. */
+function codeLabel(t, prefix, code) {
+  if (!code) return "";
+  const key = prefix + "." + code;
+  const label = t(key);
+  return label && label !== key ? label : code;
+}
+
 /** Reason display for allowances/charges: text, code, or the generic label,
  *  plus the percentage/base derivation when the document carries it. */
 function acReason(x, fallback, t, lang) {
@@ -151,7 +161,7 @@ function headerBlock(invoice, t, lang) {
   if (invoice.tax_point_date) {
     rows.push(`<div><span class="inv-label">${t("view.taxPointDate")}</span> ${fmtDate(invoice.tax_point_date, lang)}</div>`);
   } else if (invoice.tax_point_date_code) {
-    rows.push(`<div><span class="inv-label">${t("view.taxPointDate")}</span> ${esc(t("taxPointDateCode." + invoice.tax_point_date_code))}</div>`);
+    rows.push(`<div><span class="inv-label">${t("view.taxPointDate")}</span> ${esc(codeLabel(t, "taxPointDateCode", invoice.tax_point_date_code))}</div>`);
   }
   if (invoice.currency_code) {
     rows.push(`<div><span class="inv-label">${t("view.currency")}</span> ${esc(invoice.currency_code)}</div>`);
@@ -439,7 +449,7 @@ function totalsBlock(invoice, t, lang, totals) {
   for (const g of totals.taxSubtotals) {
     const rateLabel = t("view.taxTotal", { rate: num(g.rate, lang) });
     const catLabel = g.category && g.category !== "S"
-      ? ` · ${esc(t("vatCategory." + g.category))}`
+      ? ` · ${esc(codeLabel(t, "vatCategory", g.category))}`
       : "";
     rows.push(`<tr class="inv-vat-row">
       <td>${esc(rateLabel)}${catLabel}<span class="inv-vat-base"> · ${t("view.taxableAmount")} ${curAmt(g.taxable, cur, lang)}</span></td>
