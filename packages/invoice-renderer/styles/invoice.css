@@ -95,6 +95,13 @@
   color: #0f172a;
 }
 
+.inv-preceding {
+  margin-top: var(--space-1);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: #334155;
+}
+
 .inv-header-right {
   text-align: right;
   color: #475569;
@@ -208,6 +215,7 @@
 .inv-references,
 .inv-period,
 .inv-notes,
+.inv-docs,
 .inv-payment,
 .inv-payment-terms,
 .inv-totals-wrap,
@@ -221,6 +229,24 @@
 
 .inv-notes p:last-child {
   margin-bottom: 0;
+}
+
+.inv-docs {
+  margin-bottom: var(--space-6);
+  padding: var(--space-3) var(--space-4);
+  background: #f5ede0;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  color: #475569;
+}
+
+.inv-doc-ref {
+  font-weight: 600;
+  color: #334155;
+}
+
+.inv-doc-url {
+  word-break: break-all;
 }
 
 .inv-payment > div {
@@ -303,6 +329,22 @@
   font-size: var(--text-xs);
   color: #94a3b8;
   text-decoration: line-through;
+}
+
+.inv-line-price-base {
+  font-size: var(--text-xs);
+  color: #94a3b8;
+}
+
+.inv-line-vatcat,
+.inv-note-code {
+  display: inline-block;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: #64748b;
+  background: #f5ede0;
+  border-radius: var(--radius-sm);
+  padding: 0 0.35em;
 }
 
 .inv-vat-base {
@@ -438,9 +480,28 @@
 .invoice-paper--dark .inv-references,
 .invoice-paper--dark .inv-period,
 .invoice-paper--dark .inv-notes,
+.invoice-paper--dark .inv-docs,
 .invoice-paper--dark .inv-payment {
   background: var(--bg-card);
   color: var(--text-secondary);
+}
+
+.invoice-paper--dark .inv-preceding {
+  color: var(--text-secondary);
+}
+
+.invoice-paper--dark .inv-line-price-base {
+  color: var(--text-secondary);
+}
+
+.invoice-paper--dark .inv-line-vatcat,
+.invoice-paper--dark .inv-note-code {
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+}
+
+.invoice-paper--dark .inv-doc-ref {
+  color: var(--text);
 }
 
 .invoice-paper--dark .inv-ref {

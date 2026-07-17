@@ -24,13 +24,16 @@ import { renderInvoiceDocument, renderInvoice, makeT } from "@facturion/invoice-
 const html = renderInvoiceDocument(invoice, { lang: "de" });
 
 // Or just the fragment, with your own label resolver:
-const fragment = renderInvoice(invoice, { t: makeT("en") });
+const fragment = renderInvoice(invoice, { t: makeT("en"), lang: "en" });
 ```
 
 - **`renderInvoiceDocument(invoice, { lang?, t? })`** → full `<!DOCTYPE html>` document.
-- **`renderInvoice(invoice, { t })`** → HTML fragment; `t(key, vars?)` resolves
-  `view.*` / `units.*` / `paymentMeans.*` and returns the key on a miss. Use
-  `makeT(lang)` for the default resolver, or inject your own.
+- **`renderInvoice(invoice, { t, lang? })`** → HTML fragment; `t(key, vars?)`
+  resolves `view.*` / `units.*` / `paymentMeans.*` / `invoiceTypes.*` /
+  `vatCategory.*` / `taxPointDateCode.*` and returns the key on a miss. Use
+  `makeT(lang)` for the default resolver, or inject your own. `lang` drives
+  date and number formatting (`de` → `17.07.2026`, `1.234,56`); formatting is
+  deterministic per language — the process/browser locale is never consulted.
 
 Partial invoices render fine (missing sections simply don't appear), so the
 renderer suits live previews as well as final documents.

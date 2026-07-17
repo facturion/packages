@@ -9,13 +9,22 @@ export { lineNet, computeTotals } from "@facturion/invoice/model";
 
 /** HTML-escape a value (`&`, `<`, `>`, `"`). */
 export function esc(s: unknown): string;
-/** Format a number with exactly two fraction digits; non-numerics pass through escaped. */
-export function amt(value: unknown): string;
+/** Format a number with exactly two fraction digits, using the document
+ *  language's separators (deterministic — never the process locale);
+ *  non-numerics pass through escaped. */
+export function amt(value: unknown, lang?: Lang): string;
 /** `amt(value)` optionally suffixed with a currency code. */
-export function curAmt(value: unknown, cur?: string): string;
+export function curAmt(value: unknown, cur?: string, lang?: Lang): string;
+/** Unlimited-precision number (quantity, rate, percentage) with the document
+ *  language's separators. */
+export function num(value: unknown, lang?: Lang): string;
+/** Localize an ISO date for the document language (`de` → DD.MM.YYYY);
+ *  other languages and non-ISO input pass through. */
+export function fmtDate(value: unknown, lang?: Lang): string;
 
-/** Render the invoice as an HTML fragment (no document chrome). */
-export function renderInvoice(invoice: Invoice, opts: { t: TFunction }): string;
+/** Render the invoice as an HTML fragment (no document chrome). `lang` drives
+ *  date/number formatting; labels still come from `t`. */
+export function renderInvoice(invoice: Invoice, opts: { t: TFunction; lang?: Lang }): string;
 
 /** Render a standalone HTML document (stylesheet inlined, default labels). */
 export function renderInvoiceDocument(

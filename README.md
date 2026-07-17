@@ -9,8 +9,8 @@ Open-source (MIT) building blocks for EN 16931 / e-invoicing, published under th
 | Package | Description |
 |---|---|
 | [`@facturion/codelists`](packages/codelists) | Friendly, multilingual EN 16931 / UN-CEFACT code lists (units, VAT categories, payment means, invoice types, countries, currencies, Peppol EAS schemes) with curated labels and hints. |
-
-_(More to come — e.g. `@facturion/invoice-renderer`.)_
+| [`@facturion/invoice`](packages/invoice) | The simplified-JSON invoice model covering the full EN 16931 semantic model, with schema validation and the standard's totals/rounding math. |
+| [`@facturion/invoice-renderer`](packages/invoice-renderer) | Render the simplified-JSON model to a human-readable HTML invoice (the presentation layer behind an HTML→PDF flow), covering every model field, localized per document language. |
 
 ## Development
 

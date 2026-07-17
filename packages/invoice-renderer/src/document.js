@@ -22,7 +22,7 @@ const _HTML_LANG = { en: "en", de: "de" };
  */
 export function renderInvoiceDocument(invoice, { lang = DEFAULT_LANG, t } = {}) {
   const resolve = t ?? makeT(lang);
-  const fragment = renderInvoice(invoice, { t: resolve });
+  const fragment = renderInvoice(invoice, { t: resolve, lang });
   const htmlLang = _HTML_LANG[lang] || DEFAULT_LANG;
   return `<!DOCTYPE html>
 <html lang="${htmlLang}">
