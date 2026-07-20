@@ -38,8 +38,37 @@ const fragment = renderInvoice(invoice, { t: makeT("en"), lang: "en" });
 Partial invoices render fine (missing sections simply don't appear), so the
 renderer suits live previews as well as final documents.
 
-The bundled stylesheet is also importable directly, e.g.
-`@facturion/invoice-renderer/styles/view.css`.
+The bundled stylesheet is also importable directly:
+`@facturion/invoice-renderer/styles/invoice.css`.
+
+## Theming
+
+The stylesheet is self-contained: its design tokens are scoped to
+`.invoice-paper` rather than `:root`, so importing it neither depends on nor
+collides with a host app's global tokens. Every colour and dimension resolves
+through a token, and light — the default — is the palette declared on
+`.invoice-paper`. Retheme by overriding tokens; you should never need to touch
+`.inv-*` internals.
+
+```css
+/* Match the host's brand without restyling the document. */
+.invoice-paper {
+  --paper: #ffffff;
+  --surface: #f4f6fb;
+  --text-strong: #0b1f3a;
+  --border: #d9e0ea;
+}
+```
+
+`.invoice-paper--dark` is an optional dark preview. It is a pure token
+override — it redeclares the same names and adds no rules of its own, so a
+token you override applies to whichever mode declares it. Print always renders
+on white regardless of mode.
+
+Tokens are grouped as surfaces (`--paper`, `--surface`, `--surface-chip`), a
+text ramp from `--text-strong` down to `--text-faint`, rules (`--border`,
+`--border-strong`, `--border-accent`), semantic accents (`--accent-allowance`),
+and the shared type/space scale (`--text-*`, `--space-*`, `--radius-*`).
 
 ## License
 

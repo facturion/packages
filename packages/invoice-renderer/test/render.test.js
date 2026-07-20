@@ -10,6 +10,7 @@ import {
   num,
   fmtDate,
 } from "../src/index.js";
+import { invoiceCss } from "../src/styles.js";
 
 const invoice = {
   invoice_number: "INV-1",
@@ -362,4 +363,72 @@ test("renderInvoice: codelist lookups degrade to the code with a minimal t", () 
   assert.doesNotMatch(html, /taxPointDateCode\./);
   assert.match(html, /· AE/);   // breakdown shows the bare category code
   assert.match(html, /> 35</);  // tax point code shown raw
+});
+
+// ── Theming contract ────────────────────────────────────────────────────────
+// The package's stated seam is "override tokens, never .inv-* internals". That
+// held for geometry but not colour: the token block carried the *dark* palette
+// while light was ~47 hardcoded literals, so overriding --text changed nothing
+// in light mode and silently moved dark. Two of those dark tokens also leaked
+// into non-dark rules — .data-table's border resolved to rgba(255,255,255,.08)
+// on cream, making every line-item separator invisible. These tests pin the
+// invariants that make the seam real; they read the stylesheet as text because
+// that is where the contract lives.
+
+// Comments mention selectors and colours, so every check runs against the
+// declarations only.
+const css = invoiceCss.replace(/\/\*[\s\S]*?\*\//g, "");
+/** The declaration block for a selector, matched literally. */
+const block = (selector) => {
+  const at = css.indexOf(selector + " {");
+  if (at === -1) return undefined;
+  return css.slice(at, css.indexOf("}", at) + 1);
+};
+
+test("stylesheet: every colour resolves through a token", () => {
+  // A literal outside the token blocks is a value a host cannot retheme.
+  const stripped = css.replace(/\.invoice-paper(--dark)?\s*\{[^}]*\}/g, "");
+  const literals = stripped.match(/#[0-9a-fA-F]{3,8}|rgba?\([^)]*\)/g);
+  assert.equal(literals, null,
+    `hardcoded colour(s) outside the token blocks: ${literals?.join(", ")}`);
+});
+
+test("stylesheet: the dark theme is a token override, nothing else", () => {
+  // Every dark declaration must be a custom property. A `.invoice-paper--dark
+  // .inv-thing { color: … }` rule means the light rule is missing a token —
+  // which is how ~35 of them accumulated before.
+  const darkRules = css.match(/\.invoice-paper--dark[^{]*\{[^}]*\}/g) ?? [];
+  assert.equal(darkRules.length, 1,
+    `dark should be one token block, found ${darkRules.length}`);
+  const decls = darkRules[0]
+    .slice(darkRules[0].indexOf("{") + 1, -1)
+    .split(";").map((d) => d.trim()).filter(Boolean);
+  assert.ok(decls.length > 0);
+  for (const d of decls) {
+    assert.ok(d.startsWith("--"), `dark theme declares a property, not a token: ${d}`);
+  }
+});
+
+test("stylesheet: both themes define the same colour tokens", () => {
+  // A colour name defined in light but not dark silently inherits the light
+  // value — the failure mode is a light-coloured rule surviving into dark.
+  const names = (b) => new Set([...b.matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1]));
+  const light = names(block(".invoice-paper"));
+  const dark = names(block(".invoice-paper--dark"));
+  const colour = [...light].filter((n) =>
+    /^--(paper|surface|text|border|accent)/.test(n)
+    && !/^--text-(base|sm|xl|xs)$/.test(n)      // type scale, not colour
+    && !n.startsWith("--accent-"));             // one value, shared by design
+  assert.ok(colour.length > 5);
+  assert.deepEqual(colour.filter((n) => !dark.has(n)), []);
+});
+
+test("stylesheet: the shared table base sets no colour", () => {
+  // `.invoice-paper .data-table td` is (0,2,1) and outranks `.inv-lines`
+  // (0,1,0), so a colour here wins over the per-table colour that is meant to
+  // govern — that is exactly why line-item amounts rendered washed out while
+  // the description beside them was near-black.
+  const base = block(".invoice-paper .data-table th,\n.invoice-paper .data-table td");
+  assert.ok(base, "table base rule not found — did the selector change?");
+  assert.doesNotMatch(base, /(^|[\s;{])color:/);
 });
