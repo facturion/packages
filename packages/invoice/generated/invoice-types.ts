@@ -545,11 +545,11 @@ export interface EN16931SimplifiedInvoice {
      */
     amount: number | string;
     /**
-     * BT-93 | Document level allowance base amount
+     * BT-93 | Document level allowance base amount | The amount BT-94 was applied to. Conventionally the sum of line net amounts carrying this entry's vat_rate — not the document total, and not a running balance after other allowances.
      */
     base_amount?: number | string;
     /**
-     * BT-94 | Document level allowance percentage
+     * BT-94 | Document level allowance percentage | Documents how BT-92 was derived; it is never applied on your behalf. Supply the resolved BT-92 yourself. Where both BT-93 and BT-94 are given they must agree with BT-92 to within one cent.
      */
     percentage?: number | string;
     /**
@@ -578,11 +578,11 @@ export interface EN16931SimplifiedInvoice {
      */
     amount: number | string;
     /**
-     * BT-100 | Document level charge base amount
+     * BT-100 | Document level charge base amount | The amount BT-101 was applied to. Conventionally the sum of line net amounts carrying this entry's vat_rate — not the document total, and not a running balance after other charges.
      */
     base_amount?: number | string;
     /**
-     * BT-101 | Document level charge percentage
+     * BT-101 | Document level charge percentage | Documents how BT-99 was derived; it is never applied on your behalf. Supply the resolved BT-99 yourself. Where both BT-100 and BT-101 are given they must agree with BT-99 to within one cent.
      */
     percentage?: number | string;
     /**
@@ -785,11 +785,11 @@ export interface EN16931SimplifiedInvoice {
          */
         amount: number | string;
         /**
-         * BT-137 | Invoice line allowance base amount
+         * BT-137 | Invoice line allowance base amount | The amount BT-138 was applied to. Conventionally this line's quantity × net_price ÷ base_quantity, before any other allowance or charge on the line.
          */
         base_amount?: number | string;
         /**
-         * BT-138 | Invoice line allowance percentage
+         * BT-138 | Invoice line allowance percentage | Documents how BT-136 was derived; it is never applied on your behalf. Supply the resolved BT-136 yourself. Where both BT-137 and BT-138 are given they must agree with BT-136 to within one cent.
          */
         percentage?: number | string;
         /**
@@ -810,11 +810,11 @@ export interface EN16931SimplifiedInvoice {
          */
         amount: number | string;
         /**
-         * BT-142 | Invoice line charge base amount
+         * BT-142 | Invoice line charge base amount | The amount BT-143 was applied to. Conventionally this line's quantity × net_price ÷ base_quantity, before any other allowance or charge on the line.
          */
         base_amount?: number | string;
         /**
-         * BT-143 | Invoice line charge percentage
+         * BT-143 | Invoice line charge percentage | Documents how BT-141 was derived; it is never applied on your behalf. Supply the resolved BT-141 yourself. Where both BT-142 and BT-143 are given they must agree with BT-141 to within one cent.
          */
         percentage?: number | string;
         /**
@@ -991,11 +991,11 @@ export interface EN16931SimplifiedInvoice {
          */
         amount: number | string;
         /**
-         * BT-137 | Invoice line allowance base amount
+         * BT-137 | Invoice line allowance base amount | The amount BT-138 was applied to. Conventionally this line's quantity × net_price ÷ base_quantity, before any other allowance or charge on the line.
          */
         base_amount?: number | string;
         /**
-         * BT-138 | Invoice line allowance percentage
+         * BT-138 | Invoice line allowance percentage | Documents how BT-136 was derived; it is never applied on your behalf. Supply the resolved BT-136 yourself. Where both BT-137 and BT-138 are given they must agree with BT-136 to within one cent.
          */
         percentage?: number | string;
         /**
@@ -1016,11 +1016,11 @@ export interface EN16931SimplifiedInvoice {
          */
         amount: number | string;
         /**
-         * BT-142 | Invoice line charge base amount
+         * BT-142 | Invoice line charge base amount | The amount BT-143 was applied to. Conventionally this line's quantity × net_price ÷ base_quantity, before any other allowance or charge on the line.
          */
         base_amount?: number | string;
         /**
-         * BT-143 | Invoice line charge percentage
+         * BT-143 | Invoice line charge percentage | Documents how BT-141 was derived; it is never applied on your behalf. Supply the resolved BT-141 yourself. Where both BT-142 and BT-143 are given they must agree with BT-141 to within one cent.
          */
         percentage?: number | string;
         /**

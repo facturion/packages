@@ -18,6 +18,12 @@ export {
   InvoiceValidationError,
 } from "./validate.js";
 
+// Exported standalone as well as wired into strict validation: a draft surface
+// that cannot use the strict validator (half its required fields are still
+// empty) may still want to flag a self-contradicting allowance as soon as both
+// derivation fields are present.
+export { checkAdjustmentDerivations } from "./adjustments.js";
+
 // `round2` is exported deliberately: any consumer that computes an Amount of
 // its own needs the same rounding these totals were built with, or its figures
 // drift from ours. EN 16931 Amounts are 2dp everywhere, not just in here.

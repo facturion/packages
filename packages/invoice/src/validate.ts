@@ -9,13 +9,18 @@
  *      previews and the renderer, which tolerate omitted fields.
  *
  *  Each validator is its own Ajv instance: the relaxed clone keeps the original
- *  `$id`, so compiling both in one instance would collide. */
+ *  `$id`, so compiling both in one instance would collide.
+ *
+ *  Strict mode additionally runs the cross-field checks in `adjustments.ts` —
+ *  arithmetic JSON Schema cannot express. See that module for why they exist
+ *  and why partial mode is deliberately exempt. */
 
 import Ajv2020Default from "ajv/dist/2020.js";
 import addFormatsDefault from "ajv-formats";
 import type { ErrorObject, SchemaObject, ValidateFunction } from "ajv";
 import { invoiceSchema } from "../generated/schema.js";
 import type { EN16931SimplifiedInvoice } from "../generated/invoice-types.js";
+import { checkAdjustmentDerivations } from "./adjustments.js";
 
 // ajv and ajv-formats are CJS; under NodeNext the default import is typed as
 // the module namespace and (depending on the consumer's interop) may arrive
@@ -55,9 +60,31 @@ function stripRequired(node: unknown): unknown {
   return node;
 }
 
-export const validateInvoice: ValidateFunction = addFormats(
+const validateInvoiceSchema: ValidateFunction = addFormats(
   new Ajv2020({ strict: false, allErrors: true }),
 ).compile(invoiceSchema as SchemaObject);
+
+/** Strict validation: the full schema, plus the cross-field checks.
+ *
+ *  Wraps Ajv's compiled function rather than replacing it so the contract
+ *  callers rely on holds — `validateInvoice(x) === true` still means "this is
+ *  acceptable", and `.errors` still carries an `ErrorObject[]`. The schema's
+ *  own properties (`schema`, `schemaEnv`, …) are copied across so the wrapper
+ *  remains a usable `ValidateFunction` for tooling that introspects them.
+ *
+ *  Both passes always run and their errors concatenate, matching the
+ *  `allErrors: true` posture elsewhere: a caller fixing a payload should see
+ *  everything wrong with it in one round trip, not one class at a time. */
+export const validateInvoice: ValidateFunction = Object.assign(
+  (data: unknown): boolean => {
+    const schemaOk = validateInvoiceSchema(data);
+    const schemaErrors = schemaOk ? [] : (validateInvoiceSchema.errors ?? []);
+    const errors = [...schemaErrors, ...checkAdjustmentDerivations(data)];
+    validateInvoice.errors = errors.length > 0 ? errors : null;
+    return errors.length === 0;
+  },
+  validateInvoiceSchema,
+) as ValidateFunction;
 
 export const validatePartialInvoice: ValidateFunction = addFormats(
   new Ajv2020({ strict: false, allErrors: true }),
