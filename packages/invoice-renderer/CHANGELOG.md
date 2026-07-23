@@ -1,5 +1,12 @@
 # @facturion/invoice-renderer
 
+## 0.4.1
+
+### Patch Changes
+
+- Updated dependencies [29b7d6a]
+  - @facturion/invoice@0.2.0
+
 ## 0.4.0
 
 ### Minor Changes
