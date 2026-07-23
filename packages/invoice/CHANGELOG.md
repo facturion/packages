@@ -1,5 +1,11 @@
 # @facturion/invoice
 
+## 0.2.0
+
+### Minor Changes
+
+- 29b7d6a: Verify percentage/amount math reconciliation for document-level charges and allowances during schema validation.
+
 ## 0.1.2
 
 ### Patch Changes
