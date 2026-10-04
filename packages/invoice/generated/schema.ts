@@ -50,7 +50,11 @@ export const invoiceSchema: Record<string, unknown> = {
     "vat_accounting_currency_code": {
       "type": "string",
       "pattern": "^[A-Z]{3}$",
-      "description": "BT-6 | VAT accounting currency code | ISO 4217, only if different from currency_code"
+      "description": "BT-6 | VAT accounting currency code | ISO 4217, only if different from currency_code. Requires tax_amount_accounting_currency."
+    },
+    "tax_amount_accounting_currency": {
+      "$ref": "#/$defs/decimal",
+      "description": "BT-111 | Invoice total VAT amount in accounting currency | The invoice's total VAT converted into vat_accounting_currency_code at your exchange rate. Cannot be derived from the lines, so supply it yourself. Required together with vat_accounting_currency_code."
     },
     "tax_point_date": {
       "type": "string",
@@ -966,7 +970,7 @@ export const invoiceSchema: Record<string, unknown> = {
         "tax_amount_accounting_currency": {
           "$ref": "#/$defs/decimal",
           "readOnly": true,
-          "description": "BT-111 | Invoice total VAT amount in accounting currency | Only present when vat_accounting_currency_code differs from currency_code"
+          "description": "BT-111 | Invoice total VAT amount in accounting currency | Read-only echo of top-level tax_amount_accounting_currency; populated on extraction, ignored on input"
         },
         "tax_inclusive_amount": {
           "$ref": "#/$defs/decimal",
@@ -1360,6 +1364,18 @@ export const invoiceSchema: Record<string, unknown> = {
           }
         }
       }
+    }
+  },
+  "dependentSchemas": {
+    "vat_accounting_currency_code": {
+      "required": [
+        "tax_amount_accounting_currency"
+      ]
+    },
+    "tax_amount_accounting_currency": {
+      "required": [
+        "vat_accounting_currency_code"
+      ]
     }
   }
 };
