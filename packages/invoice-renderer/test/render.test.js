@@ -156,6 +156,20 @@ test("renderInvoice: VAT accounting currency renders (BT-6 + BT-111)", () => {
   assert.match(html, /3\.42.EUR/);
 });
 
+test("renderInvoice: BT-111 from the top-level input when no totals echo", () => {
+  const html = renderInvoice(
+    {
+      ...invoice,
+      currency_code: "SEK",
+      vat_accounting_currency_code: "EUR",
+      tax_amount_accounting_currency: "3.42",
+    },
+    { t: en },
+  );
+  assert.match(html, /VAT total in EUR/);
+  assert.match(html, /3\.42.EUR/);
+});
+
 test("renderInvoice: supporting documents section (BG-24)", () => {
   const html = renderInvoice(
     {

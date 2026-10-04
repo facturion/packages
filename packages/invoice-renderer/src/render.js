@@ -464,9 +464,11 @@ function totalsBlock(invoice, t, lang, totals) {
   }
 
   // BT-111: VAT total restated in the accounting currency (BT-6). Cannot be
-  // recomputed from lines (unknown exchange rate) — read the caller's echo.
+  // recomputed from lines (unknown exchange rate) — read the extracted echo,
+  // else the caller's top-level input.
   const acctCur = invoice.vat_accounting_currency_code;
-  const acctVat = invoice.totals?.tax_amount_accounting_currency;
+  const acctVat = invoice.totals?.tax_amount_accounting_currency
+    ?? invoice.tax_amount_accounting_currency;
   if (acctCur && acctVat != null) {
     rows.push(`<tr class="inv-vat-row"><td>${esc(t("view.taxTotalIn", { cur: acctCur }))}</td><td class="inv-col-num">${curAmt(acctVat, acctCur, lang)}</td></tr>`);
   }
