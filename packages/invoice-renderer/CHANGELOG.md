@@ -1,5 +1,13 @@
 # @facturion/invoice-renderer
 
+## 0.4.2
+
+### Patch Changes
+
+- b7e229a: Render BT-111 (VAT total in the accounting currency) from the top-level `tax_amount_accounting_currency` input when the invoice has no extracted `totals` echo, so a document rendered straight from its input data shows the figure.
+- Updated dependencies [aa22ad9]
+  - @facturion/invoice@0.3.0
+
 ## 0.4.1
 
 ### Patch Changes
