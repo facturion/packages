@@ -1,5 +1,11 @@
 # @facturion/invoice
 
+## 0.4.0
+
+### Minor Changes
+
+- d76d7f6: Export a `PartialInvoice` type: the invoice with every field optional, recursively, which is the shape `validatePartialInvoice` accepts. `assertPartialInvoice` now narrows its argument to it.
+
 ## 0.3.0
 
 ### Minor Changes
