@@ -1,5 +1,13 @@
 # @facturion/invoice-renderer
 
+## 0.4.3
+
+### Patch Changes
+
+- d76d7f6: Type `renderInvoice` / `renderInvoiceDocument` input as `PartialInvoice`. The renderer has always tolerated partial invoices (drafts, previews), but its declarations demanded a complete, strictly valid `Invoice`, so typed consumers had to cast at every draft call site.
+- Updated dependencies [d76d7f6]
+  - @facturion/invoice@0.4.0
+
 ## 0.4.2
 
 ### Patch Changes
