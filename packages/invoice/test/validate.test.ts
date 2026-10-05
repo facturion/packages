@@ -57,3 +57,30 @@ test("partial: date format is enforced (ajv-formats wired)", () => {
   assert.equal(validatePartialInvoice({ issue_date: "not-a-date" }), false);
   assert.equal(validatePartialInvoice({ issue_date: "2026-01-15" }), true);
 });
+
+test("strict: BT-6 without BT-111 is rejected, and vice versa", () => {
+  const acctOnly = { ...minimalValid, vat_accounting_currency_code: "EUR" };
+  assert.equal(validateInvoice(acctOnly), false);
+  assert.ok(validateInvoice.errors?.some(
+    (e) => e.keyword === "required" && e.params.missingProperty === "tax_amount_accounting_currency",
+  ));
+  const amountOnly = { ...minimalValid, tax_amount_accounting_currency: "19.00" };
+  assert.equal(validateInvoice(amountOnly), false);
+  assert.ok(validateInvoice.errors?.some(
+    (e) => e.keyword === "required" && e.params.missingProperty === "vat_accounting_currency_code",
+  ));
+});
+
+test("strict: BT-6 with a caller-supplied BT-111 passes", () => {
+  const both = {
+    ...minimalValid,
+    vat_accounting_currency_code: "EUR",
+    tax_amount_accounting_currency: "17.42",
+  };
+  assert.equal(validateInvoice(both), true, JSON.stringify(validateInvoice.errors));
+});
+
+test("partial: a draft may carry BT-6 before BT-111 is known", () => {
+  assert.equal(validatePartialInvoice({ vat_accounting_currency_code: "EUR" }), true);
+  assert.equal(validatePartialInvoice({ tax_amount_accounting_currency: "x" }), false);
+});

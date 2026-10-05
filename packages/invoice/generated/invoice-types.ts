@@ -22,9 +22,13 @@ export interface EN16931SimplifiedInvoice {
    */
   currency_code: string;
   /**
-   * BT-6 | VAT accounting currency code | ISO 4217, only if different from currency_code
+   * BT-6 | VAT accounting currency code | ISO 4217, only if different from currency_code. Requires tax_amount_accounting_currency.
    */
   vat_accounting_currency_code?: string;
+  /**
+   * BT-111 | Invoice total VAT amount in accounting currency | The invoice's total VAT converted into vat_accounting_currency_code at your exchange rate. Cannot be derived from the lines, so supply it yourself. Required together with vat_accounting_currency_code.
+   */
+  tax_amount_accounting_currency?: number | string;
   /**
    * BT-7 | Value added tax point date | Mutually exclusive with tax_point_date_code
    */
@@ -664,7 +668,7 @@ export interface EN16931SimplifiedInvoice {
      */
     tax_amount?: number | string;
     /**
-     * BT-111 | Invoice total VAT amount in accounting currency | Only present when vat_accounting_currency_code differs from currency_code
+     * BT-111 | Invoice total VAT amount in accounting currency | Read-only echo of top-level tax_amount_accounting_currency; populated on extraction, ignored on input
      */
     tax_amount_accounting_currency?: number | string;
     /**
