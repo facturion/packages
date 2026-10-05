@@ -99,8 +99,21 @@ export function assertValidInvoice(input: unknown): asserts input is EN16931Simp
 
 /** Throw `InvoiceValidationError` unless `input` satisfies the relaxed schema
  *  (types/patterns/enums enforced, nothing mandatory). */
-export function assertPartialInvoice(input: unknown): void {
+export function assertPartialInvoice(input: unknown): asserts input is PartialInvoice {
   if (!validatePartialInvoice(input)) {
     throw new InvoiceValidationError("Invalid invoice data", validatePartialInvoice.errors);
   }
 }
+
+/** Every field optional, recursively. Array element types are widened from the
+ *  schema's `minItems` tuples (`[T, ...T[]]`) to plain arrays, so an empty or
+ *  still-growing list is representable. */
+type DeepPartial<T> = T extends readonly (infer U)[]
+  ? DeepPartial<U>[]
+  : T extends object
+    ? { [K in keyof T]?: DeepPartial<T[K]> }
+    : T;
+
+/** The shape `validatePartialInvoice` accepts: the invoice with nothing
+ *  required. What drafts, previews and the renderer work with. */
+export type PartialInvoice = DeepPartial<EN16931SimplifiedInvoice>;

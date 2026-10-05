@@ -17,6 +17,7 @@ export {
   assertPartialInvoice,
   InvoiceValidationError,
 } from "./validate.js";
+export type { PartialInvoice } from "./validate.js";
 
 // Exported standalone as well as wired into strict validation: a draft surface
 // that cannot use the strict validator (half its required fields are still

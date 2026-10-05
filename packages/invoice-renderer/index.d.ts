@@ -1,4 +1,4 @@
-import type { Invoice, InvoiceTotals } from "@facturion/invoice";
+import type { Invoice, InvoiceTotals, PartialInvoice } from "@facturion/invoice";
 
 export type Lang = "en" | "de";
 
@@ -23,12 +23,14 @@ export function num(value: unknown, lang?: Lang): string;
 export function fmtDate(value: unknown, lang?: Lang): string;
 
 /** Render the invoice as an HTML fragment (no document chrome). `lang` drives
- *  date/number formatting; labels still come from `t`. */
-export function renderInvoice(invoice: Invoice, opts: { t: TFunction; lang?: Lang }): string;
+ *  date/number formatting; labels still come from `t`. Accepts a partial
+ *  invoice (drafts, previews): absent fields are simply not rendered. */
+export function renderInvoice(invoice: PartialInvoice, opts: { t: TFunction; lang?: Lang }): string;
 
-/** Render a standalone HTML document (stylesheet inlined, default labels). */
+/** Render a standalone HTML document (stylesheet inlined, default labels).
+ *  Accepts a partial invoice, like `renderInvoice`. */
 export function renderInvoiceDocument(
-  invoice: Invoice,
+  invoice: PartialInvoice,
   opts?: { lang?: Lang; t?: TFunction },
 ): string;
 
@@ -39,4 +41,4 @@ export function makeT(lang: Lang): TFunction;
 export const VIEW: Record<Lang, Record<string, string>>;
 export const DEFAULT_LANG: Lang;
 
-export type { Invoice, InvoiceTotals };
+export type { Invoice, InvoiceTotals, PartialInvoice };
