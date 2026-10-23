@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { computeTotals, lineNet, round2 } from "../src/index.js";
+import { completeInvoice, computeTotals, lineNet, round2 } from "../src/index.js";
 
 // NB: there used to be a `cents()` helper here, and every total was asserted
 // through it. It rounded the results before comparing, which is exactly the
@@ -89,7 +89,7 @@ test("computeTotals: golden two-rate invoice with document allowance + charge", 
   assert.equal(t.grandTotal, 126.99);
   assert.equal(t.payable, 126.99);
 
-  // Subtotals sorted by rate descending; reasons attached from vat_breakdown.
+  // Subtotals in first-seen order (here the 19% line comes first).
   assert.deepEqual(
     t.taxSubtotals.map((s) => [s.rate, s.taxable, s.tax]),
     [
@@ -165,4 +165,99 @@ test("computeTotals: vat_breakdown reason is attached to the matching subtotal",
   const [sub] = computeTotals(invoice).taxSubtotals;
   assert.equal(sub?.reason, "Exempt");
   assert.equal(sub?.reason_code, "VATEX-EU-O");
+});
+
+test("computeTotals: VAT groups keep first-seen order, as the XML writers emit them", () => {
+  // Lines, then document allowances, then document charges. Not sorted by
+  // rate: a preview must list the groups in the order the issued XML will.
+  const invoice = {
+    lines: [
+      { quantity: "1", price: { net_price: "10" }, vat: { category_code: "S", rate: "7" } },
+      { quantity: "1", price: { net_price: "10" }, vat: { category_code: "S", rate: "19" } },
+    ],
+    document_charges: [{ amount: "5", vat_category_code: "Z", vat_rate: "0" }],
+  };
+  assert.deepEqual(
+    computeTotals(invoice).taxSubtotals.map((g) => [g.category, g.rate]),
+    [["S", 7], ["S", 19], ["Z", 0]],
+  );
+});
+
+test("computeTotals: rates group numerically, like the XML writers' key", () => {
+  const invoice = {
+    lines: [
+      { quantity: "1", price: { net_price: "10" }, vat: { category_code: "S", rate: "19" } },
+      { quantity: "1", price: { net_price: "10" }, vat: { category_code: "S", rate: "19.00" } },
+      { quantity: "1", price: { net_price: "10" }, vat: { category_code: "S", rate: 19 } },
+    ],
+  };
+  const subs = computeTotals(invoice).taxSubtotals;
+  assert.equal(subs.length, 1);
+  assert.equal(subs[0]?.taxable, 30);
+});
+
+const draft = () => ({
+  currency_code: "EUR",
+  lines: [
+    { id: "1", quantity: "2", price: { net_price: "10.00" }, vat: { category_code: "S", rate: "19" } },
+    { id: "2", net_amount: "99.99", quantity: "1", price: { net_price: "1" }, vat: { category_code: "S", rate: "7" } },
+    { id: "3", quantity: "1", price: { net_price: "40" }, vat: { category_code: "E", rate: "0" } },
+  ],
+  document_allowances: [{ amount: "5", vat_category_code: "S", vat_rate: "19" }],
+  vat_breakdown: [
+    { category_code: "E", rate: 0, reason: "Exempt", reason_code: "VATEX-EU-132-1F" },
+    { category_code: "AE", rate: 0, reason: "Not used by any line" },
+  ],
+  prepaid_amount: "20",
+});
+
+test("completeInvoice: fills totals the way the XML writers state them", () => {
+  assert.deepEqual(completeInvoice(draft()).totals, {
+    line_net_total: 159.99, // 20 + 99.99 (stated) + 40
+    allowance_total: 5,
+    tax_exclusive_amount: 154.99,
+    tax_amount: 9.85, // 15 × 19% = 2.85, 99.99 × 7% = 7.00, 0
+    tax_inclusive_amount: 164.84,
+    prepaid_amount: 20,
+    amount_due: 144.84,
+  });
+});
+
+test("completeInvoice: omits the totals the XML writers only emit when non-zero", () => {
+  const t = completeInvoice({ lines: [{ quantity: "1", price: { net_price: "10" }, vat: { category_code: "S", rate: "19" } }] }).totals;
+  assert.deepEqual(Object.keys(t), ["line_net_total", "tax_exclusive_amount", "tax_amount", "tax_inclusive_amount", "amount_due"]);
+  const r = completeInvoice({ lines: [{ quantity: "1", price: { net_price: "10" } }], rounding_amount: "-0.01" }).totals;
+  assert.equal(r.rounding_amount, -0.01);
+  assert.equal(r.amount_due, 9.99);
+});
+
+test("completeInvoice: full vat_breakdown, first-seen, reasons from the draft", () => {
+  assert.deepEqual(completeInvoice(draft()).vat_breakdown, [
+    { category_code: "S", rate: 19, taxable_amount: 15, tax_amount: 2.85 },
+    { category_code: "S", rate: 7, taxable_amount: 99.99, tax_amount: 7 },
+    { category_code: "E", rate: 0, taxable_amount: 40, tax_amount: 0, reason: "Exempt", reason_code: "VATEX-EU-132-1F" },
+  ]);
+});
+
+test("completeInvoice: every line gets net_amount; a stated one is kept", () => {
+  assert.deepEqual(completeInvoice(draft()).lines.map((l) => l.net_amount), [20, 99.99, 40]);
+});
+
+test("completeInvoice: input totals are replaced, as the server ignores them", () => {
+  const stale = { ...draft(), totals: { amount_due: 1, tax_amount: 1 } };
+  assert.equal(completeInvoice(stale).totals.amount_due, 144.84);
+});
+
+test("completeInvoice: BT-111 is carried over, never derived", () => {
+  const withAcct = { ...draft(), vat_accounting_currency_code: "CHF", tax_amount_accounting_currency: "9.40" };
+  assert.equal(completeInvoice(withAcct).totals.tax_amount_accounting_currency, 9.4);
+  const noCode = { ...draft(), tax_amount_accounting_currency: "9.40" };
+  assert.equal("tax_amount_accounting_currency" in completeInvoice(noCode).totals, false);
+});
+
+test("completeInvoice: the draft is not modified", () => {
+  const d = draft();
+  const before = JSON.stringify(d);
+  completeInvoice(d);
+  assert.equal(JSON.stringify(d), before);
 });

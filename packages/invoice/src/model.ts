@@ -1,10 +1,10 @@
 /** Canonical net / total computation over the simplified-invoice model.
  *
  *  Pure arithmetic — no HTML, no i18n, no code-list lookups. These are the
- *  numbers a renderer, a previewer or an editor needs (per-line net, the VAT
- *  breakdown, and the document totals chain down to the payable amount). The
- *  presentation layer (formatting, labels) lives in the renderer package; this
- *  is the model.
+ *  numbers an editor needs while a draft is being written (per-line net, the
+ *  VAT breakdown, and the document totals chain down to the payable amount),
+ *  and `completeInvoice` turns a draft into the invoice it will be once issued.
+ *  The renderer computes nothing: it shows what it is given.
  *
  *  Input is typed structurally (`ComputableInvoice`) rather than as the full
  *  `Invoice`: the math reads only a subset and must tolerate partial invoices
@@ -35,6 +35,8 @@ export interface ComputableInvoice {
   vat_breakdown?: { category_code?: string; rate?: Decimal; reason?: string; reason_code?: string }[];
   prepaid_amount?: Decimal;
   rounding_amount?: Decimal;
+  vat_accounting_currency_code?: string;
+  tax_amount_accounting_currency?: Decimal;
 }
 
 export interface TaxSubtotal {
@@ -56,8 +58,41 @@ export interface InvoiceTotals {
   prepaid: number;
   rounding: number;
   payable: number;
-  /** Sorted by rate descending. */
+  /** In first-seen order over lines, then document allowances, then document
+   *  charges: the order the XML writers emit BG-23 in. */
   taxSubtotals: TaxSubtotal[];
+}
+
+/** BG-22 as the simplified JSON states it (`totals`). Optional keys are the
+ *  ones the XML writers only emit when non-zero. */
+export interface DocumentTotals {
+  line_net_total: number;
+  allowance_total?: number;
+  charge_total?: number;
+  tax_exclusive_amount: number;
+  tax_amount: number;
+  tax_amount_accounting_currency?: number;
+  tax_inclusive_amount: number;
+  prepaid_amount?: number;
+  rounding_amount?: number;
+  amount_due: number;
+}
+
+/** One BG-23 entry as the simplified JSON states it (`vat_breakdown[]`). */
+export interface VatBreakdownEntry {
+  category_code?: string;
+  rate: number;
+  taxable_amount: number;
+  tax_amount: number;
+  reason?: string;
+  reason_code?: string;
+}
+
+/** What `completeInvoice` adds to a draft. */
+export interface Completion {
+  lines: { net_amount: number }[];
+  vat_breakdown: VatBreakdownEntry[];
+  totals: DocumentTotals;
 }
 
 /** Round to two decimals, half away from zero — commercial rounding.
@@ -105,12 +140,17 @@ export function lineNet(line: MoneyLine): number {
   return round2(net);
 }
 
+// Same key as the XML writers' `tax_group_key`: the rate as a number, so "19",
+// "19.00" and 19 are one group.
+const groupKey = (category: string | undefined, rate: Decimal | undefined): string =>
+  `${category ?? ""}|${Number(rate ?? 0)}`;
+
 // Group line-level taxable amounts (plus document-level allowances/charges)
 // by (category_code, rate) and attach exemption reasons from vat_breakdown.
 function vatBreakdown(invoice: ComputableInvoice): TaxSubtotal[] {
   const groups = new Map<string, TaxSubtotal>();
   const add = (amount: Decimal, category: string | undefined, rate: Decimal | undefined): void => {
-    const key = `${category ?? ""}|${rate ?? 0}`;
+    const key = groupKey(category, rate);
     const g = groups.get(key) ?? { category, rate: Number(rate ?? 0), taxable: 0, tax: 0 };
     g.taxable += Number(amount || 0);
     groups.set(key, g);
@@ -137,14 +177,16 @@ function vatBreakdown(invoice: ComputableInvoice): TaxSubtotal[] {
   // BT-120/121 exemption reasons live in vat_breakdown[], keyed on
   // (category_code, rate). Attach them to the matching subtotal.
   for (const e of invoice.vat_breakdown || []) {
-    const g = groups.get(`${e.category_code ?? ""}|${e.rate ?? 0}`);
+    const g = groups.get(groupKey(e.category_code, e.rate));
     if (g) {
       g.reason = e.reason;
       g.reason_code = e.reason_code;
     }
   }
 
-  return [...groups.values()].sort((a, b) => (b.rate ?? 0) - (a.rate ?? 0));
+  // Map order: first seen. Deliberately not sorted, so a preview lists the
+  // groups in the order the issued document will.
+  return [...groups.values()];
 }
 
 /** Full totals chain for an invoice: line extension → tax basis (after
@@ -189,4 +231,50 @@ export function computeTotals(invoice: ComputableInvoice): InvoiceTotals {
     payable,
     taxSubtotals,
   };
+}
+
+const defined = <T extends object>(o: T): T =>
+  Object.fromEntries(Object.entries(o).filter(([, v]) => v !== undefined)) as T;
+
+/** The invoice a draft becomes once issued: every derived value filled in, as
+ *  the transformation layer writes it into the XML and as extraction reads it
+ *  back. Adds `lines[].net_amount` (a stated one is kept), the full
+ *  `vat_breakdown` with amounts (input entries only contribute exemption
+ *  reasons; first-seen order) and `totals` (any input `totals` is replaced,
+ *  just as the server ignores it). Returns a new object; the draft is not
+ *  modified.
+ *
+ *  This is where derived values come from. Renderers show what they are given,
+ *  so a draft goes through here first. */
+export function completeInvoice<T extends ComputableInvoice>(draft: T): T & Completion {
+  const t = computeTotals(draft);
+  const lines = (draft.lines || []).map((l) => ({ ...l, net_amount: lineNet(l) }));
+  const vat_breakdown = t.taxSubtotals.map((g) =>
+    defined({
+      category_code: g.category,
+      rate: g.rate,
+      taxable_amount: g.taxable,
+      tax_amount: g.tax,
+      reason: g.reason || undefined,
+      reason_code: g.reason_code || undefined,
+    }),
+  );
+  // The XML writers emit BT-107/108/113 only when positive and BT-114 only
+  // when non-zero; extraction then has nothing to read. Mirror that.
+  const acct = draft.vat_accounting_currency_code && draft.tax_amount_accounting_currency != null
+    ? round2(Number(draft.tax_amount_accounting_currency))
+    : undefined;
+  const totals: DocumentTotals = defined({
+    line_net_total: t.lineExtension,
+    allowance_total: t.documentAllowances > 0 ? t.documentAllowances : undefined,
+    charge_total: t.documentCharges > 0 ? t.documentCharges : undefined,
+    tax_exclusive_amount: t.taxBasis,
+    tax_amount: t.taxAmount,
+    tax_amount_accounting_currency: acct,
+    tax_inclusive_amount: t.grandTotal,
+    prepaid_amount: t.prepaid > 0 ? t.prepaid : undefined,
+    rounding_amount: t.rounding !== 0 ? t.rounding : undefined,
+    amount_due: t.payable,
+  });
+  return { ...draft, lines, vat_breakdown, totals } as T & Completion;
 }

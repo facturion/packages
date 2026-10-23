@@ -10,14 +10,18 @@
 // and the `units.*` / `paymentMeans.*` / `invoiceTypes.*` / `vatCategory.*` /
 // `taxPointDateCode.*` vocabularies. `renderInvoiceDocument` supplies a default
 // `t` (bundled strings + @facturion/codelists); advanced callers pass their
-// own. The net/total math comes from @facturion/invoice.
-// Import from the pure ./model subpath, not the package root — the root eagerly
-// compiles Ajv validators at load, which we don't want dragged into the renderer
-// (and, transitively, the browser) bundle just for the net/total math.
-import { computeTotals, lineNet } from "@facturion/invoice/model";
+// own.
+//
+// The renderer computes nothing. Line net amounts, the VAT breakdown and the
+// document totals are shown as the invoice states them; an absent one is not
+// made up. An extracted invoice states them (right or wrong — showing what the
+// document says is the point); a draft gets them from `completeInvoice` in
+// @facturion/invoice before it is rendered.
 import { DEFAULT_LANG } from "./i18n.js";
 
-export { computeTotals, lineNet };
+// null and undefined both mean "not stated": amt() shows a dash for it, where
+// Number(null) would read as a zero.
+const stated = (v) => (v == null ? undefined : v);
 
 // Shared formatting helpers. All of them format deterministically from the
 // document language — never from the process locale, so the same invoice
@@ -334,7 +338,7 @@ function linesBlock(invoice, t, lang) {
     const discount  = line.price?.discount;
     const taxRate   = line.vat?.rate;
     const taxCat    = line.vat?.category_code;
-    const total     = lineNet(line);
+    const total     = stated(line.net_amount);
     const item      = line.item || {};
     const name      = item.name || "";
     const desc      = item.description && item.description !== name
@@ -429,11 +433,14 @@ function linesBlock(invoice, t, lang) {
     </div>`;
 }
 
-function totalsBlock(invoice, t, lang, totals) {
+function totalsBlock(invoice, t, lang) {
   const cur = invoice.currency_code;
+  const totals = invoice.totals || {};
   const rows = [];
 
-  rows.push(`<tr><td>${t("view.subtotal")}</td><td class="inv-col-num">${curAmt(totals.lineExtension, cur, lang)}</td></tr>`);
+  if (totals.line_net_total != null) {
+    rows.push(`<tr><td>${t("view.subtotal")}</td><td class="inv-col-num">${curAmt(totals.line_net_total, cur, lang)}</td></tr>`);
+  }
 
   for (const a of invoice.document_allowances || []) {
     rows.push(`<tr><td>${esc(acReason(a, t("view.documentAllowance"), t, lang))}</td><td class="inv-col-num">− ${curAmt(a.amount, cur, lang)}</td></tr>`);
@@ -442,18 +449,18 @@ function totalsBlock(invoice, t, lang, totals) {
     rows.push(`<tr><td>${esc(acReason(c, t("view.documentCharge"), t, lang))}</td><td class="inv-col-num">+ ${curAmt(c.amount, cur, lang)}</td></tr>`);
   }
 
-  // Per-category VAT breakdown — rate, category (when not standard-rated),
-  // taxable base inline, then tax amount. Exemption reason (BT-120/121)
-  // renders as a subtle sub-row so readers see the compliance statement right
-  // next to the 0% line.
-  for (const g of totals.taxSubtotals) {
-    const rateLabel = t("view.taxTotal", { rate: num(g.rate, lang) });
-    const catLabel = g.category && g.category !== "S"
-      ? ` · ${esc(codeLabel(t, "vatCategory", g.category))}`
+  // Per-category VAT breakdown, in the order the invoice states it — rate,
+  // category (when not standard-rated), taxable base inline, then tax amount.
+  // Exemption reason (BT-120/121) renders as a subtle sub-row so readers see
+  // the compliance statement right next to the 0% line.
+  for (const g of invoice.vat_breakdown || []) {
+    const rateLabel = t("view.taxTotal", { rate: num(g.rate ?? 0, lang) });
+    const catLabel = g.category_code && g.category_code !== "S"
+      ? ` · ${esc(codeLabel(t, "vatCategory", g.category_code))}`
       : "";
     rows.push(`<tr class="inv-vat-row">
-      <td>${esc(rateLabel)}${catLabel}<span class="inv-vat-base"> · ${t("view.taxableAmount")} ${curAmt(g.taxable, cur, lang)}</span></td>
-      <td class="inv-col-num">${curAmt(g.tax, cur, lang)}</td>
+      <td>${esc(rateLabel)}${catLabel}<span class="inv-vat-base"> · ${t("view.taxableAmount")} ${curAmt(stated(g.taxable_amount), cur, lang)}</span></td>
+      <td class="inv-col-num">${curAmt(stated(g.tax_amount), cur, lang)}</td>
     </tr>`);
     if (g.reason || g.reason_code) {
       const reason = g.reason
@@ -473,19 +480,24 @@ function totalsBlock(invoice, t, lang, totals) {
     rows.push(`<tr class="inv-vat-row"><td>${esc(t("view.taxTotalIn", { cur: acctCur }))}</td><td class="inv-col-num">${curAmt(acctVat, acctCur, lang)}</td></tr>`);
   }
 
-  if (totals.prepaid !== 0) {
+  const prepaid = Number(totals.prepaid_amount ?? 0);
+  if (prepaid !== 0) {
     // Sign-faithful: a positive prepaid is subtracted from the total, a
     // negative one (over-refund on a correction) adds to it.
-    const sign = totals.prepaid > 0 ? "− " : "+ ";
-    rows.push(`<tr><td>${t("view.prepaid")}</td><td class="inv-col-num">${sign}${curAmt(Math.abs(totals.prepaid), cur, lang)}</td></tr>`);
+    const sign = prepaid > 0 ? "− " : "+ ";
+    rows.push(`<tr><td>${t("view.prepaid")}</td><td class="inv-col-num">${sign}${curAmt(Math.abs(prepaid), cur, lang)}</td></tr>`);
   }
-  if (totals.rounding !== 0) {
-    const sign = totals.rounding > 0 ? "+ " : "− ";
-    rows.push(`<tr><td>${t("view.rounding")}</td><td class="inv-col-num">${sign}${curAmt(Math.abs(totals.rounding), cur, lang)}</td></tr>`);
+  const rounding = Number(totals.rounding_amount ?? 0);
+  if (rounding !== 0) {
+    const sign = rounding > 0 ? "+ " : "− ";
+    rows.push(`<tr><td>${t("view.rounding")}</td><td class="inv-col-num">${sign}${curAmt(Math.abs(rounding), cur, lang)}</td></tr>`);
   }
 
-  rows.push(`<tr class="inv-totals-payable"><td>${t("view.payable")}</td><td class="inv-col-num">${curAmt(totals.payable, cur, lang)}</td></tr>`);
+  if (totals.amount_due != null) {
+    rows.push(`<tr class="inv-totals-payable"><td>${t("view.payable")}</td><td class="inv-col-num">${curAmt(totals.amount_due, cur, lang)}</td></tr>`);
+  }
 
+  if (rows.length === 0) return "";
   return `<div class="inv-totals-wrap">
     <table class="inv-totals"><tbody>${rows.join("")}</tbody></table>
   </div>`;
@@ -596,8 +608,6 @@ function paymentTermsBlock(invoice, t) {
  * batteries-included wrapper.
  */
 export function renderInvoice(invoice, { t, lang = DEFAULT_LANG }) {
-  const totals = computeTotals(invoice);
-
   return `
     <div class="invoice-paper">
       ${headerBlock(invoice, t, lang)}
@@ -606,7 +616,7 @@ export function renderInvoice(invoice, { t, lang = DEFAULT_LANG }) {
       ${periodBlock(invoice, t, lang)}
       ${notesBlock(invoice, t)}
       ${linesBlock(invoice, t, lang)}
-      ${totalsBlock(invoice, t, lang, totals)}
+      ${totalsBlock(invoice, t, lang)}
       ${supportingDocsBlock(invoice, t)}
       ${paymentBlock(invoice, t)}
       ${paymentTermsBlock(invoice, t)}

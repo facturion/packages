@@ -6,8 +6,10 @@ presentation layer behind Facturion's invoice PDFs (feed the HTML to headless
 Chromium or any HTML→PDF tool).
 
 It owns presentation only: layout, the document stylesheet, and the `view.*`
-document strings. The data model and money math come from `@facturion/invoice`;
-unit and payment-means labels come from `@facturion/codelists`.
+document strings. It computes nothing: line net amounts, the VAT breakdown and
+the totals are shown as the invoice states them. The data model comes from
+`@facturion/invoice`; unit and payment-means labels come from
+`@facturion/codelists`.
 
 ## Install
 
@@ -19,9 +21,13 @@ npm install @facturion/invoice-renderer
 
 ```ts
 import { renderInvoiceDocument, renderInvoice, makeT } from "@facturion/invoice-renderer";
+import { completeInvoice } from "@facturion/invoice";
 
 // Batteries-included: a standalone HTML document (stylesheet inlined, labels resolved).
 const html = renderInvoiceDocument(invoice, { lang: "de" });
+
+// A draft has no totals yet: complete it first, the way the server will.
+const preview = renderInvoiceDocument(completeInvoice(draft), { lang: "de" });
 
 // Or just the fragment, with your own label resolver:
 const fragment = renderInvoice(invoice, { t: makeT("en"), lang: "en" });
@@ -35,8 +41,21 @@ const fragment = renderInvoice(invoice, { t: makeT("en"), lang: "en" });
   date and number formatting (`de` → `17.07.2026`, `1.234,56`); formatting is
   deterministic per language — the process/browser locale is never consulted.
 
-Partial invoices render fine (missing sections simply don't appear), so the
-renderer suits live previews as well as final documents.
+### Drafts and issued invoices
+
+The renderer shows what it is given and never makes a value up:
+
+- **An extracted invoice** (parsed from UBL/CII) states its totals. They are
+  rendered as stated, in the stated VAT order, even when they don't add up:
+  showing what the document says is the point, and catching the contradiction
+  is validation's job.
+- **A draft** (what an editor or a `/create`-style request holds) has no totals,
+  because they are outputs. Pass it through `completeInvoice` from
+  `@facturion/invoice`, which fills them in exactly as the XML writers will.
+  Rendered without that, a draft shows no totals and a dash for line amounts.
+
+Otherwise partial invoices render fine (missing sections simply don't appear),
+so the renderer suits live previews as well as final documents.
 
 The bundled stylesheet is also importable directly:
 `@facturion/invoice-renderer/styles/invoice.css`.

@@ -11,6 +11,7 @@ import {
   fmtDate,
 } from "../src/index.js";
 import { invoiceCss } from "../src/styles.js";
+import { completeInvoice } from "@facturion/invoice/model";
 
 const invoice = {
   invoice_number: "INV-1",
@@ -31,6 +32,9 @@ const invoice = {
   ],
   payment: { means_code: "30" },
 };
+
+// A draft, like the creator holds. Most tests render it as issued.
+const issued = (draft) => completeInvoice(draft);
 
 const en = makeT("en");
 const de = makeT("de");
@@ -58,7 +62,7 @@ test("formatters: dates localize for German, stay ISO for English", () => {
 });
 
 test("renderInvoice: fragment carries the core content (en)", () => {
-  const html = renderInvoice(invoice, { t: en });
+  const html = renderInvoice(issued(invoice), { t: en });
   assert.match(html, /class="invoice-paper"/);
   assert.match(html, /Invoice/); // view.invoice
   assert.match(html, /INV-1/);
@@ -83,7 +87,7 @@ test("renderInvoice: BT-3 titles resolve through the invoiceTypes codelist", () 
 
 test("renderInvoice: German document localizes dates and amounts", () => {
   const html = renderInvoice(
-    { ...invoice, due_date: "2026-02-01", lines: [{ ...invoice.lines[0], quantity: "2.5", price: { net_price: "1000" } }] },
+    issued({ ...invoice, due_date: "2026-02-01", lines: [{ ...invoice.lines[0], quantity: "2.5", price: { net_price: "1000" } }] }),
     { t: de, lang: "de" },
   );
   assert.match(html, /15\.01\.2026/); // issue date
@@ -135,10 +139,54 @@ test("renderInvoice: non-standard VAT categories are visible (BT-151 + BT-118 + 
 });
 
 test("renderInvoice: prepaid sign is faithful (BT-113)", () => {
-  const paid = renderInvoice({ ...invoice, prepaid_amount: "23.80" }, { t: en });
+  const paid = renderInvoice(issued({ ...invoice, prepaid_amount: "23.80" }), { t: en });
   assert.match(paid, /Prepaid<\/td><td class="inv-col-num">− 23\.80/);
-  const negative = renderInvoice({ ...invoice, prepaid_amount: "-5.00" }, { t: en });
+  // A stated negative prepaid (over-refund on a correction) adds to the total.
+  const base = issued(invoice);
+  const negative = renderInvoice({ ...base, totals: { ...base.totals, prepaid_amount: "-5.00" } }, { t: en });
   assert.match(negative, /Prepaid<\/td><td class="inv-col-num">\+ 5\.00/);
+});
+
+test("renderInvoice: shows the stated totals, never recomputed ones", () => {
+  // An extracted invoice whose stated figures don't add up. The renderer must
+  // show what the document says; catching the contradiction is validation's job.
+  const wrong = {
+    ...invoice,
+    lines: [{ ...invoice.lines[0], net_amount: 20 }],
+    vat_breakdown: [{ category_code: "S", rate: 19, taxable_amount: 20, tax_amount: 7.77 }],
+    totals: { line_net_total: 20, tax_exclusive_amount: 20, tax_amount: 7.77, tax_inclusive_amount: 27.77, amount_due: 99.99 },
+  };
+  const html = renderInvoice(wrong, { t: en });
+  assert.match(html, /7\.77.EUR/);
+  assert.match(html, /99\.99.EUR/);
+  assert.doesNotMatch(html, /23\.80/); // what the lines would compute to
+});
+
+test("renderInvoice: VAT rows keep the stated order", () => {
+  const html = renderInvoice(
+    {
+      ...invoice,
+      vat_breakdown: [
+        { category_code: "S", rate: 7, taxable_amount: 10, tax_amount: 0.7 },
+        { category_code: "S", rate: 19, taxable_amount: 10, tax_amount: 1.9 },
+      ],
+      totals: { amount_due: 22.6 },
+    },
+    { t: en },
+  );
+  assert.ok(html.indexOf("VAT 7") < html.indexOf("VAT 19"), "7% row first, as stated");
+});
+
+test("renderInvoice: the line total is the stated net amount", () => {
+  const html = renderInvoice({ ...invoice, lines: [{ ...invoice.lines[0], net_amount: "12.34" }], totals: {} }, { t: en });
+  assert.match(html, /12\.34/);
+  assert.doesNotMatch(html, /20\.00/); // quantity × price
+});
+
+test("renderInvoice: a draft that wasn't completed shows no made-up totals", () => {
+  const html = renderInvoice(invoice, { t: en });
+  assert.doesNotMatch(html, /Subtotal|Amount due|23\.80|20\.00 EUR/);
+  assert.match(html, /<td class="inv-col-num">—<\/td>/); // line total not stated
 });
 
 test("renderInvoice: VAT accounting currency renders (BT-6 + BT-111)", () => {
@@ -343,7 +391,7 @@ test("makeT: German document strings", () => {
 });
 
 test("renderInvoiceDocument: standalone HTML with inlined styles", () => {
-  const doc = renderInvoiceDocument(invoice, { lang: "de" });
+  const doc = renderInvoiceDocument(issued(invoice), { lang: "de" });
   assert.match(doc, /^<!DOCTYPE html>/);
   assert.match(doc, /<html lang="de">/);
   assert.match(doc, /<style>/);
