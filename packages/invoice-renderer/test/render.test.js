@@ -162,6 +162,51 @@ test("renderInvoice: shows the stated totals, never recomputed ones", () => {
   assert.doesNotMatch(html, /23\.80/); // what the lines would compute to
 });
 
+// The labels of the totals rows, top to bottom.
+const totalsRows = (html) =>
+  [...(html.match(/<table class="inv-totals">[\s\S]*?<\/table>/)?.[0] ?? "").matchAll(/<tr[^>]*><td[^>]*>([^<]*)/g)].map((m) => m[1].trim());
+
+test("renderInvoice: totals that equal their only addend merge into it", () => {
+  const html = renderInvoice({
+    ...invoice,
+    vat_breakdown: [{ category_code: "S", rate: 19, taxable_amount: 20, tax_amount: 3.8 }],
+    totals: { line_net_total: 20, tax_exclusive_amount: 20, tax_amount: 3.8, tax_inclusive_amount: 23.8, amount_due: 23.8 },
+  }, { t: en });
+  assert.deepEqual(totalsRows(html), ["Total net", "VAT 19 %", "Amount due"]);
+});
+
+test("renderInvoice: every stated total has a row, in EN 16931 order", () => {
+  const html = renderInvoice({
+    ...invoice,
+    document_allowances: [{ amount: 2, reason: "Loyalty" }, { amount: 1, reason: "Early order" }],
+    document_charges: [{ amount: 3, reason: "Packaging" }],
+    vat_breakdown: [
+      { category_code: "S", rate: 19, taxable_amount: 15, tax_amount: 2.85 },
+      { category_code: "S", rate: 7, taxable_amount: 5, tax_amount: 0.35 },
+    ],
+    totals: {
+      line_net_total: 20, allowance_total: 3, charge_total: 3, tax_exclusive_amount: 20,
+      tax_amount: 3.2, tax_inclusive_amount: 23.2, prepaid_amount: 10, amount_due: 13.2,
+    },
+  }, { t: en });
+  assert.deepEqual(totalsRows(html), [
+    "Subtotal", "Loyalty", "Early order", "Total discounts", "Packaging", "Total net",
+    "VAT 19 %", "VAT 7 %", "Total VAT", "Total incl. VAT", "Prepaid", "Amount due",
+  ]);
+  assert.doesNotMatch(html, /Total charges/); // one charge: its sum merges into it
+});
+
+test("renderInvoice: totals that disagree with their addend never merge", () => {
+  // BR-CO-14: the VAT total is one cent above the only VAT row.
+  const html = renderInvoice({
+    ...invoice,
+    vat_breakdown: [{ category_code: "S", rate: 7, taxable_amount: 314.86, tax_amount: 22.04 }],
+    totals: { line_net_total: 314.86, tax_exclusive_amount: 314.86, tax_amount: 22.05, tax_inclusive_amount: 336.9, amount_due: 366.86 },
+  }, { t: en });
+  assert.deepEqual(totalsRows(html), ["Total net", "VAT 7 %", "Total VAT", "Total incl. VAT", "Amount due"]);
+  assert.match(html, /22\.04.EUR[\s\S]*22\.05.EUR/);
+});
+
 test("renderInvoice: VAT rows keep the stated order", () => {
   const html = renderInvoice(
     {
