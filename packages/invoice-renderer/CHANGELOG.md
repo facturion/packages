@@ -1,5 +1,11 @@
 # @facturion/invoice-renderer
 
+## 0.7.1
+
+### Patch Changes
+
+- a6cf616: The totals open without a rule even when their first row is a sum (a line sum merged into the net total): its own top rule drew a second line just below the line table's.
+
 ## 0.7.0
 
 ### Minor Changes
