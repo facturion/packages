@@ -408,6 +408,11 @@
   border-top: 1px solid var(--border);
 }
 
+/* A sum row (net total, VAT total, gross total) closes the rows above it. */
+.inv-totals-sum td {
+  border-top: 1px solid var(--border);
+}
+
 .inv-totals-payable td {
   padding-top: var(--space-3);
   border-top: 2px solid var(--border-strong);

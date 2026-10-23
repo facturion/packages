@@ -54,6 +54,13 @@ The renderer shows what it is given and never makes a value up:
   `@facturion/invoice`, which fills them in exactly as the XML writers will.
   Rendered without that, a draft shows no totals and a dash for line amounts.
 
+The totals block has a row for every total the invoice states, in the EN 16931
+order: line sum, discounts and charges, net total, VAT per rate, VAT total,
+gross total, prepaid, rounding, amount due. A total merges into the row above
+when that row is its only addend and both state the same amount (one VAT rate
+whose tax is the VAT total, say), so a typical invoice shows three rows. Two
+amounts that disagree never merge: an inconsistent invoice shows both.
+
 Otherwise partial invoices render fine (missing sections simply don't appear),
 so the renderer suits live previews as well as final documents.
 

@@ -433,73 +433,111 @@ function linesBlock(invoice, t, lang) {
     </div>`;
 }
 
+// BG-22 document totals: every total the invoice states, in the EN 16931
+// order: line sum, document allowances and charges, net total, VAT per
+// category, VAT total, gross total, prepaid, rounding, amount due. Nothing is
+// computed; an absent total has no row.
+//
+// A total collapses into the row above it when that row is its only addend
+// and both state the same amount: one VAT category whose tax equals the VAT
+// total, nothing between the line sum and the net total, no prepaid or
+// rounding between the gross total and the amount due. Two amounts that
+// disagree never merge, so an inconsistent invoice shows the inconsistency.
+//
+// `bt` lists the fields each row shows (a merged row shows several).
 function totalsBlock(invoice, t, lang) {
   const cur = invoice.currency_code;
-  const totals = invoice.totals || {};
+  const tot = invoice.totals || {};
+  const money = (v) => curAmt(v, cur, lang);
+  const signed = (sign, v) => `${sign} ${money(v)}`;
+  const same = (a, b) => a != null && b != null && Number(a) === Number(b);
+  const has = (v) => v != null;
   const rows = [];
+  const row = (label, value, bt, cls = "") => {
+    rows.push({ label, value, bt: [bt].flat().filter(Boolean), cls });
+    return rows[rows.length - 1];
+  };
 
-  if (totals.line_net_total != null) {
-    rows.push(`<tr><td>${t("view.subtotal")}</td><td class="inv-col-num">${curAmt(totals.line_net_total, cur, lang)}</td></tr>`);
+  const allowances = invoice.document_allowances || [];
+  const charges = invoice.document_charges || [];
+
+  // BT-106 → BT-109
+  if (!allowances.length && !charges.length
+      && (!has(tot.line_net_total) || !has(tot.tax_exclusive_amount) || same(tot.line_net_total, tot.tax_exclusive_amount))) {
+    const v = tot.tax_exclusive_amount ?? tot.line_net_total;
+    if (has(v)) {
+      row(t("view.netTotal"), money(v), [has(tot.line_net_total) && "BT-106", has(tot.tax_exclusive_amount) && "BT-109"], "inv-totals-sum");
+    }
+  } else {
+    if (has(tot.line_net_total)) row(t("view.subtotal"), money(tot.line_net_total), "BT-106");
+    for (const a of allowances) {
+      row(esc(acReason(a, t("view.documentAllowance"), t, lang)), signed("−", a.amount), "BG-20");
+    }
+    if (has(tot.allowance_total) && !(allowances.length === 1 && same(allowances[0].amount, tot.allowance_total))) {
+      row(t("view.allowanceTotal"), signed("−", tot.allowance_total), "BT-107");
+    } else if (has(tot.allowance_total)) rows[rows.length - 1].bt.push("BT-107");
+    for (const c of charges) {
+      row(esc(acReason(c, t("view.documentCharge"), t, lang)), signed("+", c.amount), "BG-21");
+    }
+    if (has(tot.charge_total) && !(charges.length === 1 && same(charges[0].amount, tot.charge_total))) {
+      row(t("view.chargeTotal"), signed("+", tot.charge_total), "BT-108");
+    } else if (has(tot.charge_total)) rows[rows.length - 1].bt.push("BT-108");
+    if (has(tot.tax_exclusive_amount)) row(t("view.netTotal"), money(tot.tax_exclusive_amount), "BT-109", "inv-totals-sum");
   }
 
-  for (const a of invoice.document_allowances || []) {
-    rows.push(`<tr><td>${esc(acReason(a, t("view.documentAllowance"), t, lang))}</td><td class="inv-col-num">− ${curAmt(a.amount, cur, lang)}</td></tr>`);
-  }
-  for (const c of invoice.document_charges || []) {
-    rows.push(`<tr><td>${esc(acReason(c, t("view.documentCharge"), t, lang))}</td><td class="inv-col-num">+ ${curAmt(c.amount, cur, lang)}</td></tr>`);
-  }
-
-  // Per-category VAT breakdown, in the order the invoice states it — rate,
-  // category (when not standard-rated), taxable base inline, then tax amount.
-  // Exemption reason (BT-120/121) renders as a subtle sub-row so readers see
-  // the compliance statement right next to the 0% line.
-  for (const g of invoice.vat_breakdown || []) {
+  // BG-23, then BT-110
+  const vat = invoice.vat_breakdown || [];
+  let lastVat = null;
+  for (const g of vat) {
     const rateLabel = t("view.taxTotal", { rate: num(g.rate ?? 0, lang) });
     const catLabel = g.category_code && g.category_code !== "S"
       ? ` · ${esc(codeLabel(t, "vatCategory", g.category_code))}`
       : "";
-    rows.push(`<tr class="inv-vat-row">
-      <td>${esc(rateLabel)}${catLabel}<span class="inv-vat-base"> · ${t("view.taxableAmount")} ${curAmt(stated(g.taxable_amount), cur, lang)}</span></td>
-      <td class="inv-col-num">${curAmt(stated(g.tax_amount), cur, lang)}</td>
-    </tr>`);
+    lastVat = row(`${esc(rateLabel)}${catLabel}<span class="inv-vat-base"> · ${t("view.taxableAmount")} ${curAmt(stated(g.taxable_amount), cur, lang)}</span>`,
+      curAmt(stated(g.tax_amount), cur, lang), "BG-23", "inv-vat-row");
     if (g.reason || g.reason_code) {
       const reason = g.reason
         ? (g.reason_code ? `${g.reason} (${g.reason_code})` : g.reason)
         : g.reason_code;
-      rows.push(`<tr class="inv-vat-reason"><td colspan="2">${esc(reason)}</td></tr>`);
+      rows.push({ label: esc(reason), value: null, bt: ["BT-120"], cls: "inv-vat-reason" });
     }
   }
+  if (has(tot.tax_amount)) {
+    if (vat.length === 1 && same(vat[0].tax_amount, tot.tax_amount)) lastVat.bt.push("BT-110");
+    else row(t("view.vatTotal"), money(tot.tax_amount), "BT-110", "inv-totals-sum");
+  }
 
-  // BT-111: VAT total restated in the accounting currency (BT-6). Cannot be
-  // recomputed from lines (unknown exchange rate) — read the extracted echo,
-  // else the caller's top-level input.
+  // BT-111: VAT total restated in the accounting currency (BT-6).
   const acctCur = invoice.vat_accounting_currency_code;
   const acctVat = invoice.totals?.tax_amount_accounting_currency
     ?? invoice.tax_amount_accounting_currency;
   if (acctCur && acctVat != null) {
-    rows.push(`<tr class="inv-vat-row"><td>${esc(t("view.taxTotalIn", { cur: acctCur }))}</td><td class="inv-col-num">${curAmt(acctVat, acctCur, lang)}</td></tr>`);
+    row(esc(t("view.taxTotalIn", { cur: acctCur })), curAmt(acctVat, acctCur, lang), "BT-111", "inv-vat-row");
   }
 
-  const prepaid = Number(totals.prepaid_amount ?? 0);
-  if (prepaid !== 0) {
-    // Sign-faithful: a positive prepaid is subtracted from the total, a
-    // negative one (over-refund on a correction) adds to it.
-    const sign = prepaid > 0 ? "− " : "+ ";
-    rows.push(`<tr><td>${t("view.prepaid")}</td><td class="inv-col-num">${sign}${curAmt(Math.abs(prepaid), cur, lang)}</td></tr>`);
-  }
-  const rounding = Number(totals.rounding_amount ?? 0);
-  if (rounding !== 0) {
-    const sign = rounding > 0 ? "+ " : "− ";
-    rows.push(`<tr><td>${t("view.rounding")}</td><td class="inv-col-num">${sign}${curAmt(Math.abs(rounding), cur, lang)}</td></tr>`);
-  }
-
-  if (totals.amount_due != null) {
-    rows.push(`<tr class="inv-totals-payable"><td>${t("view.payable")}</td><td class="inv-col-num">${curAmt(totals.amount_due, cur, lang)}</td></tr>`);
+  // BT-112 → BT-115
+  const prepaid = Number(tot.prepaid_amount ?? 0);
+  const rounding = Number(tot.rounding_amount ?? 0);
+  if (prepaid === 0 && rounding === 0
+      && (!has(tot.tax_inclusive_amount) || !has(tot.amount_due) || same(tot.tax_inclusive_amount, tot.amount_due))) {
+    const v = tot.amount_due ?? tot.tax_inclusive_amount;
+    if (has(v)) row(t("view.payable"), money(v), [has(tot.tax_inclusive_amount) && "BT-112", has(tot.amount_due) && "BT-115"], "inv-totals-payable");
+  } else {
+    if (has(tot.tax_inclusive_amount)) row(t("view.grossTotal"), money(tot.tax_inclusive_amount), "BT-112", "inv-totals-sum");
+    // Sign-faithful: a positive prepaid is subtracted, a negative one added.
+    if (prepaid !== 0) row(t("view.prepaid"), signed(prepaid > 0 ? "−" : "+", Math.abs(prepaid)), "BT-113");
+    if (rounding !== 0) row(t("view.rounding"), signed(rounding > 0 ? "+" : "−", Math.abs(rounding)), "BT-114");
+    if (has(tot.amount_due)) row(t("view.payable"), money(tot.amount_due), "BT-115", "inv-totals-payable");
   }
 
   if (rows.length === 0) return "";
+  const html = rows.map((r) => {
+    const cls = r.cls ? ` class="${r.cls}"` : "";
+    if (r.value === null) return `<tr${cls}><td colspan="2">${r.label}</td></tr>`;
+    return `<tr${cls}><td>${r.label}</td><td class="inv-col-num">${r.value}</td></tr>`;
+  });
   return `<div class="inv-totals-wrap">
-    <table class="inv-totals"><tbody>${rows.join("")}</tbody></table>
+    <table class="inv-totals"><tbody>${html.join("")}</tbody></table>
   </div>`;
 }
 
