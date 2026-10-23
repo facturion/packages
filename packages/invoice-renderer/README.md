@@ -24,6 +24,7 @@ import { renderInvoiceDocument, renderInvoice, makeT } from "@facturion/invoice-
 import { completeInvoice } from "@facturion/invoice";
 
 // Batteries-included: a standalone HTML document (stylesheet inlined, labels resolved).
+// The document face (IBM Plex Sans) is inlined too, so the page needs no network.
 const html = renderInvoiceDocument(invoice, { lang: "de" });
 
 // A draft has no totals yet: complete it first, the way the server will.
@@ -65,7 +66,20 @@ Otherwise partial invoices render fine (missing sections simply don't appear),
 so the renderer suits live previews as well as final documents.
 
 The bundled stylesheet is also importable directly:
-`@facturion/invoice-renderer/styles/invoice.css`.
+`@facturion/invoice-renderer/styles/invoice.css`. Import
+`@facturion/invoice-renderer/styles/fonts.css` beside it so a browser preview
+draws the same face as the PDF.
+
+## Typeface
+
+The document is set in [IBM Plex Sans](https://github.com/IBM/plex) (SIL Open
+Font License 1.1), shipped with the package at weights 400–700 in every subset
+it comes in (Latin, Latin Extended, Cyrillic, Greek, Vietnamese).
+`renderInvoiceDocument` inlines the faces as `data:` URIs, so an HTML→PDF
+engine with no network and no fonts of its own still draws the document as the
+preview does; `styles/fonts.css` declares the same faces with `unicode-range`,
+so a browser fetches only the subsets a document uses. The family is the
+`--font-family` token, overridable like any other.
 
 ## Theming
 
@@ -86,15 +100,14 @@ through a token, and light — the default — is the palette declared on
 }
 ```
 
-`.invoice-paper--dark` is an optional dark preview. It is a pure token
-override — it redeclares the same names and adds no rules of its own, so a
-token you override applies to whichever mode declares it. Print always renders
-on white regardless of mode.
+The document is always light: it gets printed, attached and read by someone
+else, so a preview shows it as it leaves.
 
 Tokens are grouped as surfaces (`--paper`, `--surface`, `--surface-chip`), a
 text ramp from `--text-strong` down to `--text-faint`, rules (`--border`,
 `--border-strong`, `--border-accent`), semantic accents (`--accent-allowance`),
-and the shared type/space scale (`--text-*`, `--space-*`, `--radius-*`).
+the face (`--font-family`), and the shared type/space scale (`--text-*`,
+`--space-*`, `--radius-*`).
 
 ## License
 

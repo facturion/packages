@@ -6,3 +6,6 @@ dist/
 # Generated build artifacts (produced by each package's `generate` step on
 # prepare/pretest; included in the published tarball via the `files` allowlist).
 packages/invoice-renderer/src/styles.js
+packages/invoice-renderer/src/fonts.js
+packages/invoice-renderer/styles/fonts.css
+packages/invoice-renderer/fonts/
