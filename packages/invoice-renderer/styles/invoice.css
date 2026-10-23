@@ -423,8 +423,13 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* The line table already ends on a rule, so the totals open without one —
+ * including when their first row is a sum (a line sum merged into the net
+ * total), whose own rule would otherwise draw a second line a few
+ * millimetres below the first. (0,2,2) outranks .inv-totals-sum td. */
 .inv-totals tr:first-child td {
   padding-top: var(--space-3);
+  border-top: 0;
 }
 
 /* A sum row (net total, VAT total, gross total) closes the rows above it. */
