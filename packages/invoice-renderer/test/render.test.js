@@ -551,3 +551,16 @@ test("fonts: fonts.css points at files the package ships", () => {
   }
   assert.ok(existsSync(new URL("../fonts/OFL.txt", import.meta.url)), "the face's licence ships with it");
 });
+
+test("stylesheet: the totals open without a rule, even on a sum row", () => {
+  // The line table ends on a rule. A first row that is a sum (one line, no
+  // discounts: the line sum merges into the net total) carries
+  // .inv-totals-sum's top rule, which drew a double line under the table.
+  const first = block(".inv-totals tr:first-child td");
+  assert.ok(first, "first-row rule not found — did the selector change?");
+  assert.match(first, /border-top:\s*0/);
+  const html = renderInvoice(issued({ ...invoice, lines: [invoice.lines[0]] }), { t: makeT("en") });
+  const totals = html.slice(html.indexOf('class="inv-totals"'));
+  assert.match(totals.slice(0, totals.indexOf("</tr>")), /inv-totals-sum/,
+    "fixture no longer opens the totals on a sum row");
+});
