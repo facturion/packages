@@ -14,7 +14,8 @@ It ships:
   express — see [Allowances and charges](#allowances-and-charges).
 - **Derived TypeScript types** — generated from the schema.
 - **Money math** — `lineNet` and `computeTotals` (the net/VAT/totals chain down
-  to the payable amount). Pure arithmetic, no presentation.
+  to the payable amount), and `completeInvoice`, which turns a draft into the
+  invoice it becomes once issued. Pure arithmetic, no presentation.
 
 It owns no rendering or i18n. The HTML renderer
 (`@facturion/invoice-renderer`) and friendly code-list labels
@@ -50,6 +51,31 @@ if (!validatePartialInvoice(draft)) {
 // Totals: line extension → tax basis → VAT → grand total → payable.
 const { taxAmount, payable, taxSubtotals } = computeTotals(invoice);
 ```
+
+## Drafts and issued invoices
+
+The derived parts of an invoice (`lines[].net_amount`, the amounts in
+`vat_breakdown`, and `totals`) are outputs. On input the transformation layer
+computes them and ignores `totals`; on extraction they are read from the XML as
+stated. So a draft has none of them, and an extracted invoice states them,
+right or wrong.
+
+`completeInvoice(draft)` fills them in exactly as the XML writers do, giving
+the same shape extraction returns:
+
+```ts
+import { completeInvoice } from "@facturion/invoice";
+
+const issued = completeInvoice(draft);
+issued.totals.amount_due;          // BT-115
+issued.vat_breakdown;              // every (category, rate) group, first-seen order,
+                                   // exemption reasons taken from the draft's entries
+issued.lines[0].net_amount;        // a stated net_amount is kept
+```
+
+Use it wherever a draft is shown as a document (previews, PDFs from
+`/create`-style input). Don't use it on an extracted invoice: that would replace
+what the document says with what it should have said.
 
 The raw schema is available for tooling at `@facturion/invoice/invoice-schema.json`.
 
