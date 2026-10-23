@@ -259,8 +259,10 @@ export function completeInvoice<T extends ComputableInvoice>(draft: T): T & Comp
       reason_code: g.reason_code || undefined,
     }),
   );
-  // The XML writers emit BT-107/108/113 only when positive and BT-114 only
-  // when non-zero; extraction then has nothing to read. Mirror that.
+  // The XML writers emit BT-107/108 only when positive and BT-113/114 only
+  // when non-zero; extraction then has nothing to read. Mirror that. A
+  // negative prepaid amount is valid (an already-settled negative invoice
+  // states one equal to its gross total) and is stated like any other.
   const acct = draft.vat_accounting_currency_code && draft.tax_amount_accounting_currency != null
     ? round2(Number(draft.tax_amount_accounting_currency))
     : undefined;
@@ -272,7 +274,7 @@ export function completeInvoice<T extends ComputableInvoice>(draft: T): T & Comp
     tax_amount: t.taxAmount,
     tax_amount_accounting_currency: acct,
     tax_inclusive_amount: t.grandTotal,
-    prepaid_amount: t.prepaid > 0 ? t.prepaid : undefined,
+    prepaid_amount: t.prepaid !== 0 ? t.prepaid : undefined,
     rounding_amount: t.rounding !== 0 ? t.rounding : undefined,
     amount_due: t.payable,
   });

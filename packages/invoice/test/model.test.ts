@@ -231,6 +231,16 @@ test("completeInvoice: omits the totals the XML writers only emit when non-zero"
   assert.equal(r.amount_due, 9.99);
 });
 
+test("completeInvoice: states a negative prepaid amount, which the amount due adds back", () => {
+  const t = completeInvoice({
+    lines: [{ quantity: "-1", price: { net_price: "100" }, vat: { category_code: "S", rate: "19" } }],
+    prepaid_amount: "-119",
+  }).totals;
+  assert.equal(t.tax_inclusive_amount, -119);
+  assert.equal(t.prepaid_amount, -119);
+  assert.equal(t.amount_due, 0);
+});
+
 test("completeInvoice: full vat_breakdown, first-seen, reasons from the draft", () => {
   assert.deepEqual(completeInvoice(draft()).vat_breakdown, [
     { category_code: "S", rate: 19, taxable_amount: 15, tax_amount: 2.85 },
