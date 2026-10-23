@@ -29,11 +29,13 @@
       "default": "./src/index.js"
     },
     "./styles/invoice.css": "./styles/invoice.css",
+    "./styles/fonts.css": "./styles/fonts.css",
     "./package.json": "./package.json"
   },
   "files": [
     "src",
     "styles",
+    "fonts",
     "index.d.ts",
     "README.md",
     "LICENSE",
@@ -52,5 +54,8 @@
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "@fontsource/ibm-plex-sans": "^5.3.0"
   }
 }

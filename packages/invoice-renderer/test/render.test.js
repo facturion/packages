@@ -11,6 +11,8 @@ import {
   fmtDate,
 } from "../src/index.js";
 import { invoiceCss } from "../src/styles.js";
+import { fontFacesCss } from "../src/fonts.js";
+import { existsSync, readFileSync } from "node:fs";
 import { completeInvoice } from "@facturion/invoice/model";
 
 const invoice = {
@@ -445,6 +447,17 @@ test("renderInvoiceDocument: standalone HTML with inlined styles", () => {
   assert.match(doc, /15\.01\.2026/); // lang reaches the fragment formatters
 });
 
+test("renderInvoiceDocument: the document face travels inside the page", () => {
+  // An HTML→PDF engine may reach no network and have no fonts of its own worth
+  // the name — without the face inlined, the PDF fell back to the engine's
+  // default serif while the preview drew a sans.
+  const doc = renderInvoiceDocument(issued(invoice), { lang: "de" });
+  assert.ok(doc.includes(fontFacesCss));
+  assert.match(fontFacesCss, /font-family: 'IBM Plex Sans'/);
+  assert.match(fontFacesCss, /src: url\(data:font\/woff2;base64,/);
+  assert.doesNotMatch(fontFacesCss, /url\((?!data:)/);
+});
+
 test("renderInvoiceDocument: partial invoice (no seller) still renders", () => {
   const doc = renderInvoiceDocument({ invoice_number: "X", lines: [] }, { lang: "en" });
   assert.match(doc, /^<!DOCTYPE html>/);
@@ -493,41 +506,11 @@ const block = (selector) => {
 };
 
 test("stylesheet: every colour resolves through a token", () => {
-  // A literal outside the token blocks is a value a host cannot retheme.
-  const stripped = css.replace(/\.invoice-paper(--dark)?\s*\{[^}]*\}/g, "");
+  // A literal outside the token block is a value a host cannot retheme.
+  const stripped = css.replace(/\.invoice-paper\s*\{[^}]*\}/g, "");
   const literals = stripped.match(/#[0-9a-fA-F]{3,8}|rgba?\([^)]*\)/g);
   assert.equal(literals, null,
     `hardcoded colour(s) outside the token blocks: ${literals?.join(", ")}`);
-});
-
-test("stylesheet: the dark theme is a token override, nothing else", () => {
-  // Every dark declaration must be a custom property. A `.invoice-paper--dark
-  // .inv-thing { color: … }` rule means the light rule is missing a token —
-  // which is how ~35 of them accumulated before.
-  const darkRules = css.match(/\.invoice-paper--dark[^{]*\{[^}]*\}/g) ?? [];
-  assert.equal(darkRules.length, 1,
-    `dark should be one token block, found ${darkRules.length}`);
-  const decls = darkRules[0]
-    .slice(darkRules[0].indexOf("{") + 1, -1)
-    .split(";").map((d) => d.trim()).filter(Boolean);
-  assert.ok(decls.length > 0);
-  for (const d of decls) {
-    assert.ok(d.startsWith("--"), `dark theme declares a property, not a token: ${d}`);
-  }
-});
-
-test("stylesheet: both themes define the same colour tokens", () => {
-  // A colour name defined in light but not dark silently inherits the light
-  // value — the failure mode is a light-coloured rule surviving into dark.
-  const names = (b) => new Set([...b.matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1]));
-  const light = names(block(".invoice-paper"));
-  const dark = names(block(".invoice-paper--dark"));
-  const colour = [...light].filter((n) =>
-    /^--(paper|surface|text|border|accent)/.test(n)
-    && !/^--text-(base|sm|xl|xs)$/.test(n)      // type scale, not colour
-    && !n.startsWith("--accent-"));             // one value, shared by design
-  assert.ok(colour.length > 5);
-  assert.deepEqual(colour.filter((n) => !dark.has(n)), []);
 });
 
 test("stylesheet: the shared table base sets no colour", () => {
@@ -538,4 +521,33 @@ test("stylesheet: the shared table base sets no colour", () => {
   const base = block(".invoice-paper .data-table th,\n.invoice-paper .data-table td");
   assert.ok(base, "table base rule not found — did the selector change?");
   assert.doesNotMatch(base, /(^|[\s;{])color:/);
+});
+
+// ── Document face ───────────────────────────────────────────────────────────
+
+const fontsCss = readFileSync(new URL("../styles/fonts.css", import.meta.url), "utf8");
+const weightsOf = (text) => new Set([...text.matchAll(/font-weight:\s*(\d+)/g)].map((m) => m[1]));
+
+test("stylesheet: the paper names the document face", () => {
+  assert.match(block(".invoice-paper"), /--font-family: 'IBM Plex Sans'/);
+  assert.match(css, /font-family: var\(--font-family\)/);
+});
+
+test("fonts: every weight the stylesheet asks for has a face", () => {
+  // A weight with no face is synthesised or snapped to a neighbour, and the
+  // two engines need not agree on which.
+  for (const faces of [fontsCss, fontFacesCss]) {
+    const have = weightsOf(faces);
+    for (const w of weightsOf(css)) assert.ok(have.has(w), `no face for weight ${w}`);
+  }
+});
+
+test("fonts: fonts.css points at files the package ships", () => {
+  const urls = [...fontsCss.matchAll(/url\(([^)]+)\)/g)].map((m) => m[1]);
+  assert.ok(urls.length > 0);
+  for (const u of urls) {
+    assert.match(u, /^\.\.\/fonts\/[^/]+\.woff2$/);
+    assert.ok(existsSync(new URL(`../styles/${u}`, import.meta.url)), `missing ${u}`);
+  }
+  assert.ok(existsSync(new URL("../fonts/OFL.txt", import.meta.url)), "the face's licence ships with it");
 });
