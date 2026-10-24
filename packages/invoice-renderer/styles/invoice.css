@@ -472,3 +472,11 @@
     text-align: left;
   }
 }
+
+/* Annotated rendering (`annotate: true`): structure that only exists to hold
+ * slots for absent fields. An empty references block stays out of sight until
+ * a slot in it is revealed, and a contact line's separators go with the part
+ * they precede. */
+.invoice-paper .inv-references--empty:not(:has(.inv-slot:not([hidden]))) { display: none; }
+.invoice-paper .inv-sep:has(+ [hidden]) { display: none; }
+.invoice-paper .inv-party-contact > [hidden]:first-child + .inv-sep { display: none; }

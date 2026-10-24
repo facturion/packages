@@ -1,0 +1,88 @@
+/* @facturion/invoice-renderer — the default look of highlighted findings
+ * (see the `highlight` entry point), for an invoice rendered with
+ * `annotate: true`. Import it beside invoice.css.
+ *
+ * Boxes: at rest, what a finding asks to fix is tinted, a missing field shows
+ * as a dashed box with its label where it would print. A focused finding
+ * outlines every field it involves: solid for the field to fix, dashed for
+ * what made the rule apply, purple for figures compared, dashed in the
+ * finding's colour where only a containing block is rendered. The finding's
+ * severity colours the boxes; the most severe one marking a field wins.
+ *
+ * Every colour and dimension is a token on .invoice-paper; restyle by
+ * overriding them, or replace this file and keep the classes. */
+
+.invoice-paper {
+  --inv-hl-error: #c0392b;
+  --inv-hl-warning: #a86400;
+  --inv-hl-information: #2f6fa8;
+  --inv-hl-condition: #0f766e;
+  --inv-hl-operand: #6a3fc1;
+  --inv-hl-width: 2px;
+  --inv-hl-offset: 2px;
+  --inv-hl-radius: 3px;
+  --inv-hl-fill: 12%;
+  --inv-hl-rest-fill: 10%;
+  --inv-hl-slot-font-size: 11.5px;
+}
+
+.invoice-paper .inv-hl--error { --inv-hl: var(--inv-hl-error); }
+.invoice-paper .inv-hl--warning { --inv-hl: var(--inv-hl-warning); }
+.invoice-paper .inv-hl--information { --inv-hl: var(--inv-hl-information); }
+
+.invoice-paper .inv-hl {
+  border-radius: var(--inv-hl-radius);
+  outline-offset: var(--inv-hl-offset);
+  transition: background-color 0.12s, outline-color 0.12s;
+}
+
+/* At rest: what to fix. */
+.invoice-paper .inv-hl--rest {
+  background-color: color-mix(in srgb, var(--inv-hl) var(--inv-hl-rest-fill), transparent);
+}
+.invoice-paper span.inv-hl--rest {
+  text-decoration: underline wavy var(--inv-hl);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+/* Focused: every field, by role. */
+.invoice-paper .inv-hl--focus.inv-hl--target {
+  outline: var(--inv-hl-width) solid var(--inv-hl);
+  background-color: color-mix(in srgb, var(--inv-hl) var(--inv-hl-fill), transparent);
+}
+.invoice-paper .inv-hl--focus.inv-hl--condition {
+  outline: var(--inv-hl-width) dashed var(--inv-hl-condition);
+}
+.invoice-paper .inv-hl--focus.inv-hl--operand {
+  outline: var(--inv-hl-width) solid var(--inv-hl-operand);
+  background-color: color-mix(in srgb, var(--inv-hl-operand) 8%, transparent);
+}
+.invoice-paper .inv-hl--focus.inv-hl--approx {
+  outline: var(--inv-hl-width) dashed var(--inv-hl);
+}
+
+/* A revealed slot: the missing field's label in a dashed box, where it would
+ * print. */
+.invoice-paper .inv-slot--shown {
+  display: inline-block;
+  margin: 1px 0;
+  padding: 0 6px;
+  border: 1.5px dashed var(--inv-hl, var(--inv-hl-error));
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--inv-hl, var(--inv-hl-error)) 6%, transparent);
+  color: var(--inv-hl, var(--inv-hl-error));
+  font-size: var(--inv-hl-slot-font-size);
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.invoice-paper div.inv-slot--shown { display: block; width: fit-content; margin: 3px 0; }
+.invoice-paper tr.inv-slot--shown { display: table-row; }
+.invoice-paper .inv-slot--shown.inv-hl--focus {
+  border-style: solid;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--inv-hl) 18%, transparent);
+  outline: none;
+}
+.invoice-paper .inv-slot--shown.inv-hl--condition { --inv-hl: var(--inv-hl-condition); }
+.invoice-paper .inv-slot-state::before { content: "— "; }
