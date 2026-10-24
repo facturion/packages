@@ -1,0 +1,243 @@
+{
+  "spec": "SPEC.md, draft 1",
+  "documents": {
+    "rfc6901": {
+      "foo": ["bar", "baz"],
+      "": 0,
+      "a/b": 1,
+      "c%d": 2,
+      "e^f": 3,
+      "g|h": 4,
+      "i\\j": 5,
+      "k\"l": 6,
+      " ": 7,
+      "m~n": 8
+    },
+    "invoice": {
+      "seller": { "name": "Acme", "address": { "post_code": "10115" } },
+      "lines": [
+        {
+          "item": {
+            "classifications": [{ "id": "M1", "scheme_id": "CVD" }],
+            "attributes": [{ "name": "colour", "value": "red" }]
+          }
+        },
+        {
+          "item": {
+            "attributes": [
+              { "name": "colour", "value": "blue" },
+              { "name": "cva", "value": "clean" },
+              { "name": "cva", "value": "zero" }
+            ]
+          },
+          "period": { "start_date": "2026-03-01" }
+        },
+        { "item": {} }
+      ],
+      "codes": [{ "n": 3 }, { "n": "3" }, "3", null, ["3"]],
+      "taxed": [{ "vat": { "category_code": "S" } }, { "vat": { "category_code": "E" } }, { "vat": "S" }, {}],
+      "ids": [{ "id": "1", "scheme_id": "0088" }, { "id": "2" }, { "id": "3", "scheme_id": null }, { "id": "4", "scheme_id": "" }, "5"],
+      "weird": { "~*": "literal tilde-star key", "a=b": [{ "k=v": "x", "k": "v=w" }] }
+    }
+  },
+  "parse": {
+    "valid": [
+      "", "/", "/foo", "/foo/0", "/a~1b", "/m~0n", "/ ", "//",
+      "/lines/~*", "/lines/~./item", "/a/~?name=cva", "/a/~?name=", "/a/~?k~2v=x", "/a/~?name=a=b",
+      "0", "0/x", "12/x/~*", "/~01", "/~0*",
+      "/a/~?name!=cva", "/a/~?a~3=x", "/a/~?a~3!=x", "/a/~?vat~1category_code=S",
+      "/a/~?!scheme_id", "/a/~?!vat~1category_code"
+    ],
+    "invalid": [
+      { "pattern": "foo", "why": "neither absolute nor relative" },
+      { "pattern": "/a/~?na!me=x", "why": "an unescaped ! in a filter member" },
+      { "pattern": "/a/~?!=x", "why": "!= with an empty member" },
+      { "pattern": "/a/~?name!x", "why": "! without =" },
+      { "pattern": "/a/~?vat~1=S", "why": "an empty step in a nested member" },
+      { "pattern": "/a/~?!", "why": "~?! without a member" },
+      { "pattern": "/a/~?!na!me", "why": "an unescaped ! inside an absent filter's member" },
+      { "pattern": "01/x", "why": "level count with a leading zero" },
+      { "pattern": "0x", "why": "level count not followed by / or end" },
+      { "pattern": "/~", "why": "~ at the end of a token" },
+      { "pattern": "/~2", "why": "~2 outside a filter member" },
+      { "pattern": "/~a", "why": "unknown escape" },
+      { "pattern": "/~?", "why": "filter without member=value" },
+      { "pattern": "/~?name", "why": "filter without =" },
+      { "pattern": "/~?=cva", "why": "filter with an empty member" },
+      { "pattern": "/~?name=~2", "why": "~2 in a filter value" },
+      { "pattern": "/~**", "why": "~* must be the whole token" },
+      { "pattern": "/x~.", "why": "~. must be the whole token" }
+    ]
+  },
+  "match": [
+    { "name": "RFC 6901 §5: every example pointer matches itself", "doc": "rfc6901", "cases": [
+      { "pattern": "", "results": [{ "pointer": "", "exists": true }] },
+      { "pattern": "/foo", "results": [{ "pointer": "/foo", "exists": true }] },
+      { "pattern": "/foo/0", "results": [{ "pointer": "/foo/0", "exists": true }] },
+      { "pattern": "/", "results": [{ "pointer": "/", "exists": true }] },
+      { "pattern": "/a~1b", "results": [{ "pointer": "/a~1b", "exists": true }] },
+      { "pattern": "/c%d", "results": [{ "pointer": "/c%d", "exists": true }] },
+      { "pattern": "/e^f", "results": [{ "pointer": "/e^f", "exists": true }] },
+      { "pattern": "/g|h", "results": [{ "pointer": "/g|h", "exists": true }] },
+      { "pattern": "/i\\j", "results": [{ "pointer": "/i\\j", "exists": true }] },
+      { "pattern": "/k\"l", "results": [{ "pointer": "/k\"l", "exists": true }] },
+      { "pattern": "/ ", "results": [{ "pointer": "/ ", "exists": true }] },
+      { "pattern": "/m~0n", "results": [{ "pointer": "/m~0n", "exists": true }] }
+    ]},
+    { "name": "pointers that don't resolve", "doc": "rfc6901", "cases": [
+      { "pattern": "/foo/2", "results": [{ "pointer": "/foo/2", "exists": false }] },
+      { "pattern": "/foo/-", "results": [{ "pointer": "/foo/-", "exists": false }] },
+      { "pattern": "/foo/01", "results": [{ "pointer": "/foo/01", "exists": false }] },
+      { "pattern": "/foo/0/x", "results": [{ "pointer": "/foo/0/x", "exists": false }] },
+      { "pattern": "/nope/deeper", "results": [{ "pointer": "/nope/deeper", "exists": false }] }
+    ]},
+    { "name": "a missing field is where it would go", "doc": "invoice", "cases": [
+      { "pattern": "/seller/address/city", "results": [{ "pointer": "/seller/address/city", "exists": false }] },
+      { "pattern": "/seller/contact/phone", "results": [{ "pointer": "/seller/contact/phone", "exists": false }] }
+    ]},
+    { "name": "~* — every item", "doc": "invoice", "cases": [
+      { "pattern": "/lines/~*/period", "results": [
+        { "pointer": "/lines/0/period", "exists": false },
+        { "pointer": "/lines/1/period", "exists": true },
+        { "pointer": "/lines/2/period", "exists": false }
+      ]},
+      { "pattern": "/lines/~*/item/classifications/~*/id", "results": [
+        { "pointer": "/lines/0/item/classifications/0/id", "exists": true }
+      ]},
+      { "pattern": "/seller/~*", "results": [], "why": "objects have no items" },
+      { "pattern": "/nope/~*", "results": [], "why": "nothing to enumerate" },
+      { "pattern": "/lines/~*", "anchor": "/lines/1", "results": [
+        { "pointer": "/lines/0", "exists": true },
+        { "pointer": "/lines/1", "exists": true },
+        { "pointer": "/lines/2", "exists": true }
+      ], "why": "~* ignores the anchor" }
+    ]},
+    { "name": "~. — the anchor's item", "doc": "invoice", "cases": [
+      { "pattern": "/lines/~./period", "anchor": "/lines/1/item", "results": [{ "pointer": "/lines/1/period", "exists": true }] },
+      { "pattern": "/lines/~./period", "anchor": "/lines/0", "results": [{ "pointer": "/lines/0/period", "exists": false }] },
+      { "pattern": "/lines/~./period", "anchor": "/lines/7", "results": [{ "pointer": "/lines/7/period", "exists": false }], "why": "binds even past the end" },
+      { "pattern": "/lines/~./period", "anchor": "/seller", "results": [
+        { "pointer": "/lines/0/period", "exists": false },
+        { "pointer": "/lines/1/period", "exists": true },
+        { "pointer": "/lines/2/period", "exists": false }
+      ], "why": "anchor disagrees at depth 0: like ~*" },
+      { "pattern": "/lines/~./period", "results": [
+        { "pointer": "/lines/0/period", "exists": false },
+        { "pointer": "/lines/1/period", "exists": true },
+        { "pointer": "/lines/2/period", "exists": false }
+      ], "why": "no anchor: like ~*" },
+      { "pattern": "/lines/~./period", "anchor": "/lines", "results": [
+        { "pointer": "/lines/0/period", "exists": false },
+        { "pointer": "/lines/1/period", "exists": true },
+        { "pointer": "/lines/2/period", "exists": false }
+      ], "why": "anchor too short to bind: like ~*" },
+      { "pattern": "/lines/~./item/attributes/~.", "anchor": "/lines/1/item/attributes/2/value", "results": [
+        { "pointer": "/lines/1/item/attributes/2", "exists": true }
+      ]},
+      { "pattern": "/lines/~*/item/attributes/~.", "anchor": "/lines/1/item/attributes/2", "results": [
+        { "pointer": "/lines/0/item/attributes/2", "exists": false },
+        { "pointer": "/lines/1/item/attributes/2", "exists": true },
+        { "pointer": "/lines/2/item/attributes/2", "exists": false }
+      ], "why": "~* at depth 1 still agrees (anchor has an index there), so the inner ~. binds" },
+      { "pattern": "/lines/~./item", "anchor": "/lines/x", "results": [
+        { "pointer": "/lines/0/item", "exists": true },
+        { "pointer": "/lines/1/item", "exists": true },
+        { "pointer": "/lines/2/item", "exists": true }
+      ], "why": "anchor token is not an index" }
+    ]},
+    { "name": "~? — matching entries", "doc": "invoice", "cases": [
+      { "pattern": "/lines/1/item/attributes/~?name=cva", "results": [
+        { "pointer": "/lines/1/item/attributes/1", "exists": true },
+        { "pointer": "/lines/1/item/attributes/2", "exists": true }
+      ], "why": "every match, e.g. duplicates" },
+      { "pattern": "/lines/1/item/attributes/~?name=cva/value", "results": [
+        { "pointer": "/lines/1/item/attributes/1/value", "exists": true },
+        { "pointer": "/lines/1/item/attributes/2/value", "exists": true }
+      ]},
+      { "pattern": "/lines/0/item/attributes/~?name=cva", "results": [
+        { "pointer": "/lines/0/item/attributes", "exists": false, "entry": { "member": "name", "value": "cva" } }
+      ], "why": "no match: the array, as the place to add one" },
+      { "pattern": "/lines/0/item/attributes/~?name=cva/value", "results": [
+        { "pointer": "/lines/0/item/attributes", "exists": false, "entry": { "member": "name", "value": "cva" } }
+      ], "why": "the rest is dropped after a miss" },
+      { "pattern": "/lines/2/item/attributes/~?name=cva", "results": [
+        { "pointer": "/lines/2/item/attributes", "exists": false, "entry": { "member": "name", "value": "cva" } }
+      ], "why": "absent array: same terminal result" },
+      { "pattern": "/lines/~*/item/attributes/~?name=cva", "results": [
+        { "pointer": "/lines/0/item/attributes", "exists": false, "entry": { "member": "name", "value": "cva" } },
+        { "pointer": "/lines/1/item/attributes/1", "exists": true },
+        { "pointer": "/lines/1/item/attributes/2", "exists": true },
+        { "pointer": "/lines/2/item/attributes", "exists": false, "entry": { "member": "name", "value": "cva" } }
+      ], "why": "hits and misses in document order" },
+      { "pattern": "/lines/~./item/classifications/~?scheme_id=CVD", "anchor": "/lines/0/item", "results": [
+        { "pointer": "/lines/0/item/classifications/0", "exists": true }
+      ]},
+      { "pattern": "/codes/~?n=3", "results": [
+        { "pointer": "/codes/1", "exists": true }
+      ], "why": "string equality only; non-objects never match" },
+      { "pattern": "/seller/~?name=Acme", "results": [
+        { "pointer": "/seller", "exists": false, "entry": { "member": "name", "value": "Acme" } }
+      ], "why": "an object is not an array" },
+      { "pattern": "/weird/a=b/~?k~2v=x", "results": [
+        { "pointer": "/weird/a=b/0", "exists": true }
+      ], "why": "~2 escapes = in a member; = is a plain character in a key" },
+      { "pattern": "/weird/a=b/~?k=v=w", "results": [
+        { "pointer": "/weird/a=b/0", "exists": true }
+      ], "why": "the first = splits member and value" }
+    ]},
+    { "name": "relative patterns", "doc": "invoice", "cases": [
+      { "pattern": "0", "anchor": "/lines/0/item/classifications/0", "results": [
+        { "pointer": "/lines/0/item/classifications/0", "exists": true }
+      ]},
+      { "pattern": "0/scheme_id", "anchor": "/lines/0/item/classifications/0", "results": [
+        { "pointer": "/lines/0/item/classifications/0/scheme_id", "exists": true }
+      ]},
+      { "pattern": "0/version", "anchor": "/lines/0/item/classifications/0", "results": [
+        { "pointer": "/lines/0/item/classifications/0/version", "exists": false }
+      ]},
+      { "pattern": "2/period", "anchor": "/lines/1/item/attributes", "results": [
+        { "pointer": "/lines/1/period", "exists": true }
+      ]},
+      { "pattern": "1/attributes/~?name=cva", "anchor": "/lines/1/item/classifications", "results": [
+        { "pointer": "/lines/1/item/attributes/1", "exists": true },
+        { "pointer": "/lines/1/item/attributes/2", "exists": true }
+      ]},
+      { "pattern": "0", "anchor": "", "results": [{ "pointer": "", "exists": true }] },
+      { "pattern": "1", "anchor": "", "results": [], "why": "more levels than the anchor has" },
+      { "pattern": "0/x", "results": [], "why": "no anchor" }
+    ]},
+    { "name": "extension tokens never collide with keys", "doc": "invoice", "cases": [
+      { "pattern": "/weird/~0*", "results": [{ "pointer": "/weird/~0*", "exists": true }], "why": "the key \"~*\" is spelled ~0*" },
+      { "pattern": "/weird/~*", "results": [], "why": "~* is every item; /weird is an object" }
+    ]},
+    { "name": "~?!= — entries that differ", "doc": "invoice", "cases": [
+      { "pattern": "/lines/1/item/attributes/~?name!=cva", "results": [{ "pointer": "/lines/1/item/attributes/0", "exists": true }] },
+      { "pattern": "/lines/~*/item/attributes/~?name!=colour/value", "results": [
+        { "pointer": "/lines/1/item/attributes/1/value", "exists": true },
+        { "pointer": "/lines/1/item/attributes/2/value", "exists": true }
+      ]},
+      { "pattern": "/lines/0/item/attributes/~?name!=colour", "results": [], "why": "no entry differs: nothing to add either" },
+      { "pattern": "/lines/2/item/attributes/~?name!=colour", "results": [], "why": "no list at all" },
+      { "pattern": "/codes/~?n!=x", "results": [{ "pointer": "/codes/1", "exists": true }], "why": "a member that isn't a string never differs" }
+    ]},
+    { "name": "~? with a nested member", "doc": "invoice", "cases": [
+      { "pattern": "/taxed/~?vat~1category_code=S", "results": [{ "pointer": "/taxed/0", "exists": true }], "why": "a member that isn't an object stops the walk" },
+      { "pattern": "/taxed/~?vat~1category_code!=S/vat", "results": [{ "pointer": "/taxed/1/vat", "exists": true }] },
+      { "pattern": "/taxed/~?vat~1category_code=Z", "results": [
+        { "pointer": "/taxed", "exists": false, "entry": { "member": "vat/category_code", "value": "Z" } }
+      ]}
+    ]},
+    { "name": "~?! — entries without the member", "doc": "invoice", "cases": [
+      { "pattern": "/ids/~?!scheme_id/scheme_id", "results": [
+        { "pointer": "/ids/1/scheme_id", "exists": false },
+        { "pointer": "/ids/2/scheme_id", "exists": true }
+      ], "why": "missing and null are absent; an empty string is present; a non-object never matches" },
+      { "pattern": "/taxed/~?!vat~1category_code", "results": [
+        { "pointer": "/taxed/2", "exists": true },
+        { "pointer": "/taxed/3", "exists": true }
+      ], "why": "a step that isn't an object, or is missing, makes the nested member absent" },
+      { "pattern": "/ids/~?!id", "results": [], "why": "every object has it: nothing is missing" },
+      { "pattern": "/nowhere/~?!id", "results": [], "why": "no list: nothing is missing either" }
+    ]}
+  ]
+}
