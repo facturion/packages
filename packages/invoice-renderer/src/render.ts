@@ -17,16 +17,74 @@
 // made up. An extracted invoice states them (right or wrong — showing what the
 // document says is the point); a draft gets them from `completeInvoice` in
 // @facturion/invoice before it is rendered.
-import { DEFAULT_LANG } from "./i18n.js";
+import type { PartialInvoice } from "@facturion/invoice";
+import { DEFAULT_LANG, viewLabel, type Lang, type LabelKey, type TFunction } from "./i18n.js";
+
+/** An invoice that states its totals: extracted from XML, or a draft passed
+ *  through `completeInvoice` from @facturion/invoice. The renderer shows the
+ *  stated line nets, VAT breakdown and totals and computes none of them; other
+ *  fields may still be missing (absent fields are simply not rendered). */
+export type RenderableInvoice = PartialInvoice & { totals: NonNullable<PartialInvoice["totals"]> };
+
+type Line = NonNullable<RenderableInvoice["lines"]>[number];
+type DocumentAllowance = NonNullable<RenderableInvoice["document_allowances"]>[number];
+type DocumentCharge = NonNullable<RenderableInvoice["document_charges"]>[number];
+type LineAllowance = NonNullable<Line["allowances"]>[number];
+type LineCharge = NonNullable<Line["charges"]>[number];
+
+/** An identifier with an optional scheme (BT-29, BT-46, BT-34, …). */
+interface SchemeId {
+  id?: string;
+  scheme_id?: string;
+}
+
+interface AddressLike {
+  line1?: string;
+  line2?: string;
+  line3?: string;
+  post_code?: string;
+  city?: string;
+  country_subdivision?: string;
+  country_code?: string;
+}
+
+/** What a party block shows; the seller, buyer, payee, tax representative and
+ *  deliver-to party each have a subset of it. */
+interface PartyLike {
+  name?: string;
+  trading_name?: string;
+  address?: AddressLike;
+  identifiers?: readonly (SchemeId | undefined)[];
+  identifier?: SchemeId;
+  vat_id?: string;
+  tax_registration_id?: string;
+  legal_registration_id?: SchemeId;
+  electronic_address?: SchemeId;
+  additional_legal_info?: string;
+  contact?: { name?: string; phone?: string; email?: string };
+}
+
+type Adjustment = DocumentAllowance | DocumentCharge | LineAllowance | LineCharge;
+type Payment = NonNullable<RenderableInvoice["payment"]>;
+
+/** One row of the totals block. `bt` lists the fields it shows (a merged row
+ *  shows several); `value: null` is a full-width note row. */
+interface TotalsRow {
+  label: string;
+  value: string | null;
+  bt: string[];
+  cls: string;
+}
 
 // null and undefined both mean "not stated": amt() shows a dash for it, where
 // Number(null) would read as a zero.
-const stated = (v) => (v == null ? undefined : v);
+const stated = <T>(v: T | null | undefined): T | undefined => (v == null ? undefined : v);
 
 // Shared formatting helpers. All of them format deterministically from the
 // document language — never from the process locale, so the same invoice
 // renders byte-identically on any host (Lambda ICU builds differ).
-export function esc(s) {
+/** HTML-escape a value (`&`, `<`, `>`, `"`). */
+export function esc(s: unknown): string {
   return String(s ?? "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -34,40 +92,38 @@ export function esc(s) {
     .replace(/"/g, "&quot;");
 }
 
-const _SEPARATORS = {
+const _SEPARATORS: Readonly<Record<Lang, { group: string; decimal: string }>> = {
   en: { group: ",", decimal: "." },
   de: { group: ".", decimal: "," },
 };
 
-function _formatNumber(n, lang, minFraction) {
+function _formatNumber(n: number, lang: Lang, minFraction?: number): string {
+  // Typed callers pass a Lang; a JS caller's unknown language gets the default.
   const sep = _SEPARATORS[lang] ?? _SEPARATORS[DEFAULT_LANG];
   const abs = Math.abs(n);
-  let intPart, fracPart;
-  if (minFraction != null) {
-    [intPart, fracPart] = abs.toFixed(minFraction).split(".");
-  } else {
-    [intPart, fracPart] = String(abs).split(".");
-  }
-  intPart = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, sep.group);
+  const [whole = "", fracPart] = (minFraction != null ? abs.toFixed(minFraction) : String(abs)).split(".");
+  const intPart = whole.replace(/\B(?=(\d{3})+(?!\d))/g, sep.group);
   const frac = fracPart ? sep.decimal + fracPart : "";
   // U+2212 minus sign, matching the sign glyph used elsewhere on the document.
   return `${n < 0 ? "−" : ""}${intPart}${frac}`;
 }
 
-/** Two-decimal amount in the document language (EN 16931 Amounts are 2dp). */
-export function amt(value, lang = DEFAULT_LANG) {
+/** Two-decimal amount in the document language (EN 16931 Amounts are 2dp);
+ *  non-numerics pass through escaped, an absent value as a dash. */
+export function amt(value: unknown, lang: Lang = DEFAULT_LANG): string {
   const n = Number(value);
   if (!isFinite(n)) return esc(value ?? "—");
   return _formatNumber(n, lang, 2);
 }
 
-export function curAmt(value, cur, lang = DEFAULT_LANG) {
+/** `amt(value)` suffixed with a currency code when there is one. */
+export function curAmt(value: unknown, cur?: string, lang: Lang = DEFAULT_LANG): string {
   // U+00A0 (no-break space) keeps the amount and its currency on one line.
   return cur ? `${amt(value, lang)} ${esc(cur)}` : amt(value, lang);
 }
 
 /** Quantities, rates, percentages: unlimited precision, localized separators. */
-export function num(value, lang = DEFAULT_LANG) {
+export function num(value: unknown, lang: Lang = DEFAULT_LANG): string {
   const n = Number(value);
   if (!isFinite(n)) return esc(value ?? "");
   return _formatNumber(n, lang);
@@ -75,35 +131,35 @@ export function num(value, lang = DEFAULT_LANG) {
 
 /** ISO dates localize for German (17.07.2026); other languages keep the
  *  unambiguous ISO form. Non-ISO input passes through untouched. */
-export function fmtDate(value, lang = DEFAULT_LANG) {
+export function fmtDate(value: unknown, lang: Lang = DEFAULT_LANG): string {
   const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(value ?? ""));
   if (!m) return esc(value ?? "");
   if (lang === "de") return `${m[3]}.${m[2]}.${m[1]}`;
   return `${m[1]}-${m[2]}-${m[3]}`;
 }
 
-function unitLabel(code, qty, t) {
+function unitLabel(code: string | undefined, qty: unknown, t: TFunction): string {
   if (!code) return "";
   const plural = Number(qty) !== 1;
-  const key = "units." + code + (plural ? "_plural" : "");
+  const key: LabelKey = `units.${code}${plural ? "_plural" : ""}`;
   const label = t(key);
   return label === key ? code : label;
 }
 
-function dateRange(start, end, lang) {
+function dateRange(start: string | undefined, end: string | undefined, lang: Lang): string {
   if (start && end && start !== end) return `${fmtDate(start, lang)} – ${fmtDate(end, lang)}`;
   return fmtDate(start || end || "", lang);
 }
 
 /** Scheme-qualified identifier display: `id (scheme_id)`. */
-function schemeVal(obj) {
+function schemeVal(obj: SchemeId | undefined): string {
   if (!obj?.id) return "";
   return obj.scheme_id ? `${obj.id} (${obj.scheme_id})` : obj.id;
 }
 
-function addressLines(addr) {
+function addressLines(addr: AddressLike | undefined): string[] {
   if (!addr) return [];
-  const lines = [];
+  const lines: string[] = [];
   if (addr.line1) lines.push(addr.line1);
   if (addr.line2) lines.push(addr.line2);
   if (addr.line3) lines.push(addr.line3);
@@ -117,21 +173,21 @@ function addressLines(addr) {
 /** Codelist label with the raw code as fallback: a custom `t` that misses
  *  returns the KEY unchanged ("vatCategory.AE"), which must never reach the
  *  document — degrade to the code itself, like every other codelist lookup. */
-function codeLabel(t, prefix, code) {
+function codeLabel(t: TFunction, prefix: "vatCategory" | "taxPointDateCode", code: string | undefined): string {
   if (!code) return "";
-  const key = prefix + "." + code;
+  const key: LabelKey = `${prefix}.${code}`;
   const label = t(key);
   return label && label !== key ? label : code;
 }
 
 /** Reason display for allowances/charges: text, code, or the generic label,
  *  plus the percentage/base derivation when the document carries it. */
-function acReason(x, fallback, t, lang) {
+function acReason(x: Adjustment, fallback: string, t: TFunction, lang: Lang): string {
   let label = x.reason || x.reason_code || fallback;
   if (x.reason && x.reason_code) label = `${x.reason} (${x.reason_code})`;
-  const bits = [];
+  const bits: string[] = [];
   if (x.percentage != null) bits.push(`${num(x.percentage, lang)} %`);
-  if (x.base_amount != null) bits.push(`${t("view.of")} ${amt(x.base_amount, lang)}`);
+  if (x.base_amount != null) bits.push(`${viewLabel(t, "of")} ${amt(x.base_amount, lang)}`);
   return bits.length ? `${label} (${bits.join(" ")})` : label;
 }
 
@@ -140,38 +196,38 @@ function acReason(x, fallback, t, lang) {
 /** BT-3 → document title. 380 and unknown codes keep the friendly "Invoice";
  *  381 keeps the established "Credit Note"; every other UNCL 1001 code takes
  *  its codelist label (e.g. 384 → "Corrected invoice"/"Rechnungskorrektur"). */
-function docTitle(invoice, t) {
+function docTitle(invoice: RenderableInvoice, t: TFunction): string {
   const code = invoice.invoice_type_code;
-  if (!code || code === "380") return t("view.invoice");
-  if (code === "381") return t("view.creditNote");
-  const key = "invoiceTypes." + code;
+  if (!code || code === "380") return viewLabel(t, "invoice");
+  if (code === "381") return viewLabel(t, "creditNote");
+  const key: LabelKey = `invoiceTypes.${code}`;
   const label = t(key);
-  return label && label !== key && label !== code ? label : t("view.invoice");
+  return label && label !== key && label !== code ? label : viewLabel(t, "invoice");
 }
 
-function headerBlock(invoice, t, lang) {
+function headerBlock(invoice: RenderableInvoice, t: TFunction, lang: Lang): string {
   // BG-3 sits under the document number: on a corrective document the link to
   // the preceding invoice is part of its identity, not a footnote reference.
   const preceding = (invoice.preceding_invoices || [])
     .map(p => (p.issue_date ? `${p.reference} (${fmtDate(p.issue_date, lang)})` : p.reference))
     .join(", ");
 
-  const rows = [];
-  rows.push(`<div><span class="inv-label">${t("view.issueDate")}</span> ${fmtDate(invoice.issue_date, lang)}</div>`);
+  const rows: string[] = [];
+  rows.push(`<div><span class="inv-label">${viewLabel(t, "issueDate")}</span> ${fmtDate(invoice.issue_date, lang)}</div>`);
   if (invoice.due_date) {
-    rows.push(`<div><span class="inv-label">${t("view.dueDate")}</span> ${fmtDate(invoice.due_date, lang)}</div>`);
+    rows.push(`<div><span class="inv-label">${viewLabel(t, "dueDate")}</span> ${fmtDate(invoice.due_date, lang)}</div>`);
   }
   // BT-7 / BT-8 are mutually exclusive per the model; render whichever exists.
   if (invoice.tax_point_date) {
-    rows.push(`<div><span class="inv-label">${t("view.taxPointDate")}</span> ${fmtDate(invoice.tax_point_date, lang)}</div>`);
+    rows.push(`<div><span class="inv-label">${viewLabel(t, "taxPointDate")}</span> ${fmtDate(invoice.tax_point_date, lang)}</div>`);
   } else if (invoice.tax_point_date_code) {
-    rows.push(`<div><span class="inv-label">${t("view.taxPointDate")}</span> ${esc(codeLabel(t, "taxPointDateCode", invoice.tax_point_date_code))}</div>`);
+    rows.push(`<div><span class="inv-label">${viewLabel(t, "taxPointDate")}</span> ${esc(codeLabel(t, "taxPointDateCode", invoice.tax_point_date_code))}</div>`);
   }
   if (invoice.currency_code) {
-    rows.push(`<div><span class="inv-label">${t("view.currency")}</span> ${esc(invoice.currency_code)}</div>`);
+    rows.push(`<div><span class="inv-label">${viewLabel(t, "currency")}</span> ${esc(invoice.currency_code)}</div>`);
   }
   if (invoice.vat_accounting_currency_code) {
-    rows.push(`<div><span class="inv-label">${t("view.vatCurrency")}</span> ${esc(invoice.vat_accounting_currency_code)}</div>`);
+    rows.push(`<div><span class="inv-label">${viewLabel(t, "vatCurrency")}</span> ${esc(invoice.vat_accounting_currency_code)}</div>`);
   }
 
   return `
@@ -179,7 +235,7 @@ function headerBlock(invoice, t, lang) {
       <div class="inv-header-left">
         <div class="inv-type">${esc(docTitle(invoice, t))}</div>
         <div class="inv-id">${esc(invoice.invoice_number)}</div>
-        ${preceding ? `<div class="inv-preceding"><span class="inv-label">${t("view.preceding")}</span> ${esc(preceding)}</div>` : ""}
+        ${preceding ? `<div class="inv-preceding"><span class="inv-label">${viewLabel(t, "preceding")}</span> ${esc(preceding)}</div>` : ""}
       </div>
       <div class="inv-header-right">
         ${rows.join("\n        ")}
@@ -187,9 +243,9 @@ function headerBlock(invoice, t, lang) {
     </div>`;
 }
 
-function partyBlock(party, label, t, extraLines) {
+function partyBlock(party: PartyLike | undefined, label: string, t: TFunction, extraLines: readonly string[] = []): string {
   if (!party) return "";
-  const rows = [];
+  const rows: string[] = [];
   if (party.name) {
     rows.push(`<div class="inv-party-name">${esc(party.name)}</div>`);
   }
@@ -201,23 +257,23 @@ function partyBlock(party, label, t, extraLines) {
   }
   // BT-29 (seller: array) / BT-46, BT-60 (buyer, payee: single object).
   for (const ident of party.identifiers || []) {
-    if (ident?.id) rows.push(`<div><span class="inv-label">${t("view.identifier")}</span> ${esc(schemeVal(ident))}</div>`);
+    if (ident?.id) rows.push(`<div><span class="inv-label">${viewLabel(t, "identifier")}</span> ${esc(schemeVal(ident))}</div>`);
   }
   if (party.identifier?.id) {
-    rows.push(`<div><span class="inv-label">${t("view.identifier")}</span> ${esc(schemeVal(party.identifier))}</div>`);
+    rows.push(`<div><span class="inv-label">${viewLabel(t, "identifier")}</span> ${esc(schemeVal(party.identifier))}</div>`);
   }
   if (party.vat_id) {
-    rows.push(`<div><span class="inv-label">${t("view.vatId")}</span> ${esc(party.vat_id)}</div>`);
+    rows.push(`<div><span class="inv-label">${viewLabel(t, "vatId")}</span> ${esc(party.vat_id)}</div>`);
   }
   if (party.tax_registration_id) {
-    rows.push(`<div><span class="inv-label">${t("view.taxRegId")}</span> ${esc(party.tax_registration_id)}</div>`);
+    rows.push(`<div><span class="inv-label">${viewLabel(t, "taxRegId")}</span> ${esc(party.tax_registration_id)}</div>`);
   }
   if (party.legal_registration_id?.id) {
-    rows.push(`<div><span class="inv-label">${t("view.regId")}</span> ${esc(schemeVal(party.legal_registration_id))}</div>`);
+    rows.push(`<div><span class="inv-label">${viewLabel(t, "regId")}</span> ${esc(schemeVal(party.legal_registration_id))}</div>`);
   }
   // BT-34 / BT-49 electronic address (id + CEF/EAS scheme).
   if (party.electronic_address?.id) {
-    rows.push(`<div><span class="inv-label">${t("view.eAddress")}</span> ${esc(schemeVal(party.electronic_address))}</div>`);
+    rows.push(`<div><span class="inv-label">${viewLabel(t, "eAddress")}</span> ${esc(schemeVal(party.electronic_address))}</div>`);
   }
   if (party.additional_legal_info) {
     rows.push(`<div class="inv-party-legal">${esc(party.additional_legal_info)}</div>`);
@@ -228,40 +284,40 @@ function partyBlock(party, label, t, extraLines) {
       rows.push(`<div class="inv-party-contact">${bits.map(esc).join(" · ")}</div>`);
     }
   }
-  for (const extra of extraLines || []) rows.push(extra);
+  for (const extra of extraLines) rows.push(extra);
 
   return `<div class="inv-party"><div class="inv-party-label">${esc(label)}</div>${rows.join("")}</div>`;
 }
 
-function partiesBlock(invoice, t) {
+function partiesBlock(invoice: RenderableInvoice, t: TFunction): string {
   const buyerExtras = invoice.buyer_reference
     ? [`<div><span class="inv-label">Ref</span> ${esc(invoice.buyer_reference)}</div>`]
     : [];
 
   const primary = `
     <div class="inv-parties">
-      ${partyBlock(invoice.seller, t("view.from"), t)}
-      ${partyBlock(invoice.buyer,  t("view.to"),  t, buyerExtras)}
+      ${partyBlock(invoice.seller, viewLabel(t, "from"), t)}
+      ${partyBlock(invoice.buyer,  viewLabel(t, "to"),  t, buyerExtras)}
     </div>`;
 
   // Secondary parties only appear when present (payee, tax rep, deliver-to).
-  const secondaries = [];
+  const secondaries: string[] = [];
 
   if (invoice.payee) {
-    secondaries.push(partyBlock(invoice.payee, t("view.payee"), t));
+    secondaries.push(partyBlock(invoice.payee, viewLabel(t, "payee"), t));
   }
   if (invoice.seller_tax_representative) {
-    secondaries.push(partyBlock(invoice.seller_tax_representative, t("view.taxRep"), t));
+    secondaries.push(partyBlock(invoice.seller_tax_representative, viewLabel(t, "taxRep"), t));
   }
   const d = invoice.delivery;
   if (d && (d.name || d.address?.line1 || d.location_id?.id)) {
-    const extras = [];
+    const extras: string[] = [];
     if (d.location_id?.id) {
-      extras.push(`<div><span class="inv-label">${t("view.identifier")}</span> ${esc(schemeVal(d.location_id))}</div>`);
+      extras.push(`<div><span class="inv-label">${viewLabel(t, "identifier")}</span> ${esc(schemeVal(d.location_id))}</div>`);
     }
     secondaries.push(partyBlock(
       { name: d.name, address: d.address },
-      t("view.deliverTo"),
+      viewLabel(t, "deliverTo"),
       t,
       extras,
     ));
@@ -274,19 +330,19 @@ function partiesBlock(invoice, t) {
   return primary + secondaryHtml;
 }
 
-function referencesBlock(invoice, t) {
-  const refs = [];
-  const push = (label, value) => { if (value) refs.push([label, value]); };
+function referencesBlock(invoice: RenderableInvoice, t: TFunction): string {
+  const refs: [label: string, value: string][] = [];
+  const push = (label: string, value: string | undefined) => { if (value) refs.push([label, value]); };
 
-  push(t("view.purchaseOrder"),    invoice.purchase_order_reference);
-  push(t("view.contract"),         invoice.contract_reference);
-  push(t("view.project"),          invoice.project_reference);
-  push(t("view.salesOrder"),       invoice.sales_order_reference);
-  push(t("view.despatchAdvice"),   invoice.despatch_advice_reference);
-  push(t("view.receivingAdvice"),  invoice.receiving_advice_reference);
-  push(t("view.tender"),           invoice.tender_or_lot_reference);
-  push(t("view.objectIdentifier"), schemeVal(invoice.object_identifier));
-  push(t("view.accountingRef"),    invoice.buyer_accounting_reference);
+  push(viewLabel(t, "purchaseOrder"),    invoice.purchase_order_reference);
+  push(viewLabel(t, "contract"),         invoice.contract_reference);
+  push(viewLabel(t, "project"),          invoice.project_reference);
+  push(viewLabel(t, "salesOrder"),       invoice.sales_order_reference);
+  push(viewLabel(t, "despatchAdvice"),   invoice.despatch_advice_reference);
+  push(viewLabel(t, "receivingAdvice"),  invoice.receiving_advice_reference);
+  push(viewLabel(t, "tender"),           invoice.tender_or_lot_reference);
+  push(viewLabel(t, "objectIdentifier"), schemeVal(invoice.object_identifier));
+  push(viewLabel(t, "accountingRef"),    invoice.buyer_accounting_reference);
 
   if (refs.length === 0) return "";
   const rows = refs.map(([k, v]) =>
@@ -295,27 +351,27 @@ function referencesBlock(invoice, t) {
   return `<div class="inv-references">${rows}</div>`;
 }
 
-function periodBlock(invoice, t, lang) {
+function periodBlock(invoice: RenderableInvoice, t: TFunction, lang: Lang): string {
   // BT-72 and BG-14 are independent in EN 16931 (BR-IC-11 accepts either or
   // both) — render both when both exist.
-  const rows = [];
+  const rows: string[] = [];
   const period = invoice.delivery?.period;
   if (period?.start_date || period?.end_date) {
     rows.push(`<div class="inv-period">
-      <span class="inv-label">${t("view.invoicingPeriod")}</span>
+      <span class="inv-label">${viewLabel(t, "invoicingPeriod")}</span>
       ${dateRange(period.start_date, period.end_date, lang)}
     </div>`);
   }
   if (invoice.delivery?.date) {
     rows.push(`<div class="inv-period">
-      <span class="inv-label">${t("view.deliveryDate")}</span>
+      <span class="inv-label">${viewLabel(t, "deliveryDate")}</span>
       ${fmtDate(invoice.delivery.date, lang)}
     </div>`);
   }
   return rows.join("");
 }
 
-function notesBlock(invoice, t) {
+function notesBlock(invoice: RenderableInvoice, t: TFunction): string {
   const notes = invoice.notes || [];
   if (notes.length === 0) return "";
   const items = notes.map(n => {
@@ -323,12 +379,12 @@ function notesBlock(invoice, t) {
     return `<p>${code}${esc(n.text)}</p>`;
   }).join("");
   return `<div class="inv-notes">
-    <div class="inv-section-label">${esc(t("view.notes"))}</div>
+    <div class="inv-section-label">${esc(viewLabel(t, "notes"))}</div>
     ${items}
   </div>`;
 }
 
-function linesBlock(invoice, t, lang) {
+function linesBlock(invoice: RenderableInvoice, t: TFunction, lang: Lang): string {
   const lines = invoice.lines || [];
   const rows = lines.map(line => {
     const qty       = line.quantity;
@@ -339,48 +395,48 @@ function linesBlock(invoice, t, lang) {
     const taxRate   = line.vat?.rate;
     const taxCat    = line.vat?.category_code;
     const total     = stated(line.net_amount);
-    const item      = line.item || {};
+    const item: NonNullable<Line["item"]> = line.item ?? {};
     const name      = item.name || "";
     const desc      = item.description && item.description !== name
       ? item.description : "";
 
-    const meta = [];
-    const pushMeta = (label, value) => {
+    const meta: string[] = [];
+    const pushMeta = (label: string, value: string | undefined) => {
       if (value) meta.push(`<div class="inv-line-meta"><span class="inv-label">${label}</span> ${esc(value)}</div>`);
     };
     if (line.period?.start_date || line.period?.end_date) {
-      meta.push(`<div class="inv-line-meta"><span class="inv-label">${t("view.linePeriod")}</span> ${dateRange(line.period.start_date, line.period.end_date, lang)}</div>`);
+      meta.push(`<div class="inv-line-meta"><span class="inv-label">${viewLabel(t, "linePeriod")}</span> ${dateRange(line.period.start_date, line.period.end_date, lang)}</div>`);
     }
     if (line.note) meta.push(`<div class="inv-line-meta">${esc(line.note)}</div>`);
-    pushMeta(t("view.itemSellerId"),   item.seller_id);
-    pushMeta(t("view.itemBuyerId"),    item.buyer_id);
-    pushMeta(t("view.itemStandardId"), schemeVal(item.standard_id));
+    pushMeta(viewLabel(t, "itemSellerId"),   item.seller_id);
+    pushMeta(viewLabel(t, "itemBuyerId"),    item.buyer_id);
+    pushMeta(viewLabel(t, "itemStandardId"), schemeVal(item.standard_id));
     for (const c of item.classifications || []) {
       const scheme = [c.scheme_id, c.version].filter(Boolean).join(" ");
-      pushMeta(t("view.classification"), scheme ? `${c.id} (${scheme})` : c.id);
+      pushMeta(viewLabel(t, "classification"), scheme ? `${c.id} (${scheme})` : c.id);
     }
-    pushMeta(t("view.origin"), item.country_of_origin);
+    pushMeta(viewLabel(t, "origin"), item.country_of_origin);
     for (const a of item.attributes || []) {
       if (a?.name) pushMeta(esc(a.name), a.value);
     }
-    pushMeta(t("view.orderLine"),        line.order_line_reference);
-    pushMeta(t("view.objectIdentifier"), schemeVal(line.object_identifier));
-    pushMeta(t("view.accountingRef"),    line.buyer_accounting_reference);
+    pushMeta(viewLabel(t, "orderLine"),        line.order_line_reference);
+    pushMeta(viewLabel(t, "objectIdentifier"), schemeVal(line.object_identifier));
+    pushMeta(viewLabel(t, "accountingRef"),    line.buyer_accounting_reference);
 
     // Line-level allowances and charges: shown inline under the description,
     // with their percentage/base derivation and reason (code) when present.
     for (const a of line.allowances || []) {
-      meta.push(`<div class="inv-line-allowance">− ${amt(a.amount, lang)} · ${esc(acReason(a, t("view.documentAllowance"), t, lang))}</div>`);
+      meta.push(`<div class="inv-line-allowance">− ${amt(a.amount, lang)} · ${esc(acReason(a, viewLabel(t, "documentAllowance"), t, lang))}</div>`);
     }
     for (const c of line.charges || []) {
-      meta.push(`<div class="inv-line-charge">+ ${amt(c.amount, lang)} · ${esc(acReason(c, t("view.documentCharge"), t, lang))}</div>`);
+      meta.push(`<div class="inv-line-charge">+ ${amt(c.amount, lang)} · ${esc(acReason(c, viewLabel(t, "documentCharge"), t, lang))}</div>`);
     }
 
     // Show gross + discount alongside the net price when the invoice carries
     // both (e.g. "100.00" over "was 120.00 (− 20.00)").
     let priceCell = amt(netPrice, lang);
     if (grossPrice != null && (discount != null || Number(grossPrice) !== Number(netPrice))) {
-      const was = t("view.priceBefore", { price: amt(grossPrice, lang) });
+      const was = viewLabel(t, "priceBefore", { price: amt(grossPrice, lang) });
       const disc = discount != null ? ` (− ${amt(discount, lang)})` : "";
       priceCell += `<div class="inv-line-price-gross">${esc(was + disc)}</div>`;
     }
@@ -391,7 +447,7 @@ function linesBlock(invoice, t, lang) {
       const qtyText = baseUnit
         ? `${num(baseQty, lang)} ${unitLabel(baseUnit, baseQty, t)}`
         : num(baseQty, lang);
-      priceCell += `<div class="inv-line-price-base">${esc(t("view.perBase", { qty: qtyText }))}</div>`;
+      priceCell += `<div class="inv-line-price-base">${esc(viewLabel(t, "perBase", { qty: qtyText }))}</div>`;
     }
 
     // BT-151/152: the rate, plus the category letter whenever it isn't the
@@ -421,12 +477,12 @@ function linesBlock(invoice, t, lang) {
     <div class="inv-lines-wrap">
       <table class="data-table inv-lines">
         <thead><tr>
-          <th class="inv-col-id">${t("view.lineNo")}</th>
-          <th class="inv-col-desc">${t("view.description")}</th>
-          <th class="inv-col-num">${t("view.quantity")}</th>
-          <th class="inv-col-num">${t("view.unitPrice")}</th>
-          <th class="inv-col-num">${t("view.taxRate")}</th>
-          <th class="inv-col-num">${t("view.lineTotal")}</th>
+          <th class="inv-col-id">${viewLabel(t, "lineNo")}</th>
+          <th class="inv-col-desc">${viewLabel(t, "description")}</th>
+          <th class="inv-col-num">${viewLabel(t, "quantity")}</th>
+          <th class="inv-col-num">${viewLabel(t, "unitPrice")}</th>
+          <th class="inv-col-num">${viewLabel(t, "taxRate")}</th>
+          <th class="inv-col-num">${viewLabel(t, "lineTotal")}</th>
         </tr></thead>
         <tbody>${rows}</tbody>
       </table>
@@ -445,17 +501,18 @@ function linesBlock(invoice, t, lang) {
 // disagree never merge, so an inconsistent invoice shows the inconsistency.
 //
 // `bt` lists the fields each row shows (a merged row shows several).
-function totalsBlock(invoice, t, lang) {
+function totalsBlock(invoice: RenderableInvoice, t: TFunction, lang: Lang): string {
   const cur = invoice.currency_code;
   const tot = invoice.totals || {};
-  const money = (v) => curAmt(v, cur, lang);
-  const signed = (sign, v) => `${sign} ${money(v)}`;
-  const same = (a, b) => a != null && b != null && Number(a) === Number(b);
-  const has = (v) => v != null;
-  const rows = [];
-  const row = (label, value, bt, cls = "") => {
-    rows.push({ label, value, bt: [bt].flat().filter(Boolean), cls });
-    return rows[rows.length - 1];
+  const money = (v: unknown) => curAmt(v, cur, lang);
+  const signed = (sign: "+" | "−", v: unknown) => `${sign} ${money(v)}`;
+  const same = (a: unknown, b: unknown) => a != null && b != null && Number(a) === Number(b);
+  const has = <T>(v: T | null | undefined): v is T => v != null;
+  const rows: TotalsRow[] = [];
+  const row = (label: string, value: string, bt: string | readonly (string | false)[], cls = ""): TotalsRow => {
+    const r: TotalsRow = { label, value, bt: [bt].flat().filter((b): b is string => Boolean(b)), cls };
+    rows.push(r);
+    return r;
   };
 
   const allowances = invoice.document_allowances || [];
@@ -466,34 +523,34 @@ function totalsBlock(invoice, t, lang) {
       && (!has(tot.line_net_total) || !has(tot.tax_exclusive_amount) || same(tot.line_net_total, tot.tax_exclusive_amount))) {
     const v = tot.tax_exclusive_amount ?? tot.line_net_total;
     if (has(v)) {
-      row(t("view.netTotal"), money(v), [has(tot.line_net_total) && "BT-106", has(tot.tax_exclusive_amount) && "BT-109"], "inv-totals-sum");
+      row(viewLabel(t, "netTotal"), money(v), [has(tot.line_net_total) && "BT-106", has(tot.tax_exclusive_amount) && "BT-109"], "inv-totals-sum");
     }
   } else {
-    if (has(tot.line_net_total)) row(t("view.subtotal"), money(tot.line_net_total), "BT-106");
+    if (has(tot.line_net_total)) row(viewLabel(t, "subtotal"), money(tot.line_net_total), "BT-106");
     for (const a of allowances) {
-      row(esc(acReason(a, t("view.documentAllowance"), t, lang)), signed("−", a.amount), "BG-20");
+      row(esc(acReason(a, viewLabel(t, "documentAllowance"), t, lang)), signed("−", a.amount), "BG-20");
     }
-    if (has(tot.allowance_total) && !(allowances.length === 1 && same(allowances[0].amount, tot.allowance_total))) {
-      row(t("view.allowanceTotal"), signed("−", tot.allowance_total), "BT-107");
-    } else if (has(tot.allowance_total)) rows[rows.length - 1].bt.push("BT-107");
+    if (has(tot.allowance_total) && !(allowances.length === 1 && same(allowances[0]?.amount, tot.allowance_total))) {
+      row(viewLabel(t, "allowanceTotal"), signed("−", tot.allowance_total), "BT-107");
+    } else if (has(tot.allowance_total)) rows.at(-1)?.bt.push("BT-107"); // the one allowance's row
     for (const c of charges) {
-      row(esc(acReason(c, t("view.documentCharge"), t, lang)), signed("+", c.amount), "BG-21");
+      row(esc(acReason(c, viewLabel(t, "documentCharge"), t, lang)), signed("+", c.amount), "BG-21");
     }
-    if (has(tot.charge_total) && !(charges.length === 1 && same(charges[0].amount, tot.charge_total))) {
-      row(t("view.chargeTotal"), signed("+", tot.charge_total), "BT-108");
-    } else if (has(tot.charge_total)) rows[rows.length - 1].bt.push("BT-108");
-    if (has(tot.tax_exclusive_amount)) row(t("view.netTotal"), money(tot.tax_exclusive_amount), "BT-109", "inv-totals-sum");
+    if (has(tot.charge_total) && !(charges.length === 1 && same(charges[0]?.amount, tot.charge_total))) {
+      row(viewLabel(t, "chargeTotal"), signed("+", tot.charge_total), "BT-108");
+    } else if (has(tot.charge_total)) rows.at(-1)?.bt.push("BT-108"); // the one charge's row
+    if (has(tot.tax_exclusive_amount)) row(viewLabel(t, "netTotal"), money(tot.tax_exclusive_amount), "BT-109", "inv-totals-sum");
   }
 
   // BG-23, then BT-110
   const vat = invoice.vat_breakdown || [];
-  let lastVat = null;
+  let lastVat: TotalsRow | null = null;
   for (const g of vat) {
-    const rateLabel = t("view.taxTotal", { rate: num(g.rate ?? 0, lang) });
+    const rateLabel = viewLabel(t, "taxTotal", { rate: num(g.rate ?? 0, lang) });
     const catLabel = g.category_code && g.category_code !== "S"
       ? ` · ${esc(codeLabel(t, "vatCategory", g.category_code))}`
       : "";
-    lastVat = row(`${esc(rateLabel)}${catLabel}<span class="inv-vat-base"> · ${t("view.taxableAmount")} ${curAmt(stated(g.taxable_amount), cur, lang)}</span>`,
+    lastVat = row(`${esc(rateLabel)}${catLabel}<span class="inv-vat-base"> · ${viewLabel(t, "taxableAmount")} ${curAmt(stated(g.taxable_amount), cur, lang)}</span>`,
       curAmt(stated(g.tax_amount), cur, lang), "BG-23", "inv-vat-row");
     if (g.reason || g.reason_code) {
       const reason = g.reason
@@ -503,8 +560,8 @@ function totalsBlock(invoice, t, lang) {
     }
   }
   if (has(tot.tax_amount)) {
-    if (vat.length === 1 && same(vat[0].tax_amount, tot.tax_amount)) lastVat.bt.push("BT-110");
-    else row(t("view.vatTotal"), money(tot.tax_amount), "BT-110", "inv-totals-sum");
+    if (vat.length === 1 && lastVat && same(vat[0]?.tax_amount, tot.tax_amount)) lastVat.bt.push("BT-110");
+    else row(viewLabel(t, "vatTotal"), money(tot.tax_amount), "BT-110", "inv-totals-sum");
   }
 
   // BT-111: VAT total restated in the accounting currency (BT-6).
@@ -512,7 +569,7 @@ function totalsBlock(invoice, t, lang) {
   const acctVat = invoice.totals?.tax_amount_accounting_currency
     ?? invoice.tax_amount_accounting_currency;
   if (acctCur && acctVat != null) {
-    row(esc(t("view.taxTotalIn", { cur: acctCur })), curAmt(acctVat, acctCur, lang), "BT-111", "inv-vat-row");
+    row(esc(viewLabel(t, "taxTotalIn", { cur: acctCur })), curAmt(acctVat, acctCur, lang), "BT-111", "inv-vat-row");
   }
 
   // BT-112 → BT-115
@@ -521,13 +578,13 @@ function totalsBlock(invoice, t, lang) {
   if (prepaid === 0 && rounding === 0
       && (!has(tot.tax_inclusive_amount) || !has(tot.amount_due) || same(tot.tax_inclusive_amount, tot.amount_due))) {
     const v = tot.amount_due ?? tot.tax_inclusive_amount;
-    if (has(v)) row(t("view.payable"), money(v), [has(tot.tax_inclusive_amount) && "BT-112", has(tot.amount_due) && "BT-115"], "inv-totals-payable");
+    if (has(v)) row(viewLabel(t, "payable"), money(v), [has(tot.tax_inclusive_amount) && "BT-112", has(tot.amount_due) && "BT-115"], "inv-totals-payable");
   } else {
-    if (has(tot.tax_inclusive_amount)) row(t("view.grossTotal"), money(tot.tax_inclusive_amount), "BT-112", "inv-totals-sum");
+    if (has(tot.tax_inclusive_amount)) row(viewLabel(t, "grossTotal"), money(tot.tax_inclusive_amount), "BT-112", "inv-totals-sum");
     // Sign-faithful: a positive prepaid is subtracted, a negative one added.
-    if (prepaid !== 0) row(t("view.prepaid"), signed(prepaid > 0 ? "−" : "+", Math.abs(prepaid)), "BT-113");
-    if (rounding !== 0) row(t("view.rounding"), signed(rounding > 0 ? "+" : "−", Math.abs(rounding)), "BT-114");
-    if (has(tot.amount_due)) row(t("view.payable"), money(tot.amount_due), "BT-115", "inv-totals-payable");
+    if (prepaid !== 0) row(viewLabel(t, "prepaid"), signed(prepaid > 0 ? "−" : "+", Math.abs(prepaid)), "BT-113");
+    if (rounding !== 0) row(viewLabel(t, "rounding"), signed(rounding > 0 ? "+" : "−", Math.abs(rounding)), "BT-114");
+    if (has(tot.amount_due)) row(viewLabel(t, "payable"), money(tot.amount_due), "BT-115", "inv-totals-payable");
   }
 
   if (rows.length === 0) return "";
@@ -543,11 +600,11 @@ function totalsBlock(invoice, t, lang) {
 
 // BG-24: additional supporting documents — reference, description, and where
 // the document lives (URL or embedded file).
-function supportingDocsBlock(invoice, t) {
+function supportingDocsBlock(invoice: RenderableInvoice, t: TFunction): string {
   const docs = invoice.supporting_documents || [];
   if (docs.length === 0) return "";
   const rows = docs.map(d => {
-    const bits = [];
+    const bits: string[] = [];
     if (d.reference) bits.push(`<span class="inv-doc-ref">${esc(d.reference)}</span>`);
     if (d.description) bits.push(esc(d.description));
     if (d.attached_document?.filename) bits.push(esc(d.attached_document.filename));
@@ -555,7 +612,7 @@ function supportingDocsBlock(invoice, t) {
     return `<div class="inv-doc">${bits.join(" · ")}</div>`;
   }).join("");
   return `<div class="inv-docs">
-    <div class="inv-section-label">${esc(t("view.attachments"))}</div>
+    <div class="inv-section-label">${esc(viewLabel(t, "attachments"))}</div>
     ${rows}
   </div>`;
 }
@@ -563,44 +620,44 @@ function supportingDocsBlock(invoice, t) {
 // Resolve the payment means to a human-readable label. Prefer BT-82 free
 // text; fall back to a lookup of the BT-81 (UNTDID 4461) code; fall back
 // further to the raw code if the lookup misses.
-function paymentMeansLabel(p, t) {
+function paymentMeansLabel(p: Payment, t: TFunction): string {
   if (p.means_text) return p.means_text;
   if (!p.means_code) return "";
-  const key = "paymentMeans." + p.means_code;
+  const key: LabelKey = `paymentMeans.${p.means_code}`;
   const label = t(key);
   return label === key ? p.means_code : label;
 }
 
-function paymentBlock(invoice, t) {
+function paymentBlock(invoice: RenderableInvoice, t: TFunction): string {
   const p = invoice.payment;
   if (!p) return "";
-  const rows = [];
+  const rows: string[] = [];
 
   const means = paymentMeansLabel(p, t);
   if (means) {
-    rows.push(`<div><span class="inv-label">${t("view.paymentMeans")}</span> ${esc(means)}</div>`);
+    rows.push(`<div><span class="inv-label">${viewLabel(t, "paymentMeans")}</span> ${esc(means)}</div>`);
   }
 
   // BG-17 credit transfers (one or more).
   for (const ct of p.credit_transfers || []) {
     if (ct.account_id) {
-      rows.push(`<div><span class="inv-label">${t("view.iban")}</span> ${esc(ct.account_id)}</div>`);
+      rows.push(`<div><span class="inv-label">${viewLabel(t, "iban")}</span> ${esc(ct.account_id)}</div>`);
     }
     if (ct.service_provider_id) {
-      rows.push(`<div><span class="inv-label">${t("view.bic")}</span> ${esc(ct.service_provider_id)}</div>`);
+      rows.push(`<div><span class="inv-label">${viewLabel(t, "bic")}</span> ${esc(ct.service_provider_id)}</div>`);
     }
     if (ct.account_name) {
-      rows.push(`<div><span class="inv-label">${t("view.accountName")}</span> ${esc(ct.account_name)}</div>`);
+      rows.push(`<div><span class="inv-label">${viewLabel(t, "accountName")}</span> ${esc(ct.account_name)}</div>`);
     }
   }
 
   // BG-18 payment card (masked PAN + holder name).
   if (p.card) {
     if (p.card.account_number) {
-      rows.push(`<div><span class="inv-label">${t("view.cardNumber")}</span> ${esc(p.card.account_number)}</div>`);
+      rows.push(`<div><span class="inv-label">${viewLabel(t, "cardNumber")}</span> ${esc(p.card.account_number)}</div>`);
     }
     if (p.card.holder_name) {
-      rows.push(`<div><span class="inv-label">${t("view.cardHolder")}</span> ${esc(p.card.holder_name)}</div>`);
+      rows.push(`<div><span class="inv-label">${viewLabel(t, "cardHolder")}</span> ${esc(p.card.holder_name)}</div>`);
     }
   }
 
@@ -608,31 +665,31 @@ function paymentBlock(invoice, t) {
   const dd = p.direct_debit;
   if (dd) {
     if (dd.mandate_reference) {
-      rows.push(`<div><span class="inv-label">${t("view.mandateReference")}</span> ${esc(dd.mandate_reference)}</div>`);
+      rows.push(`<div><span class="inv-label">${viewLabel(t, "mandateReference")}</span> ${esc(dd.mandate_reference)}</div>`);
     }
     if (dd.creditor_id) {
-      rows.push(`<div><span class="inv-label">${t("view.creditorId")}</span> ${esc(dd.creditor_id)}</div>`);
+      rows.push(`<div><span class="inv-label">${viewLabel(t, "creditorId")}</span> ${esc(dd.creditor_id)}</div>`);
     }
     if (dd.debited_account_id) {
-      rows.push(`<div><span class="inv-label">${t("view.debitedAccount")}</span> ${esc(dd.debited_account_id)}</div>`);
+      rows.push(`<div><span class="inv-label">${viewLabel(t, "debitedAccount")}</span> ${esc(dd.debited_account_id)}</div>`);
     }
   }
 
   if (p.remittance_information) {
-    rows.push(`<div><span class="inv-label">${t("view.remittance")}</span> ${esc(p.remittance_information)}</div>`);
+    rows.push(`<div><span class="inv-label">${viewLabel(t, "remittance")}</span> ${esc(p.remittance_information)}</div>`);
   }
 
   if (rows.length === 0) return "";
   return `<div class="inv-payment">
-    <div class="inv-section-label">${esc(t("view.paymentInstructions"))}</div>
+    <div class="inv-section-label">${esc(viewLabel(t, "paymentInstructions"))}</div>
     ${rows.join("")}
   </div>`;
 }
 
-function paymentTermsBlock(invoice, t) {
+function paymentTermsBlock(invoice: RenderableInvoice, t: TFunction): string {
   if (!invoice.payment_terms) return "";
   return `<div class="inv-payment-terms">
-    <span class="inv-label">${t("view.paymentTerms")}</span> ${esc(invoice.payment_terms)}
+    <span class="inv-label">${viewLabel(t, "paymentTerms")}</span> ${esc(invoice.payment_terms)}
   </div>`;
 }
 
@@ -645,7 +702,7 @@ function paymentTermsBlock(invoice, t) {
  * locale is never consulted). See `renderInvoiceDocument` for a
  * batteries-included wrapper.
  */
-export function renderInvoice(invoice, { t, lang = DEFAULT_LANG }) {
+export function renderInvoice(invoice: RenderableInvoice, { t, lang = DEFAULT_LANG }: { t: TFunction; lang?: Lang }): string {
   return `
     <div class="invoice-paper">
       ${headerBlock(invoice, t, lang)}
