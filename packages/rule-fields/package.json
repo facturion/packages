@@ -1,0 +1,55 @@
+{
+  "name": "@facturion/rule-fields",
+  "version": "0.0.0",
+  "description": "Which fields of an e-invoice an EN 16931 / XRechnung / French CTC validation rule concerns, and in what role (to fix, made it apply, compared): tables over the @facturion/invoice model, and the matching that turns a validation finding into fields.",
+  "keywords": [
+    "en16931",
+    "einvoicing",
+    "xrechnung",
+    "factur-x",
+    "schematron",
+    "validation",
+    "invoice"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/facturion/packages.git",
+    "directory": "packages/rule-fields"
+  },
+  "homepage": "https://github.com/facturion/packages/tree/main/packages/rule-fields#readme",
+  "bugs": "https://github.com/facturion/packages/issues",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    },
+    "./tables/*.json": "./tables/*.json",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "tables",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "tsc -p test/tsconfig.json && node --import tsx --test test/*.test.ts",
+    "prepublishOnly": "npm test"
+  },
+  "dependencies": {
+    "@facturion/pointer-patterns": "^0.0.0"
+  },
+  "devDependencies": {
+    "@facturion/invoice": "^0.5.1",
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

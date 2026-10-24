@@ -1,0 +1,234 @@
+{
+  "_meta": {
+    "status": "DRAFT — written by Claude from the pack's code (lambda/validator/vat_rules/de.py); not yet human-reviewed",
+    "source": "lambda/validator/vat_rules/de.py (content pack vat-de, opt-in)",
+    "drafted": "2026-10-23",
+    "kinds": {
+      "missing": "every target must be present and is absent",
+      "missing-any": "at least one of the targets must be present; none is. When the targets carry a `group`, at least one per group must be present (\"the seller's VAT ID or tax number, and the buyer's VAT ID\"); a field result keeps its group",
+      "invalid": "the target is present but its value is wrong (format, code list, checksum)",
+      "forbidden": "the target is present but not allowed in this combination",
+      "inconsistent": "the fields disagree. In a calculation the result is the target (it is what the rule checks, and recomputing it always satisfies the rule) and the inputs are operands; in a comparison with no derived side (dates, codes that must match), every field is an operand",
+      "structural": "the XML breaks a rule the simplified JSON cannot express (a duplicated, empty or malformed element). Any sender's invoice can trip it; our own generator never should, so `generator` says why and a hit on a document we generated is a bug. Fields point at the nearest data",
+      "unrepresentable": "concerns XRechnung-extension structures the simplified JSON has no fields for; the note has to carry the whole message"
+    },
+    "anchored": "a field with \"anchored\": true applies only on the anchor's branch: it keeps the matches the anchor is, lies inside, or contains (the document itself excepted); a containing anchor must supply every ~. index, or it would widen to every item. For a rule that fires on different kinds of object, each target names its own",
+    "roles": {
+      "target": "the field to fix",
+      "condition": "a field whose value made the rule apply",
+      "operand": "an input of a calculation, or one side of a comparison with no derived side"
+    },
+    "conventions": {
+      "no rule-set conditions": "BT-24 (and anything else that only selects which rule set runs, e.g. $isCVD) is never a condition: every rule in the set already presupposes it",
+      "narrowest field": "map the field the rule tests, not its group; the group is a path prefix any consumer can walk up to. Map a group only when its entries are what is tested (\"exactly one entry such that …\"), and then with a filter",
+      "schema, not generator": "fields name what the simplified-JSON schema can hold; what an editor shows of them is a UX question",
+      "anchor": "`anchor` accepts what check_anchors.py reports for the rule (a collision, an unbound ~., a relative path off the schema), and says why it does no harm",
+      "notes": "`note` is shown to the person checking the invoice, whoever sent it: plain words, no BT codes. `generator` says why our own generator can't (or rarely does) trip the rule; `remark` is for whoever maintains this table. Neither is shown"
+    },
+    "paths": {
+      "syntax": "JSON Pointer patterns (@facturion/pointer-patterns, SPEC.md): a JSON Pointer (RFC 6901) is a pattern matching itself",
+      "/a/b": "absolute path in the @facturion/invoice model (invoice-schema.json)",
+      "~.": "the list index of the finding's anchor at this position; no anchor there → every item",
+      "~*": "every item, regardless of the anchor",
+      "~?f=v": "the entries whose member f equals 'v'; none matching → the list itself, as the place to add one",
+      "~?f!=v": "the entries whose member f is a string other than 'v'; none matching → nothing",
+      "~?a~1b=v": "a nested member: the entries whose a/b equals 'v' (~1 separates the steps)",
+      "~?!f": "the entries without member f (missing or null; an empty string counts as present); none → nothing",
+      "unmatched filters": "only a target's unmatched ~?f=v means \"add one here\"; a condition's or operand's yields nothing",
+      "0/x": "relative to the finding's anchor (Relative JSON Pointer; 0 = the anchor itself)"
+    },
+    "anchors": "pack findings carry no location, so no anchor: every path is absolute"
+  },
+  "rules": {
+    "FCT-VAT-DE-01": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller/tax_registration_id",
+          "role": "target"
+        }
+      ],
+      "remark": "The check accepts the seller's own VAT ID or tax number only; a tax representative's VAT ID doesn't count (unlike BR-S-02)."
+    },
+    "FCT-VAT-DE-02": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/notes",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~?category_code=AE/reason",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=AE/vat/category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=AE/vat_category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=AE/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "note": "Only a warning. German VAT law requires reverse-charge invoices to say so (\"Steuerschuldnerschaft des Leistungsempfängers\", or the English \"reverse charge\"). Add it as an invoice note, or as the exemption reason of the reverse-charge VAT entry.",
+      "remark": "The check searches all notes and every breakdown entry's reason (_exemption_haystack); the AE entry's reason is the natural place, /notes the alternative (a target list: add a note)."
+    },
+    "FCT-VAT-DE-04": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/notes",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~*/reason",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~*/vat/rate",
+          "role": "condition"
+        },
+        {
+          "path": "/seller/vat_id",
+          "role": "condition"
+        }
+      ],
+      "note": "Only a hint. The invoice charges no VAT and the seller has no VAT ID, which looks like a small business under §19 UStG (Kleinunternehmer). If it is one, the invoice must say so in a note or exemption reason; if it isn't, the VAT is missing.",
+      "remark": "Fires when every line's rate is 0 or absent, there's no seller VAT ID and no Kleinunternehmer wording in notes or breakdown reasons."
+    },
+    "FCT-VAT-DE-05": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/tax_point_date",
+          "role": "target"
+        },
+        {
+          "path": "/tax_point_date_code",
+          "role": "target"
+        },
+        {
+          "path": "/delivery/date",
+          "role": "target"
+        },
+        {
+          "path": "/delivery/period",
+          "role": "target"
+        },
+        {
+          "path": "/notes",
+          "role": "target"
+        }
+      ],
+      "note": "Only a warning. German VAT law requires the date of supply: a delivery date, a service period, or a VAT point date. If the supply date is the invoice date, say so in a note (\"Leistungsdatum entspricht Rechnungsdatum\").",
+      "remark": "The period counts only with both dates; line periods don't count (unlike BR-DE-TMP-32)."
+    },
+    "FCT-VAT-DE-06": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/seller/address/line1",
+          "role": "target"
+        },
+        {
+          "path": "/seller/address/city",
+          "role": "target"
+        },
+        {
+          "path": "/seller/address/post_code",
+          "role": "target"
+        },
+        {
+          "path": "/seller/address/country_code",
+          "role": "target"
+        },
+        {
+          "path": "/buyer/address/line1",
+          "role": "target"
+        },
+        {
+          "path": "/buyer/address/city",
+          "role": "target"
+        },
+        {
+          "path": "/buyer/address/post_code",
+          "role": "target"
+        },
+        {
+          "path": "/buyer/address/country_code",
+          "role": "target"
+        }
+      ],
+      "remark": "Fires once for both parties; each absent field among the eight is what's missing (the message lists them)."
+    },
+    "FCT-VAT-DE-07": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/notes",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~?category_code=K/reason",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=K/vat/category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=K/vat_category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=K/vat_category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/seller/address/country_code",
+          "role": "condition"
+        },
+        {
+          "path": "/buyer/address/country_code",
+          "role": "condition"
+        }
+      ],
+      "note": "Only a warning. An intra-community supply must say that it is exempt (\"steuerfreie innergemeinschaftliche Lieferung\", or \"exempt intra-community supply\"). Add it as an invoice note, or as the exemption reason of that VAT entry.",
+      "remark": "Fires only when seller and buyer countries differ (the cross-border precondition); FCT-VAT-DE-08 covers the same-country case."
+    },
+    "FCT-VAT-DE-08": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/seller/address/country_code",
+          "role": "operand"
+        },
+        {
+          "path": "/buyer/address/country_code",
+          "role": "operand"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=K/vat/category_code",
+          "role": "operand"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=K/vat_category_code",
+          "role": "operand"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=K/vat_category_code",
+          "role": "operand"
+        }
+      ],
+      "note": "Only a hint. The invoice is marked as an intra-community supply, but seller and buyer are in the same country. Either the VAT category or one of the addresses is wrong."
+    }
+  }
+}

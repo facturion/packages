@@ -1,0 +1,3847 @@
+{
+  "_meta": {
+    "status": "DRAFT — AI-drafted (two subagents + a generator script), reviewed by Claude against each rule's test; not yet human-reviewed. 188 of the CEN core rules: those whose anchor alone points at the wrong place, at nothing, only at the containing block, or is unreliable (the VAT-breakdown rules)",
+    "source": "standards/xrechnung/resources/{ubl/2.1,cii/16b}/xsl/EN16931-{UBL,CII}-validation.xsl",
+    "drafted": "2026-10-23",
+    "kinds": {
+      "missing": "every target must be present and is absent",
+      "missing-any": "at least one of the targets must be present; none is. When the targets carry a `group`, at least one per group must be present (\"the seller's VAT ID or tax number, and the buyer's VAT ID\"); a field result keeps its group",
+      "invalid": "the target is present but its value is wrong (format, code list, checksum)",
+      "forbidden": "the target is present but not allowed in this combination",
+      "inconsistent": "the fields disagree. In a calculation the result is the target (it is what the rule checks, and recomputing it always satisfies the rule) and the inputs are operands; in a comparison with no derived side (dates, codes that must match), every field is an operand",
+      "structural": "the XML breaks a rule the simplified JSON cannot express (a duplicated, empty or malformed element). Any sender's invoice can trip it; our own generator never should, so `generator` says why and a hit on a document we generated is a bug. Fields point at the nearest data",
+      "unrepresentable": "concerns XRechnung-extension structures the simplified JSON has no fields for; the note has to carry the whole message"
+    },
+    "anchored": "a field with \"anchored\": true applies only on the anchor's branch: it keeps the matches the anchor is, lies inside, or contains (the document itself excepted); a containing anchor must supply every ~. index, or it would widen to every item. For a rule that fires on different kinds of object, each target names its own",
+    "roles": {
+      "target": "the field to fix",
+      "condition": "a field whose value made the rule apply",
+      "operand": "an input of a calculation, or one side of a comparison with no derived side"
+    },
+    "conventions": {
+      "no rule-set conditions": "BT-24 (and anything else that only selects which rule set runs, e.g. $isCVD) is never a condition: every rule in the set already presupposes it",
+      "narrowest field": "map the field the rule tests, not its group; the group is a path prefix any consumer can walk up to. Map a group only when its entries are what is tested (\"exactly one entry such that …\"), and then with a filter",
+      "schema, not generator": "fields name what the simplified-JSON schema can hold; what an editor shows of them is a UX question",
+      "anchor": "`anchor` accepts what check_anchors.py reports for the rule (a collision, an unbound ~., a relative path off the schema), and says why it does no harm",
+      "notes": "`note` is shown to the person checking the invoice, whoever sent it: plain words, no BT codes. `generator` says why our own generator can't (or rarely does) trip the rule; `remark` is for whoever maintains this table. Neither is shown"
+    },
+    "paths": {
+      "syntax": "JSON Pointer patterns (@facturion/pointer-patterns, SPEC.md): a JSON Pointer (RFC 6901) is a pattern matching itself",
+      "/a/b": "absolute path in the @facturion/invoice model (invoice-schema.json)",
+      "~.": "the list index of the finding's anchor at this position; no anchor there → every item",
+      "~*": "every item, regardless of the anchor",
+      "~?f=v": "the entries whose member f equals 'v'; none matching → the list itself, as the place to add one",
+      "~?f!=v": "the entries whose member f is a string other than 'v'; none matching → nothing",
+      "~?a~1b=v": "a nested member: the entries whose a/b equals 'v' (~1 separates the steps)",
+      "~?!f": "the entries without member f (missing or null; an empty string counts as present); none → nothing",
+      "unmatched filters": "only a target's unmatched ~?f=v means \"add one here\"; a condition's or operand's yields nothing",
+      "0/x": "relative to the finding's anchor (Relative JSON Pointer; 0 = the anchor itself)"
+    },
+    "not mapped": "rules that fire on the field itself (BR-CL-01/03/04/05/06/14/15/17/18/19/20/22: the anchor is exact) and the syntax rules (UBL-*/CII-*)"
+  },
+  "rules": {
+    "BR-01": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/process_control/specification_id",
+          "role": "target"
+        }
+      ],
+      "note": "The invoice has to say which standard it follows (for example the EN 16931 core or XRechnung). Without it a receiving system doesn't know which rules apply.",
+      "generator": "The generator always writes the specification identifier of the chosen format."
+    },
+    "BR-02": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/invoice_number",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-03": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/issue_date",
+          "role": "target"
+        }
+      ],
+      "remark": "CII tests DateTimeString[@format='102'] only: a date in another format also fires here."
+    },
+    "BR-04": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/invoice_type_code",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-05": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/currency_code",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-06": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/seller/name",
+          "role": "target"
+        }
+      ],
+      "note": "The seller's legal name is missing. A trading name alone isn't enough: the invoice needs the name the seller is registered under.",
+      "remark": "UBL tests PartyLegalEntity/RegistrationName, which the parser maps to name; a UBL PartyName lands in trading_name, so an invoice with only a trading name still fires."
+    },
+    "BR-07": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/buyer/name",
+          "role": "target"
+        }
+      ],
+      "note": "The buyer's legal name is missing. A trading name alone isn't enough: the invoice needs the name the buyer is registered under.",
+      "remark": "UBL tests PartyLegalEntity/RegistrationName, which the parser maps to name; a UBL PartyName lands in trading_name, so an invoice with only a trading name still fires."
+    },
+    "BR-08": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/seller/address",
+          "role": "target"
+        }
+      ],
+      "remark": "Tests only that the address group exists; its country code is BR-09."
+    },
+    "BR-09": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/seller/address/country_code",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-10": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/buyer/address",
+          "role": "target"
+        }
+      ],
+      "remark": "Tests only that the address group exists; its country code is BR-11."
+    },
+    "BR-11": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/buyer/address/country_code",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-12": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/totals/line_net_total",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-13": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/totals/tax_exclusive_amount",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-14": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/totals/tax_inclusive_amount",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-15": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/totals/amount_due",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-16": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/lines",
+          "role": "target"
+        }
+      ],
+      "note": "An invoice needs at least one line saying what was supplied."
+    },
+    "BR-17": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/payee/name",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-18": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/seller_tax_representative/name",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-19": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/seller_tax_representative/address",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-20": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/seller_tax_representative/address/country_code",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-21": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/lines/~./id",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-22": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/lines/~./quantity",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-23": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/lines/~./unit_code",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-24": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/lines/~./net_amount",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-25": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/lines/~./item/name",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-26": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/lines/~./price/net_price",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-27": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./price/net_price",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-28": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./price/gross_price",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-29": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/delivery/period/start_date",
+          "role": "operand"
+        },
+        {
+          "path": "/delivery/period/end_date",
+          "role": "operand"
+        }
+      ]
+    },
+    "BR-30": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/lines/~./period/start_date",
+          "role": "operand"
+        },
+        {
+          "path": "/lines/~./period/end_date",
+          "role": "operand"
+        }
+      ]
+    },
+    "BR-31": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/document_allowances/~./amount",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-32": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/document_allowances/~./vat_category_code",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-33": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/document_allowances/~./reason",
+          "role": "target"
+        },
+        {
+          "path": "/document_allowances/~./reason_code",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-36": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/document_charges/~./amount",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-37": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/document_charges/~./vat_category_code",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-38": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/document_charges/~./reason",
+          "role": "target"
+        },
+        {
+          "path": "/document_charges/~./reason_code",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-41": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/lines/~./allowances/~./amount",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-42": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/lines/~./allowances/~./reason",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~./allowances/~./reason_code",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-43": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/lines/~./charges/~./amount",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-44": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/lines/~./charges/~./reason",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~./charges/~./reason_code",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-45": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./taxable_amount",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-46": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./tax_amount",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-47": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./category_code",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-48": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./rate",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~./category_code",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-49": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/payment/means_code",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-50": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/payment/credit_transfers/~./account_id",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-51": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/payment/card/account_number",
+          "role": "target"
+        }
+      ],
+      "note": "Only a warning in UBL. An invoice may not show the full card number: at most 10 characters, and mask characters count too, so a masked number like 4111********1111 is still too long. Give only the last four digits, or the first six and last four without filler.",
+      "remark": "UBL (warning) fires on the account number; CII (fatal) on the card. Both test the length (<= 10 characters), not which digits are shown. Both tests are string-length <= 10 (normalize-space), so the masked form is rejected, not only a full number."
+    },
+    "BR-52": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/supporting_documents/~./reference",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/object_identifier/id",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/lines/~./object_identifier/id",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/project_reference",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/tender_or_lot_reference",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "remark": "The context is every additional document reference, including those the JSON reads as the object identifier, the project reference (UBL credit note) or the tender reference (CII); each target is anchored so the finding marks its own reference."
+    },
+    "BR-53": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/tax_amount_accounting_currency",
+          "role": "target"
+        },
+        {
+          "path": "/vat_accounting_currency_code",
+          "role": "condition"
+        }
+      ],
+      "syntax": {
+        "cii": {
+          "kind": "missing",
+          "fields": [
+            {
+              "path": "/tax_amount_accounting_currency",
+              "role": "target"
+            },
+            {
+              "path": "/vat_accounting_currency_code",
+              "role": "condition"
+            },
+            {
+              "path": "/currency_code",
+              "role": "condition"
+            }
+          ]
+        }
+      },
+      "note": "The invoice names a separate currency for VAT accounting, so it also has to state the VAT total in that currency. If that currency is the same as the invoice currency, leave the VAT accounting currency out instead.",
+      "remark": "CII's test also fails when BT-6 equals BT-5 (not(TaxCurrencyCode = InvoiceCurrencyCode)), even with BT-111 present; UBL's doesn't. Hence BT-5 as a CII condition and the note's second sentence. Path follows PEPPOL-EN16931-R054: the parser anchors BT-111 at /totals/tax_amount_accounting_currency and copies it to the root field, the caller's input."
+    },
+    "BR-54": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/lines/~./item/attributes/~./name",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~./item/attributes/~./value",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-55": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/preceding_invoices/~./reference",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-56": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-57": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/delivery/address/country_code",
+          "role": "target"
+        },
+        {
+          "path": "/delivery/address",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-61": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/payment/credit_transfers/~./account_id",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "0",
+          "role": "target"
+        },
+        {
+          "path": "/payment/means_code",
+          "role": "condition"
+        }
+      ],
+      "remark": "UBL fires on every payment block whose code is a transfer code; one without an account is a card, a direct debit, or a block the JSON keeps only as /payment (the means code is shared). 0 marks that block; the anchored account target narrows it for a transfer."
+    },
+    "BR-62": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/seller/electronic_address/scheme_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller/electronic_address/id",
+          "role": "condition"
+        }
+      ],
+      "note": "The seller's electronic address needs a scheme code saying what kind of address it is, for example EM for an e-mail address.",
+      "remark": "UBL fires on the EndpointID (anchor = the address object); CII on the root, and tests only the first URIUniversalCommunication."
+    },
+    "BR-63": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/buyer/electronic_address/scheme_id",
+          "role": "target"
+        },
+        {
+          "path": "/buyer/electronic_address/id",
+          "role": "condition"
+        }
+      ],
+      "note": "The buyer's electronic address needs a scheme code saying what kind of address it is, for example EM for an e-mail address.",
+      "remark": "UBL fires on the EndpointID (anchor = the address object); CII on the root, and tests only the first URIUniversalCommunication."
+    },
+    "BR-64": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/lines/~./item/standard_id/scheme_id",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-65": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/lines/~./item/classifications/~./scheme_id",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-AE-01": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~?category_code=AE",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=AE/vat/category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=AE/vat_category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=AE/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "note": "Lines, allowances or charges use the VAT category 'reverse charge', so the VAT breakdown needs exactly one 'reverse charge' entry. No entry and two entries are both errors; two entries usually mean the lines of this category carry different VAT rates, and they should all have the same one.",
+      "generator": "The generator derives the VAT breakdown from the lines, allowances and charges, one entry per category and rate, so this only fires when items of this category carry different rates.",
+      "remark": "Requires exactly one entry, so it also fires on two; the filter then marks both. UBL counts TaxCategory everywhere, the breakdown included, so two breakdown entries fire even without such a line. CII also fires on a breakdown entry with no line, allowance or charge of the category."
+    },
+    "BR-AE-02": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target",
+          "group": "seller"
+        },
+        {
+          "path": "/seller/tax_registration_id",
+          "role": "target",
+          "group": "seller"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target",
+          "group": "seller"
+        },
+        {
+          "path": "/buyer/vat_id",
+          "role": "target",
+          "group": "buyer"
+        },
+        {
+          "path": "/buyer/legal_registration_id",
+          "role": "target",
+          "group": "buyer"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=AE/vat/category_code",
+          "role": "condition"
+        }
+      ],
+      "note": "A reverse-charge invoice has to identify both parties for tax: the seller by VAT ID (or tax number, or the tax representative's VAT ID), and the buyer by VAT ID or legal registration number. One of each is enough.",
+      "remark": "Two alternative groups joined by 'and': (BT-31 | BT-32 | BT-63) and (BT-48 | BT-47). Targets are grouped (seller, buyer): one of each. CII fires on the line's VAT category (the condition binds with ~.); UBL fires on the root, so its condition filters the lines of this category.",
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target",
+              "group": "seller"
+            },
+            {
+              "path": "/seller/tax_registration_id",
+              "role": "target",
+              "group": "seller"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target",
+              "group": "seller"
+            },
+            {
+              "path": "/buyer/vat_id",
+              "role": "target",
+              "group": "buyer"
+            },
+            {
+              "path": "/buyer/legal_registration_id",
+              "role": "target",
+              "group": "buyer"
+            },
+            {
+              "path": "/lines/~./vat/category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      }
+    },
+    "BR-AE-03": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target",
+          "group": "seller"
+        },
+        {
+          "path": "/seller/tax_registration_id",
+          "role": "target",
+          "group": "seller"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target",
+          "group": "seller"
+        },
+        {
+          "path": "/buyer/vat_id",
+          "role": "target",
+          "group": "buyer"
+        },
+        {
+          "path": "/buyer/legal_registration_id",
+          "role": "target",
+          "group": "buyer"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=AE/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target",
+              "group": "seller"
+            },
+            {
+              "path": "/seller/tax_registration_id",
+              "role": "target",
+              "group": "seller"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target",
+              "group": "seller"
+            },
+            {
+              "path": "/buyer/vat_id",
+              "role": "target",
+              "group": "buyer"
+            },
+            {
+              "path": "/buyer/legal_registration_id",
+              "role": "target",
+              "group": "buyer"
+            },
+            {
+              "path": "/document_allowances/~./vat_category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      },
+      "note": "A document-level allowance is reverse charge, so the invoice has to identify both parties: the seller by their VAT ID, local tax number or tax representative's VAT ID, and the buyer by their VAT ID or legal registration number. Check that both sides have one.",
+      "remark": "UBL fires on the document root, so its condition filters the allowances of this category; CII fires on the allowance's VAT category, so `~.` names that one. Test is (seller VAT/tax reg/representative VAT) AND (buyer VAT or buyer legal registration ID); `/buyer/legal_registration_id` is the object: one element feeds its id and scheme. Representative: its vat_id (narrowest; BR-DE-16 maps the group)."
+    },
+    "BR-AE-04": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target",
+          "group": "seller"
+        },
+        {
+          "path": "/seller/tax_registration_id",
+          "role": "target",
+          "group": "seller"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target",
+          "group": "seller"
+        },
+        {
+          "path": "/buyer/vat_id",
+          "role": "target",
+          "group": "buyer"
+        },
+        {
+          "path": "/buyer/legal_registration_id",
+          "role": "target",
+          "group": "buyer"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=AE/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "note": "A charge on the invoice is marked as reverse charge, so the invoice has to identify both parties for tax: the seller by VAT ID (or tax number, or the tax representative's VAT ID), and the buyer by VAT ID or legal registration number. One of each is enough.",
+      "remark": "Two alternative groups joined by 'and', as BR-AE-02. CII fires on the charge's VAT category (the condition binds with ~.); UBL fires on the root, so its condition filters the charges with category AE.",
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target",
+              "group": "seller"
+            },
+            {
+              "path": "/seller/tax_registration_id",
+              "role": "target",
+              "group": "seller"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target",
+              "group": "seller"
+            },
+            {
+              "path": "/buyer/vat_id",
+              "role": "target",
+              "group": "buyer"
+            },
+            {
+              "path": "/buyer/legal_registration_id",
+              "role": "target",
+              "group": "buyer"
+            },
+            {
+              "path": "/document_charges/~./vat_category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      }
+    },
+    "BR-AE-05": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./vat/rate",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~./vat/category_code",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-AE-07": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/document_charges/~./vat_rate",
+          "role": "target"
+        },
+        {
+          "path": "/document_charges/~./vat_category_code",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-AE-08": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./taxable_amount",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=AE/net_amount",
+          "role": "operand"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=AE/amount",
+          "role": "operand"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=AE/amount",
+          "role": "operand"
+        },
+        {
+          "path": "/vat_breakdown/~./category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=AE/vat/category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=AE/vat_category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=AE/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "remark": "UBL compares exactly; CII allows a difference of 1."
+    },
+    "BR-AE-09": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./tax_amount",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~./category_code",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-AE-10": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./reason_code",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~./reason",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~./category_code",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-AF-01": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~?category_code=L",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=L/vat/category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=L/vat_category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=L/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "note": "Lines, allowances or charges use the VAT category 'IGIC (Canary Islands tax)', so the VAT breakdown needs an entry for it.",
+      "generator": "The generator derives the VAT breakdown from the lines, allowances and charges, so every category used gets an entry.",
+      "remark": "UBL also fires on a breakdown entry of this category with no line, allowance or charge of it (the test is 'both or neither'); the filter then marks that entry. CII only checks the direction items → breakdown, by counting (>= 2 occurrences)."
+    },
+    "BR-AF-02": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller/tax_registration_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=L/vat/category_code",
+          "role": "condition"
+        }
+      ],
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller/tax_registration_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/lines/~./vat/category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      },
+      "note": "A line uses the VAT category 'IGIC (Canary Islands tax)', so the invoice has to identify the seller for tax: their VAT ID, their local tax number, or the VAT ID of their tax representative.",
+      "remark": "UBL fires on the document root, so its condition filters the lines of this category; CII fires on the line's VAT category, so `~.` names that one. Seller side: UBL accepts any PartyTaxScheme CompanyID, CII schemeID VA or FC, i.e. vat_id or tax_registration_id. Representative: its vat_id (narrowest; BR-DE-16 maps the group)."
+    },
+    "BR-AF-03": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller/tax_registration_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=L/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller/tax_registration_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/document_allowances/~./vat_category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      },
+      "note": "A document-level allowance uses the VAT category 'IGIC (Canary Islands tax)', so the invoice has to identify the seller for tax: their VAT ID, their local tax number, or the VAT ID of their tax representative.",
+      "remark": "UBL fires on the document root, so its condition filters the allowances of this category; CII fires on the allowance's VAT category, so `~.` names that one. Seller side: UBL accepts any PartyTaxScheme CompanyID, CII schemeID VA or FC, i.e. vat_id or tax_registration_id. Representative: its vat_id (narrowest; BR-DE-16 maps the group)."
+    },
+    "BR-AF-04": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller/tax_registration_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=L/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller/tax_registration_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/document_charges/~./vat_category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      },
+      "note": "A document-level charge uses the VAT category 'IGIC (Canary Islands tax)', so the invoice has to identify the seller for tax: their VAT ID, their local tax number, or the VAT ID of their tax representative.",
+      "remark": "UBL fires on the document root, so its condition filters the charges of this category; CII fires on the charge's VAT category, so `~.` names that one. Seller side: UBL accepts any PartyTaxScheme CompanyID, CII schemeID VA or FC, i.e. vat_id or tax_registration_id. Representative: its vat_id (narrowest; BR-DE-16 maps the group)."
+    },
+    "BR-AG-01": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~?category_code=M",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=M/vat/category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=M/vat_category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=M/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "note": "Lines, allowances or charges use the VAT category 'IPSI (Ceuta and Melilla tax)', so the VAT breakdown needs an entry for it.",
+      "generator": "The generator derives the VAT breakdown from the lines, allowances and charges, so every category used gets an entry.",
+      "remark": "UBL also fires on a breakdown entry of this category with no line, allowance or charge of it (the test is 'both or neither'); the filter then marks that entry. CII only checks the direction items → breakdown, by counting (>= 2 occurrences)."
+    },
+    "BR-AG-02": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller/tax_registration_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=M/vat/category_code",
+          "role": "condition"
+        }
+      ],
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller/tax_registration_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/lines/~./vat/category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      },
+      "note": "A line uses the VAT category 'IPSI (Ceuta and Melilla tax)', so the invoice has to identify the seller for tax: their VAT ID, their local tax number, or the VAT ID of their tax representative.",
+      "remark": "UBL fires on the document root, so its condition filters the lines of this category; CII fires on the line's VAT category, so `~.` names that one. Seller side: UBL accepts any PartyTaxScheme CompanyID, CII schemeID VA or FC, i.e. vat_id or tax_registration_id. Representative: its vat_id (narrowest; BR-DE-16 maps the group)."
+    },
+    "BR-AG-03": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller/tax_registration_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=M/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller/tax_registration_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/document_allowances/~./vat_category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      },
+      "note": "A document-level allowance uses the VAT category 'IPSI (Ceuta and Melilla tax)', so the invoice has to identify the seller for tax: their VAT ID, their local tax number, or the VAT ID of their tax representative.",
+      "remark": "UBL fires on the document root, so its condition filters the allowances of this category; CII fires on the allowance's VAT category, so `~.` names that one. Seller side: UBL accepts any PartyTaxScheme CompanyID, CII schemeID VA or FC, i.e. vat_id or tax_registration_id. Representative: its vat_id (narrowest; BR-DE-16 maps the group)."
+    },
+    "BR-AG-04": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller/tax_registration_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=M/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller/tax_registration_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/document_charges/~./vat_category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      },
+      "note": "A document-level charge uses the VAT category 'IPSI (Ceuta and Melilla tax)', so the invoice has to identify the seller for tax: their VAT ID, their local tax number, or the VAT ID of their tax representative.",
+      "remark": "UBL fires on the document root, so its condition filters the charges of this category; CII fires on the charge's VAT category, so `~.` names that one. Seller side: UBL accepts any PartyTaxScheme CompanyID, CII schemeID VA or FC, i.e. vat_id or tax_registration_id. Representative: its vat_id (narrowest; BR-DE-16 maps the group)."
+    },
+    "BR-B-01": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/seller/address/country_code",
+          "role": "operand"
+        },
+        {
+          "path": "/buyer/address/country_code",
+          "role": "operand"
+        },
+        {
+          "path": "/seller_tax_representative/address/country_code",
+          "role": "operand"
+        },
+        {
+          "path": "/delivery/address/country_code",
+          "role": "operand"
+        },
+        {
+          "path": "/lines/~*/item/country_of_origin",
+          "role": "operand"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=B/vat/category_code",
+          "role": "operand"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=B/vat_category_code",
+          "role": "operand"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=B/vat_category_code",
+          "role": "operand"
+        },
+        {
+          "path": "/vat_breakdown/~?category_code=B/category_code",
+          "role": "operand"
+        }
+      ],
+      "syntax": {
+        "cii": {
+          "kind": "inconsistent",
+          "fields": [
+            {
+              "path": "/seller/address/country_code",
+              "role": "operand"
+            },
+            {
+              "path": "/buyer/address/country_code",
+              "role": "operand"
+            },
+            {
+              "path": "/seller_tax_representative/address/country_code",
+              "role": "operand"
+            },
+            {
+              "path": "/delivery/address/country_code",
+              "role": "operand"
+            },
+            {
+              "path": "/lines/~?vat~1category_code=B/vat/category_code",
+              "role": "operand"
+            },
+            {
+              "path": "/document_allowances/~?vat_category_code=B/vat_category_code",
+              "role": "operand"
+            },
+            {
+              "path": "/document_charges/~?vat_category_code=B/vat_category_code",
+              "role": "operand"
+            },
+            {
+              "path": "/vat_breakdown/~?category_code=B/category_code",
+              "role": "operand"
+            }
+          ]
+        }
+      },
+      "note": "The VAT category 'split payment' is an Italian scheme and only allowed on an invoice within Italy: every country on it has to be Italy. Either a country is wrong or the VAT category is.",
+      "remark": "Tests every country code in the document (UBL //cbc:IdentificationCode, which includes the item's country of origin; CII //ram:CountryID, addresses only). UBL also counts category B in the breakdown and on any TaxCategory, CII any CategoryCode."
+    },
+    "BR-B-02": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/lines/~?vat~1category_code=B/vat/category_code",
+          "role": "operand"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=S/vat/category_code",
+          "role": "operand"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=B/vat_category_code",
+          "role": "operand"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=S/vat_category_code",
+          "role": "operand"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=B/vat_category_code",
+          "role": "operand"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=S/vat_category_code",
+          "role": "operand"
+        },
+        {
+          "path": "/vat_breakdown/~?category_code=B/category_code",
+          "role": "operand"
+        },
+        {
+          "path": "/vat_breakdown/~?category_code=S/category_code",
+          "role": "operand"
+        }
+      ],
+      "note": "The invoice mixes 'split payment' and 'standard rate': with split payment, no line, allowance or charge may be standard rated. Check which VAT category is right.",
+      "remark": "Operands are the B and the S entries of each list; an unmatched operand filter yields nothing. UBL counts document-level AllowanceCharge only, CII any CategoryCode."
+    },
+    "BR-CL-07": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/object_identifier/scheme_id",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/lines/~./object_identifier/scheme_id",
+          "role": "target",
+          "anchored": true
+        }
+      ]
+    },
+    "BR-CL-08": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/notes/~./subject_code",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-CL-10": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/seller/identifiers/~./scheme_id",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/buyer/identifier/scheme_id",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/payee/identifier/scheme_id",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/payment/direct_debit/creditor_id",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "remark": "UBL also fires on a SEPA creditor identifier whose scheme isn't exactly 'SEPA' (the parser reads it case-insensitively, the rule doesn't), or on one outside the seller and payee; the JSON keeps the creditor ID without its scheme, so that finding marks the creditor ID."
+    },
+    "BR-CL-11": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "0/scheme_id",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-CL-13": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "0/scheme_id",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-CL-16": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/payment/means_code",
+          "role": "target"
+        }
+      ],
+      "anchor": "The JSON has one payment means code for all payment means, so every means code lands on that one field; the target is the same either way."
+    },
+    "BR-CL-21": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "0/scheme_id",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-CL-23": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./unit_code",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/lines/~./price/base_quantity_unit_code",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "remark": "The invoiced quantity's element feeds the quantity and its unit, so it anchors at the line, which contains both unit-code targets: that finding also marks the line's price base unit if one is stated. The base quantity anchors at the line's price and marks only its unit. UBL sub-lines have no anchor.",
+      "anchor": "CII states the base quantity under both the gross and the net price; the JSON holds one, so both places are the same field."
+    },
+    "BR-CL-24": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "0/mime_code",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-CL-25": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "0/scheme_id",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-CL-26": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "0/scheme_id",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-CO-03": {
+      "kind": "forbidden",
+      "fields": [
+        {
+          "path": "/tax_point_date",
+          "role": "target"
+        },
+        {
+          "path": "/tax_point_date_code",
+          "role": "target"
+        }
+      ],
+      "note": "The invoice states both a VAT point date and a code for how that date is determined. Only one of them is allowed: keep the date, or the code, not both.",
+      "remark": "Neither field is the condition of the other; both are targets. CII fires once per VAT breakdown row (where CII carries both fields) with the same outcome for each; the JSON holds one of each."
+    },
+    "BR-CO-04": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/lines/~./vat/category_code",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-CO-05": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/document_allowances/~./reason_code",
+          "role": "operand"
+        },
+        {
+          "path": "/document_allowances/~./reason",
+          "role": "operand"
+        }
+      ],
+      "note": "Reason code and reason text describe different things. The code is what software books by; check which one is meant."
+    },
+    "BR-CO-06": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/document_charges/~./reason_code",
+          "role": "operand"
+        },
+        {
+          "path": "/document_charges/~./reason",
+          "role": "operand"
+        }
+      ],
+      "note": "Reason code and reason text describe different things. The code is what software books by; check which one is meant."
+    },
+    "BR-CO-07": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/lines/~./allowances/~./reason_code",
+          "role": "operand"
+        },
+        {
+          "path": "/lines/~./allowances/~./reason",
+          "role": "operand"
+        }
+      ],
+      "note": "Reason code and reason text describe different things. The code is what software books by; check which one is meant."
+    },
+    "BR-CO-08": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/lines/~./charges/~./reason_code",
+          "role": "operand"
+        },
+        {
+          "path": "/lines/~./charges/~./reason",
+          "role": "operand"
+        }
+      ],
+      "note": "Reason code and reason text describe different things. The code is what software books by; check which one is meant."
+    },
+    "BR-CO-09": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/buyer/vat_id",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "note": "A VAT ID starts with the two-letter code of the country that issued it (Greece uses EL), for example DE123456789.",
+      "remark": "Fires on each VAT registration (UBL PartyTaxScheme with scheme VAT, CII ID with schemeID VA); the anchored targets pick the party."
+    },
+    "BR-CO-10": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/totals/line_net_total",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~*/net_amount",
+          "role": "operand"
+        }
+      ]
+    },
+    "BR-CO-11": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/totals/allowance_total",
+          "role": "target"
+        },
+        {
+          "path": "/document_allowances/~*/amount",
+          "role": "operand"
+        }
+      ]
+    },
+    "BR-CO-12": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/totals/charge_total",
+          "role": "target"
+        },
+        {
+          "path": "/document_charges/~*/amount",
+          "role": "operand"
+        }
+      ]
+    },
+    "BR-CO-13": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/totals/tax_exclusive_amount",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~*/net_amount",
+          "role": "operand"
+        },
+        {
+          "path": "/totals/allowance_total",
+          "role": "operand"
+        },
+        {
+          "path": "/totals/charge_total",
+          "role": "operand"
+        }
+      ]
+    },
+    "BR-CO-14": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/totals/tax_amount",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~*/tax_amount",
+          "role": "operand"
+        }
+      ],
+      "remark": "UBL fires on each TaxTotal (also the accounting-currency one, which passes when it has no subtotals); CII on the document-currency VAT total.",
+      "anchor": "UBL's second TaxTotal (the VAT total in accounting currency) also anchors at the root; it passes unless it carries subtotals, and the operands are absolute, so both places yield the same fields."
+    },
+    "BR-CO-15": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/totals/tax_inclusive_amount",
+          "role": "target"
+        },
+        {
+          "path": "/totals/tax_exclusive_amount",
+          "role": "operand"
+        },
+        {
+          "path": "/totals/tax_amount",
+          "role": "operand"
+        }
+      ],
+      "note": "The total with VAT doesn't equal the total without VAT plus the VAT total. The rule also fails when the VAT total in the invoice currency is missing or stated twice. Check which figure is wrong.",
+      "generator": "The generator computes all three totals from the lines, so the equation holds.",
+      "remark": "Also requires exactly one TaxAmount in the document currency; if the VAT accounting currency equals the invoice currency, the second TaxAmount (tax_amount_accounting_currency) counts too. CII passes when GrandTotal = TaxBasisTotal even without a VAT total."
+    },
+    "BR-CO-16": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/totals/amount_due",
+          "role": "target"
+        },
+        {
+          "path": "/totals/tax_inclusive_amount",
+          "role": "operand"
+        },
+        {
+          "path": "/totals/prepaid_amount",
+          "role": "operand"
+        },
+        {
+          "path": "/totals/rounding_amount",
+          "role": "operand"
+        }
+      ]
+    },
+    "BR-CO-17": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./tax_amount",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~./taxable_amount",
+          "role": "operand"
+        },
+        {
+          "path": "/vat_breakdown/~./rate",
+          "role": "operand"
+        }
+      ]
+    },
+    "BR-CO-18": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/vat_breakdown",
+          "role": "target"
+        }
+      ],
+      "note": "The invoice has no VAT breakdown: every invoice needs at least one row with a VAT category, its taxable amount and its VAT, even when no VAT is charged.",
+      "remark": "CII fires once per line (any line implies the breakdown is missing); UBL on the root."
+    },
+    "BR-CO-19": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/delivery/period/start_date",
+          "role": "target"
+        },
+        {
+          "path": "/delivery/period/end_date",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-CO-20": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/lines/~./period/start_date",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~./period/end_date",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-CO-21": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/document_allowances/~./reason",
+          "role": "target"
+        },
+        {
+          "path": "/document_allowances/~./reason_code",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-CO-22": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/document_charges/~./reason",
+          "role": "target"
+        },
+        {
+          "path": "/document_charges/~./reason_code",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-CO-23": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/lines/~./allowances/~./reason",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~./allowances/~./reason_code",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-CO-24": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/lines/~./charges/~./reason",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~./charges/~./reason_code",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-CO-26": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/identifiers",
+          "role": "target"
+        },
+        {
+          "path": "/seller/legal_registration_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller/vat_id",
+          "role": "target"
+        }
+      ]
+    },
+    "BR-DEC-01": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/document_allowances/~./amount",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-DEC-02": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/document_allowances/~./base_amount",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-DEC-05": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/document_charges/~./amount",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-DEC-06": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/document_charges/~./base_amount",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-DEC-09": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/totals/line_net_total",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-DEC-10": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/totals/allowance_total",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-DEC-11": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/totals/charge_total",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-DEC-12": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/totals/tax_exclusive_amount",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-DEC-13": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/totals/tax_amount",
+          "role": "target"
+        }
+      ],
+      "remark": "UBL's test compares TaxAmount/@currencyID with cbc:DocumentCurrencyCode relative to the TaxAmount (a child it never has), so the predicate never matches and UBL can't fire; only CII can."
+    },
+    "BR-DEC-14": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/totals/tax_inclusive_amount",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-DEC-15": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/tax_amount_accounting_currency",
+          "role": "target"
+        },
+        {
+          "path": "/vat_accounting_currency_code",
+          "role": "condition"
+        }
+      ],
+      "remark": "UBL's test compares @currencyID with cbc:TaxCurrencyCode relative to the TaxAmount, so it never matches and UBL can't fire. CII's test needs some TaxTotalAmount in BT-6 with ≤2 decimals once BT-6 is present, so it also fires when BT-111 is absent (alongside BR-53); the target is then a missing field, which is still the one to fix. Path as BR-53."
+    },
+    "BR-DEC-16": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/totals/prepaid_amount",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-DEC-17": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/totals/rounding_amount",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-DEC-18": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/totals/amount_due",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-DEC-19": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./taxable_amount",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-DEC-20": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./tax_amount",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-DEC-23": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./net_amount",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-DEC-24": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./allowances/~./amount",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-DEC-25": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./allowances/~./base_amount",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-DEC-27": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./charges/~./amount",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-DEC-28": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./charges/~./base_amount",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-E-01": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~?category_code=E",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=E/vat/category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=E/vat_category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=E/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "note": "Lines, allowances or charges use the VAT category 'exempt from VAT', so the VAT breakdown needs exactly one 'exempt from VAT' entry. No entry and two entries are both errors; two entries usually mean the lines of this category carry different VAT rates, and they should all have the same one.",
+      "generator": "The generator derives the VAT breakdown from the lines, allowances and charges, one entry per category and rate, so this only fires when items of this category carry different rates.",
+      "remark": "Requires exactly one entry, so it also fires on two; the filter then marks both. UBL counts TaxCategory everywhere, the breakdown included, so two breakdown entries fire even without such a line. CII also fires on a breakdown entry with no line, allowance or charge of the category."
+    },
+    "BR-E-02": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller/tax_registration_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=E/vat/category_code",
+          "role": "condition"
+        }
+      ],
+      "remark": "CII fires on the line's VAT category (the condition binds with ~.); UBL fires on the root, so its condition filters the lines of this category.",
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller/tax_registration_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/lines/~./vat/category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      }
+    },
+    "BR-E-03": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller/tax_registration_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=E/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "remark": "CII fires on the allowance's VAT category (the condition binds with ~.); UBL fires on the root, so its condition filters the allowances with category E.",
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller/tax_registration_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/document_allowances/~./vat_category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      }
+    },
+    "BR-E-04": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller/tax_registration_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=E/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "remark": "CII fires on the charge's VAT category (the condition binds with ~.); UBL fires on the root, so its condition filters the charges with category E.",
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller/tax_registration_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/document_charges/~./vat_category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      }
+    },
+    "BR-E-05": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./vat/rate",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~./vat/category_code",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-E-06": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/document_allowances/~./vat_rate",
+          "role": "target"
+        },
+        {
+          "path": "/document_allowances/~./vat_category_code",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-E-07": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/document_charges/~./vat_rate",
+          "role": "target"
+        },
+        {
+          "path": "/document_charges/~./vat_category_code",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-E-08": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./taxable_amount",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=E/net_amount",
+          "role": "operand"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=E/amount",
+          "role": "operand"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=E/amount",
+          "role": "operand"
+        },
+        {
+          "path": "/vat_breakdown/~./category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=E/vat/category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=E/vat_category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=E/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "remark": "UBL compares exactly; CII allows a difference of 1."
+    },
+    "BR-E-09": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./tax_amount",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~./category_code",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-E-10": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./reason_code",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~./reason",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~./category_code",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-G-01": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~?category_code=G",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=G/vat/category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=G/vat_category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=G/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "note": "Lines, allowances or charges use the VAT category 'export outside the EU', so the VAT breakdown needs exactly one 'export outside the EU' entry. No entry and two entries are both errors; two entries usually mean the lines of this category carry different VAT rates, and they should all have the same one.",
+      "generator": "The generator derives the VAT breakdown from the lines, allowances and charges, one entry per category and rate, so this only fires when items of this category carry different rates.",
+      "remark": "Requires exactly one entry, so it also fires on two; the filter then marks both. UBL counts TaxCategory everywhere, the breakdown included, so two breakdown entries fire even without such a line. CII also fires on a breakdown entry with no line, allowance or charge of the category."
+    },
+    "BR-G-02": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=G/vat/category_code",
+          "role": "condition"
+        }
+      ],
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/lines/~./vat/category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      },
+      "note": "A line is an export outside the EU, so the invoice has to carry the seller's VAT ID or the VAT ID of their tax representative. A local tax number isn't enough.",
+      "remark": "UBL fires on the document root, so its condition filters the lines of this category; CII fires on the line's VAT category, so `~.` names that one. Representative: its vat_id (narrowest; BR-DE-16 maps the group)."
+    },
+    "BR-G-03": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=G/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/document_allowances/~./vat_category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      },
+      "note": "A document-level allowance is an export outside the EU, so the invoice has to carry the seller's VAT ID or the VAT ID of their tax representative. A local tax number isn't enough.",
+      "remark": "UBL fires on the document root, so its condition filters the allowances of this category; CII fires on the allowance's VAT category, so `~.` names that one. Representative: its vat_id (narrowest; BR-DE-16 maps the group)."
+    },
+    "BR-G-04": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=G/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/document_charges/~./vat_category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      },
+      "note": "A document-level charge is an export outside the EU, so the invoice has to carry the seller's VAT ID or the VAT ID of their tax representative. A local tax number isn't enough.",
+      "remark": "UBL fires on the document root, so its condition filters the charges of this category; CII fires on the charge's VAT category, so `~.` names that one. Representative: its vat_id (narrowest; BR-DE-16 maps the group)."
+    },
+    "BR-IC-01": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~?category_code=K",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=K/vat/category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=K/vat_category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=K/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "note": "Lines, allowances or charges use the VAT category 'intra-community supply', so the VAT breakdown needs exactly one 'intra-community supply' entry. No entry and two entries are both errors; two entries usually mean the lines of this category carry different VAT rates, and they should all have the same one.",
+      "generator": "The generator derives the VAT breakdown from the lines, allowances and charges, one entry per category and rate, so this only fires when items of this category carry different rates.",
+      "remark": "Requires exactly one entry, so it also fires on two; the filter then marks both. UBL counts TaxCategory everywhere, the breakdown included, so two breakdown entries fire even without such a line. CII also fires on a breakdown entry with no line, allowance or charge of the category."
+    },
+    "BR-IC-02": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target",
+          "group": "seller"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target",
+          "group": "seller"
+        },
+        {
+          "path": "/buyer/vat_id",
+          "role": "target",
+          "group": "buyer"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=K/vat/category_code",
+          "role": "condition"
+        }
+      ],
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target",
+              "group": "seller"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target",
+              "group": "seller"
+            },
+            {
+              "path": "/buyer/vat_id",
+              "role": "target",
+              "group": "buyer"
+            },
+            {
+              "path": "/lines/~./vat/category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      },
+      "note": "A line is an intra-community supply, so the invoice needs two VAT IDs: the seller's (or their tax representative's) and the buyer's. Check that both are there.",
+      "remark": "UBL fires on the document root, so its condition filters the lines of this category; CII fires on the line's VAT category, so `~.` names that one. Test is (seller VAT or representative VAT) AND buyer VAT; Representative: its vat_id (narrowest; BR-DE-16 maps the group)."
+    },
+    "BR-IC-03": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target",
+          "group": "seller"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target",
+          "group": "seller"
+        },
+        {
+          "path": "/buyer/vat_id",
+          "role": "target",
+          "group": "buyer"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=K/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target",
+              "group": "seller"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target",
+              "group": "seller"
+            },
+            {
+              "path": "/buyer/vat_id",
+              "role": "target",
+              "group": "buyer"
+            },
+            {
+              "path": "/document_allowances/~./vat_category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      },
+      "note": "A document-level allowance is an intra-community supply, so the invoice needs two VAT IDs: the seller's (or their tax representative's) and the buyer's. Check that both are there.",
+      "remark": "UBL fires on the document root, so its condition filters the allowances of this category; CII fires on the allowance's VAT category, so `~.` names that one. Test is (seller VAT or representative VAT) AND buyer VAT; targets are grouped (seller, buyer). Representative: its vat_id (narrowest; BR-DE-16 maps the group)."
+    },
+    "BR-IC-04": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target",
+          "group": "seller"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target",
+          "group": "seller"
+        },
+        {
+          "path": "/buyer/vat_id",
+          "role": "target",
+          "group": "buyer"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=K/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "note": "A charge on the invoice is marked as an intra-community supply, so the invoice needs the VAT IDs of both parties: the seller's (or its tax representative's) and the buyer's. A tax number isn't enough.",
+      "remark": "Targets are grouped (seller, buyer): one of each. CII fires on the charge's VAT category (the condition binds with ~.); UBL fires on the root, so its condition filters the charges with category K.",
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target",
+              "group": "seller"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target",
+              "group": "seller"
+            },
+            {
+              "path": "/buyer/vat_id",
+              "role": "target",
+              "group": "buyer"
+            },
+            {
+              "path": "/document_charges/~./vat_category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      }
+    },
+    "BR-IC-07": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/document_charges/~./vat_rate",
+          "role": "target"
+        },
+        {
+          "path": "/document_charges/~./vat_category_code",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-IC-08": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./taxable_amount",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=K/net_amount",
+          "role": "operand"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=K/amount",
+          "role": "operand"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=K/amount",
+          "role": "operand"
+        },
+        {
+          "path": "/vat_breakdown/~./category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=K/vat/category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=K/vat_category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=K/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "remark": "UBL compares exactly; CII allows a difference of 1."
+    },
+    "BR-IC-09": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./tax_amount",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~./category_code",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-IC-10": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./reason_code",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~./reason",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~./category_code",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-IC-11": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/delivery/date",
+          "role": "target"
+        },
+        {
+          "path": "/delivery/period/start_date",
+          "role": "target"
+        },
+        {
+          "path": "/delivery/period/end_date",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~?category_code=K/category_code",
+          "role": "condition"
+        }
+      ],
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            {
+              "path": "/delivery/date",
+              "role": "target"
+            },
+            {
+              "path": "/delivery/period/start_date",
+              "role": "target"
+            },
+            {
+              "path": "/delivery/period/end_date",
+              "role": "target"
+            },
+            {
+              "path": "/vat_breakdown/~./category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      },
+      "note": "An intra-community supply needs the date of delivery or the invoicing period.",
+      "remark": "UBL fires on the root (condition filters the K entries); CII on each K entry's category code. UBL accepts any child of InvoicePeriod, so a tax point date code alone satisfies it."
+    },
+    "BR-IC-12": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/delivery/address/country_code",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~?category_code=K/category_code",
+          "role": "condition"
+        }
+      ],
+      "syntax": {
+        "cii": {
+          "kind": "missing",
+          "fields": [
+            {
+              "path": "/delivery/address/country_code",
+              "role": "target"
+            },
+            {
+              "path": "/vat_breakdown/~./category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      },
+      "note": "An intra-community supply needs the country the goods are delivered to.",
+      "remark": "UBL fires on the root (condition filters the K entries); CII on each K entry's category code."
+    },
+    "BR-O-01": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~?category_code=O",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=O/vat/category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=O/vat_category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=O/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "note": "The VAT breakdown and the lines, allowances or charges disagree about 'not subject to VAT': items of that category need exactly one breakdown entry for it, and a breakdown entry for it needs at least one such item. Check whether the entry is missing, doubled, or left over.",
+      "generator": "The generator derives the VAT breakdown from the lines, allowances and charges, one entry per category and rate, so this only fires when items of this category carry different rates.",
+      "remark": "CII's test only applies when an O breakdown entry exists: it fires on two O entries or on an O entry without an O line/allowance/charge, never on a missing one, hence `inconsistent` there. UBL fires both ways.",
+      "syntax": {
+        "cii": {
+          "kind": "inconsistent",
+          "fields": [
+            {
+              "path": "/vat_breakdown/~?category_code=O",
+              "role": "operand"
+            },
+            {
+              "path": "/lines/~?vat~1category_code=O/vat/category_code",
+              "role": "operand"
+            },
+            {
+              "path": "/document_allowances/~?vat_category_code=O/vat_category_code",
+              "role": "operand"
+            },
+            {
+              "path": "/document_charges/~?vat_category_code=O/vat_category_code",
+              "role": "operand"
+            }
+          ]
+        }
+      }
+    },
+    "BR-O-02": {
+      "kind": "forbidden",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/buyer/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=O/vat/category_code",
+          "role": "condition"
+        }
+      ],
+      "note": "A line is marked as not subject to VAT, and such an invoice may not carry VAT IDs. Either the supply really is outside the scope of VAT, and the VAT IDs have to go, or the line's VAT category is wrong.",
+      "remark": "CII fires on the line's VAT category (the condition binds with ~.); UBL fires on the root, so its condition filters the lines of this category.",
+      "syntax": {
+        "cii": {
+          "kind": "forbidden",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/buyer/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/lines/~./vat/category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      }
+    },
+    "BR-O-03": {
+      "kind": "forbidden",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/buyer/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=O/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "syntax": {
+        "cii": {
+          "kind": "forbidden",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/buyer/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/document_allowances/~./vat_category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      },
+      "note": "A document-level allowance is marked 'not subject to VAT', which doesn't go together with VAT IDs on the invoice: neither the seller, their tax representative nor the buyer may carry one. Either the category is wrong or the VAT IDs have to go.",
+      "remark": "UBL fires on the document root (document-level AllowanceCharge only); CII fires on the allowance's VAT category, so `~.` names that one. Representative: its vat_id."
+    },
+    "BR-O-04": {
+      "kind": "forbidden",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/buyer/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=O/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "syntax": {
+        "cii": {
+          "kind": "forbidden",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/buyer/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/document_charges/~./vat_category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      },
+      "note": "A document-level charge is marked 'not subject to VAT', which doesn't go together with VAT IDs on the invoice: neither the seller, their tax representative nor the buyer may carry one. Either the category is wrong or the VAT IDs have to go.",
+      "remark": "UBL fires on the document root (document-level AllowanceCharge only); CII fires on the charge's VAT category, so `~.` names that one. Representative: its vat_id."
+    },
+    "BR-O-05": {
+      "kind": "forbidden",
+      "fields": [
+        {
+          "path": "/lines/~./vat/rate",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~./vat/category_code",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-O-08": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./taxable_amount",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=O/net_amount",
+          "role": "operand"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=O/amount",
+          "role": "operand"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=O/amount",
+          "role": "operand"
+        },
+        {
+          "path": "/vat_breakdown/~./category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=O/vat/category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=O/vat_category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=O/vat_category_code",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-O-09": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./tax_amount",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~./category_code",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-O-10": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./reason_code",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~./reason",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~./category_code",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-O-11": {
+      "kind": "forbidden",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~?category_code!=O/category_code",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~?category_code=O",
+          "role": "condition"
+        }
+      ],
+      "syntax": {
+        "cii": {
+          "kind": "forbidden",
+          "fields": [
+            {
+              "path": "/vat_breakdown/~?category_code!=O/category_code",
+              "role": "target"
+            },
+            {
+              "path": "/lines/~?vat~1category_code!=O/vat/category_code",
+              "role": "target"
+            },
+            {
+              "path": "/vat_breakdown/~?category_code=O",
+              "role": "condition"
+            }
+          ]
+        }
+      },
+      "note": "Part of this invoice is not subject to VAT, and such an invoice can't contain any other VAT category. Invoice the other items separately, or correct the VAT category that is wrong.",
+      "remark": "CII's test is //ram:ApplicableTradeTax[CategoryCode != 'O'], which also matches line VAT, so it is identical to CII BR-O-12; hence the line target for CII."
+    },
+    "BR-O-12": {
+      "kind": "forbidden",
+      "fields": [
+        {
+          "path": "/lines/~?vat~1category_code!=O/vat/category_code",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~?category_code=O",
+          "role": "condition"
+        }
+      ],
+      "syntax": {
+        "cii": {
+          "kind": "forbidden",
+          "fields": [
+            {
+              "path": "/lines/~?vat~1category_code!=O/vat/category_code",
+              "role": "target"
+            },
+            {
+              "path": "/vat_breakdown/~?category_code!=O/category_code",
+              "role": "target"
+            },
+            {
+              "path": "/vat_breakdown/~?category_code=O",
+              "role": "condition"
+            }
+          ]
+        }
+      },
+      "note": "Part of this invoice is not subject to VAT, and such an invoice can't contain a line with another VAT category. Invoice those items separately, or correct the line's VAT category.",
+      "remark": "CII's test is identical to CII BR-O-11 (//ram:ApplicableTradeTax also matches the breakdown rows), hence the breakdown target for CII."
+    },
+    "BR-O-13": {
+      "kind": "forbidden",
+      "fields": [
+        {
+          "path": "/document_allowances/~?vat_category_code!=O/vat_category_code",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~?category_code=O",
+          "role": "condition"
+        }
+      ],
+      "syntax": {
+        "cii": {
+          "kind": "forbidden",
+          "fields": [
+            {
+              "path": "/document_allowances/~?vat_category_code!=O/vat_category_code",
+              "role": "target"
+            },
+            {
+              "path": "/document_charges/~?vat_category_code!=O/vat_category_code",
+              "role": "target"
+            },
+            {
+              "path": "/vat_breakdown/~?category_code=O",
+              "role": "condition"
+            }
+          ]
+        }
+      },
+      "note": "Part of this invoice is not subject to VAT, and such an invoice can't contain an allowance with another VAT category. Correct the allowance's VAT category, or invoice the rest separately.",
+      "remark": "Targets are the allowances whose category is not O;  CII's test is //ram:CategoryTradeTax[CategoryCode != 'O'], which matches charges as well, so CII BR-O-13 and BR-O-14 are identical; hence the charge target for CII."
+    },
+    "BR-O-14": {
+      "kind": "forbidden",
+      "fields": [
+        {
+          "path": "/document_charges/~?vat_category_code!=O/vat_category_code",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~?category_code=O",
+          "role": "condition"
+        }
+      ],
+      "syntax": {
+        "cii": {
+          "kind": "forbidden",
+          "fields": [
+            {
+              "path": "/document_charges/~?vat_category_code!=O/vat_category_code",
+              "role": "target"
+            },
+            {
+              "path": "/document_allowances/~?vat_category_code!=O/vat_category_code",
+              "role": "target"
+            },
+            {
+              "path": "/vat_breakdown/~?category_code=O",
+              "role": "condition"
+            }
+          ]
+        }
+      },
+      "note": "Part of this invoice is not subject to VAT, and such an invoice can't contain a charge with another VAT category. Correct the charge's VAT category, or invoice the rest separately.",
+      "remark": "Targets are the charges whose category is not O;  CII's test is identical to CII BR-O-13 (matches allowances as well); hence the allowance target for CII."
+    },
+    "BR-S-01": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~?category_code=S",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=S/vat/category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=S/vat_category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=S/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "note": "Lines, allowances or charges use the VAT category 'standard rate', so the VAT breakdown needs an entry for it.",
+      "generator": "The generator derives the VAT breakdown from the lines, allowances and charges, so every category used gets an entry.",
+      "remark": "UBL also fires on a breakdown entry of this category with no line, allowance or charge of it (the test is 'both or neither'); the filter then marks that entry. CII only checks the direction items → breakdown, by counting (>= 2 occurrences)."
+    },
+    "BR-S-02": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller/tax_registration_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=S/vat/category_code",
+          "role": "condition"
+        }
+      ],
+      "remark": "CII fires on the line's VAT category (the condition binds with ~.); UBL fires on the root, so its condition filters the lines of this category.",
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller/tax_registration_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/lines/~./vat/category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      }
+    },
+    "BR-S-03": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller/tax_registration_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=S/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "remark": "CII fires on the allowance's VAT category (the condition binds with ~.); UBL fires on the root, so its condition filters the allowances with category S.",
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller/tax_registration_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/document_allowances/~./vat_category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      }
+    },
+    "BR-S-04": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller/tax_registration_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=S/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "remark": "CII fires on the charge's VAT category (the condition binds with ~.); UBL fires on the root, so its condition filters the charges with category S.",
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller/tax_registration_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/document_charges/~./vat_category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      }
+    },
+    "BR-S-05": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./vat/rate",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~./vat/category_code",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-S-06": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/document_allowances/~./vat_rate",
+          "role": "target"
+        },
+        {
+          "path": "/document_allowances/~./vat_category_code",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-S-07": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/document_charges/~./vat_rate",
+          "role": "target"
+        },
+        {
+          "path": "/document_charges/~./vat_category_code",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-S-08": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./taxable_amount",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=S/net_amount",
+          "role": "operand"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=S/amount",
+          "role": "operand"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=S/amount",
+          "role": "operand"
+        },
+        {
+          "path": "/vat_breakdown/~./category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=S/vat/category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=S/vat_category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=S/vat_category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/vat_breakdown/~./rate",
+          "role": "condition"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=S/vat/rate",
+          "role": "condition"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=S/vat_rate",
+          "role": "condition"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=S/vat_rate",
+          "role": "condition"
+        }
+      ],
+      "remark": "Per rate: the sums run over the S lines, allowances and charges of the entry's rate, which a filter can't express (one condition per filter, no reference to the anchor's value), so the operands mark every S item. UBL also fails when no line, allowance or charge has this category and rate, and allows a difference of 1; CII compares exactly (after rounding the sums)."
+    },
+    "BR-S-09": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./tax_amount",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~./taxable_amount",
+          "role": "operand"
+        },
+        {
+          "path": "/vat_breakdown/~./rate",
+          "role": "operand"
+        },
+        {
+          "path": "/vat_breakdown/~./category_code",
+          "role": "condition"
+        }
+      ],
+      "remark": "Tolerance of 1 in both syntaxes; compares absolute values."
+    },
+    "BR-S-10": {
+      "kind": "forbidden",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./reason_code",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~./reason",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~./category_code",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-Z-01": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~?category_code=Z",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=Z/vat/category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=Z/vat_category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=Z/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "note": "Lines, allowances or charges use the VAT category 'zero rated', so the VAT breakdown needs exactly one 'zero rated' entry. No entry and two entries are both errors; two entries usually mean the lines of this category carry different VAT rates, and they should all have the same one.",
+      "generator": "The generator derives the VAT breakdown from the lines, allowances and charges, one entry per category and rate, so this only fires when items of this category carry different rates.",
+      "remark": "Requires exactly one entry, so it also fires on two; the filter then marks both. UBL counts TaxCategory everywhere, the breakdown included, so two breakdown entries fire even without such a line. CII also fires on a breakdown entry with no line, allowance or charge of the category."
+    },
+    "BR-Z-02": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller/tax_registration_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=Z/vat/category_code",
+          "role": "condition"
+        }
+      ],
+      "remark": "CII fires on the line's VAT category (the condition binds with ~.); UBL fires on the root, so its condition filters the lines of this category.",
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller/tax_registration_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/lines/~./vat/category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      }
+    },
+    "BR-Z-03": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller/tax_registration_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=Z/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "remark": "CII fires on the allowance's VAT category (the condition binds with ~.); UBL fires on the root, so its condition filters the allowances with category Z.",
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller/tax_registration_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/document_allowances/~./vat_category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      }
+    },
+    "BR-Z-04": {
+      "kind": "missing-any",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller/tax_registration_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=Z/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "remark": "CII fires on the charge's VAT category (the condition binds with ~.); UBL fires on the root, so its condition filters the charges with category Z.",
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            {
+              "path": "/seller/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller/tax_registration_id",
+              "role": "target"
+            },
+            {
+              "path": "/seller_tax_representative/vat_id",
+              "role": "target"
+            },
+            {
+              "path": "/document_charges/~./vat_category_code",
+              "role": "condition"
+            }
+          ]
+        }
+      }
+    },
+    "BR-Z-05": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./vat/rate",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~./vat/category_code",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-Z-06": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/document_allowances/~./vat_rate",
+          "role": "target"
+        },
+        {
+          "path": "/document_allowances/~./vat_category_code",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-Z-07": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/document_charges/~./vat_rate",
+          "role": "target"
+        },
+        {
+          "path": "/document_charges/~./vat_category_code",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-Z-08": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./taxable_amount",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=Z/net_amount",
+          "role": "operand"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=Z/amount",
+          "role": "operand"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=Z/amount",
+          "role": "operand"
+        },
+        {
+          "path": "/vat_breakdown/~./category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/lines/~?vat~1category_code=Z/vat/category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_allowances/~?vat_category_code=Z/vat_category_code",
+          "role": "condition"
+        },
+        {
+          "path": "/document_charges/~?vat_category_code=Z/vat_category_code",
+          "role": "condition"
+        }
+      ],
+      "remark": "UBL compares exactly; CII allows a difference of 1."
+    },
+    "BR-Z-09": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./tax_amount",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~./category_code",
+          "role": "condition"
+        }
+      ]
+    },
+    "BR-Z-10": {
+      "kind": "forbidden",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./reason_code",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~./reason",
+          "role": "target"
+        },
+        {
+          "path": "/vat_breakdown/~./category_code",
+          "role": "condition"
+        }
+      ]
+    }
+  }
+}
