@@ -1,0 +1,52 @@
+{
+  "name": "@facturion/pointer-patterns",
+  "version": "0.0.0",
+  "description": "JSON Pointer patterns: a strict superset of JSON Pointer (RFC 6901) with wildcards, an anchor-bound index and entry filters, matched against a document to concrete pointers, including places that don't exist yet.",
+  "keywords": [
+    "json-pointer",
+    "rfc6901",
+    "relative-json-pointer",
+    "json",
+    "patterns",
+    "validation"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/facturion/packages.git",
+    "directory": "packages/pointer-patterns"
+  },
+  "homepage": "https://github.com/facturion/packages/tree/main/packages/pointer-patterns#readme",
+  "bugs": "https://github.com/facturion/packages/issues",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    },
+    "./vectors.json": "./test/vectors.json",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "test/vectors.json",
+    "SPEC.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "tsc -p test/tsconfig.json && node --import tsx --test test/*.test.ts",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
