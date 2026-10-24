@@ -9,6 +9,8 @@
  *           schema via json-schema-to-typescript, one per direction (below).
  *           generated/fields.ts        — the BT/BG code → field maps and their
  *           types, for `field` / `setField` (src/fields.ts).
+ *           generated/fields.json      — the same maps with each code's term,
+ *           for consumers in other languages (`@facturion/invoice/fields.json`).
  *
  *  One schema, two directions. `readOnly` marks what only a document states
  *  (BG-22 totals, the VAT breakdown's amounts: computed, ignored on input);
@@ -114,7 +116,7 @@ export async function typesModule(schema: Schema): Promise<string> {
 
 // ── Field maps ───────────────────────────────────────────────────────────
 
-const CODE = /^(B[TG]-\d+(?:-\d+)?)\s*\|/;
+const CODE = /^(B[TG]-\d+(?:-\d+)?)\s*\|\s*([^|]*?)\s*(?:\||$)/;
 
 export interface FieldEntry {
   code: string;
@@ -127,6 +129,8 @@ export interface FieldEntry {
    *  to such an entry. */
   group?: string;
   rel?: string;
+  /** The EN 16931 term, as the schema's description names it. */
+  term: string;
 }
 
 /** Every code in `schema` (one direction) with its place. Throws when a code
@@ -145,7 +149,8 @@ export function fieldEntries(schema: Schema): FieldEntry[] {
   const walk = (node: Schema, toks: string[], groups: { code: string; at: number }[]) => {
     node = deref(node);
     if (!node || typeof node !== "object") return;
-    const code = CODE.exec(node.description ?? "")?.[1];
+    const m = CODE.exec(node.description ?? "");
+    const code = m?.[1];
     const isList = node.type === "array" || node.items;
     const here = isList ? [...toks, "~*"] : toks;
     if (code) {
@@ -155,6 +160,7 @@ export function fieldEntries(schema: Schema): FieldEntry[] {
         pattern: `/${here.join("/")}`,
         many: here.includes("~*"),
         ...(g ? { group: g.code, rel: here.slice(g.at).join("/") } : {}),
+        term: m![2]!,
       };
       if (out.has(code)) dupes.push(`${code}: ${out.get(code)!.pattern} and ${entry.pattern}`);
       else out.set(code, entry);
@@ -218,17 +224,37 @@ ${typesSource("InputFieldTypes", "InvoiceInput", write)}
 `;
 }
 
-export async function buildArtifacts(): Promise<{ schemaTs: string; typesTs: string; fieldsTs: string }> {
+/** The `generated/fields.json` source: `read` and `write` as in fields.ts,
+ *  each entry with its `term`. */
+export function fieldsJson(schema: Schema): string {
+  const map = (entries: FieldEntry[]) => Object.fromEntries(entries.map(({ code, ...rest }) => [code, rest]));
+  return `${JSON.stringify(
+    {
+      read: map(fieldEntries(variantSchema(schema, "document"))),
+      write: map(fieldEntries(variantSchema(schema, "input"))),
+    },
+    null,
+    1,
+  )}\n`;
+}
+
+export async function buildArtifacts(): Promise<{ schemaTs: string; typesTs: string; fieldsTs: string; fieldsJson: string }> {
   const schema = readSchema();
-  return { schemaTs: schemaModule(schema), typesTs: await typesModule(schema), fieldsTs: fieldsModule(schema) };
+  return {
+    schemaTs: schemaModule(schema),
+    typesTs: await typesModule(schema),
+    fieldsTs: fieldsModule(schema),
+    fieldsJson: fieldsJson(schema),
+  };
 }
 
 async function main(): Promise<void> {
-  const { schemaTs, typesTs, fieldsTs } = await buildArtifacts();
+  const { schemaTs, typesTs, fieldsTs, fieldsJson: json } = await buildArtifacts();
   writeFileSync(join(GEN_DIR, "schema.ts"), schemaTs);
   writeFileSync(join(GEN_DIR, "invoice-types.ts"), typesTs);
   writeFileSync(join(GEN_DIR, "fields.ts"), fieldsTs);
-  process.stdout.write("Generated generated/schema.ts, invoice-types.ts, fields.ts\n");
+  writeFileSync(join(GEN_DIR, "fields.json"), json);
+  process.stdout.write("Generated generated/schema.ts, invoice-types.ts, fields.ts, fields.json\n");
 }
 
 // Run only when invoked directly (so importing this module from the artifacts

@@ -1,0 +1,2396 @@
+{
+ "read": {
+  "BT-1": {
+   "pattern": "/invoice_number",
+   "many": false,
+   "term": "Invoice number"
+  },
+  "BT-2": {
+   "pattern": "/issue_date",
+   "many": false,
+   "term": "Invoice issue date"
+  },
+  "BT-3": {
+   "pattern": "/invoice_type_code",
+   "many": false,
+   "term": "Invoice type code"
+  },
+  "BT-5": {
+   "pattern": "/currency_code",
+   "many": false,
+   "term": "Invoice currency code"
+  },
+  "BT-6": {
+   "pattern": "/vat_accounting_currency_code",
+   "many": false,
+   "term": "VAT accounting currency code"
+  },
+  "BT-7": {
+   "pattern": "/tax_point_date",
+   "many": false,
+   "term": "Value added tax point date"
+  },
+  "BT-8": {
+   "pattern": "/tax_point_date_code",
+   "many": false,
+   "term": "Value added tax point date code"
+  },
+  "BT-9": {
+   "pattern": "/due_date",
+   "many": false,
+   "term": "Payment due date"
+  },
+  "BT-10": {
+   "pattern": "/buyer_reference",
+   "many": false,
+   "term": "Buyer reference"
+  },
+  "BT-11": {
+   "pattern": "/project_reference",
+   "many": false,
+   "term": "Project reference"
+  },
+  "BT-12": {
+   "pattern": "/contract_reference",
+   "many": false,
+   "term": "Contract reference"
+  },
+  "BT-13": {
+   "pattern": "/purchase_order_reference",
+   "many": false,
+   "term": "Purchase order reference"
+  },
+  "BT-14": {
+   "pattern": "/sales_order_reference",
+   "many": false,
+   "term": "Sales order reference"
+  },
+  "BT-15": {
+   "pattern": "/receiving_advice_reference",
+   "many": false,
+   "term": "Receiving advice reference"
+  },
+  "BT-16": {
+   "pattern": "/despatch_advice_reference",
+   "many": false,
+   "term": "Despatch advice reference"
+  },
+  "BT-17": {
+   "pattern": "/tender_or_lot_reference",
+   "many": false,
+   "term": "Tender or lot reference"
+  },
+  "BT-18": {
+   "pattern": "/object_identifier",
+   "many": false,
+   "term": "Invoiced object identifier"
+  },
+  "BT-18-1": {
+   "pattern": "/object_identifier/scheme_id",
+   "many": false,
+   "term": "Invoiced object identifier scheme identifier"
+  },
+  "BT-19": {
+   "pattern": "/buyer_accounting_reference",
+   "many": false,
+   "term": "Buyer accounting reference"
+  },
+  "BT-20": {
+   "pattern": "/payment_terms",
+   "many": false,
+   "term": "Payment terms"
+  },
+  "BT-21": {
+   "pattern": "/notes/~*/subject_code",
+   "many": true,
+   "group": "BG-1",
+   "rel": "subject_code",
+   "term": "Invoice note subject code"
+  },
+  "BT-22": {
+   "pattern": "/notes/~*/text",
+   "many": true,
+   "group": "BG-1",
+   "rel": "text",
+   "term": "Invoice note text"
+  },
+  "BT-23": {
+   "pattern": "/process_control/business_process_type",
+   "many": false,
+   "term": "Business process type"
+  },
+  "BT-24": {
+   "pattern": "/process_control/specification_id",
+   "many": false,
+   "term": "Specification identifier"
+  },
+  "BT-25": {
+   "pattern": "/preceding_invoices/~*/reference",
+   "many": true,
+   "group": "BG-3",
+   "rel": "reference",
+   "term": "Preceding invoice number"
+  },
+  "BT-26": {
+   "pattern": "/preceding_invoices/~*/issue_date",
+   "many": true,
+   "group": "BG-3",
+   "rel": "issue_date",
+   "term": "Preceding invoice issue date"
+  },
+  "BT-27": {
+   "pattern": "/seller/name",
+   "many": false,
+   "term": "Seller name"
+  },
+  "BT-28": {
+   "pattern": "/seller/trading_name",
+   "many": false,
+   "term": "Seller trading name"
+  },
+  "BT-29": {
+   "pattern": "/seller/identifiers/~*",
+   "many": true,
+   "term": "Seller identifiers"
+  },
+  "BT-29-1": {
+   "pattern": "/seller/identifiers/~*/scheme_id",
+   "many": true,
+   "group": "BT-29",
+   "rel": "scheme_id",
+   "term": "Seller identifier identification scheme identifier"
+  },
+  "BT-30": {
+   "pattern": "/seller/legal_registration_id",
+   "many": false,
+   "term": "Seller legal registration identifier"
+  },
+  "BT-30-1": {
+   "pattern": "/seller/legal_registration_id/scheme_id",
+   "many": false,
+   "term": "Seller legal registration identifier identification scheme identifier"
+  },
+  "BT-31": {
+   "pattern": "/seller/vat_id",
+   "many": false,
+   "term": "Seller VAT identifier"
+  },
+  "BT-32": {
+   "pattern": "/seller/tax_registration_id",
+   "many": false,
+   "term": "Seller tax registration identifier"
+  },
+  "BT-33": {
+   "pattern": "/seller/additional_legal_info",
+   "many": false,
+   "term": "Seller additional legal information"
+  },
+  "BT-34": {
+   "pattern": "/seller/electronic_address",
+   "many": false,
+   "term": "Seller electronic address"
+  },
+  "BT-34-1": {
+   "pattern": "/seller/electronic_address/scheme_id",
+   "many": false,
+   "term": "Seller electronic address identification scheme identifier"
+  },
+  "BT-35": {
+   "pattern": "/seller/address/line1",
+   "many": false,
+   "term": "Address line 1"
+  },
+  "BT-36": {
+   "pattern": "/seller/address/line2",
+   "many": false,
+   "term": "Address line 2"
+  },
+  "BT-37": {
+   "pattern": "/seller/address/city",
+   "many": false,
+   "term": "City"
+  },
+  "BT-38": {
+   "pattern": "/seller/address/post_code",
+   "many": false,
+   "term": "Post code"
+  },
+  "BT-39": {
+   "pattern": "/seller/address/country_subdivision",
+   "many": false,
+   "term": "Country subdivision"
+  },
+  "BT-40": {
+   "pattern": "/seller/address/country_code",
+   "many": false,
+   "term": "Country code"
+  },
+  "BT-41": {
+   "pattern": "/seller/contact/name",
+   "many": false,
+   "term": "Seller contact point"
+  },
+  "BT-42": {
+   "pattern": "/seller/contact/phone",
+   "many": false,
+   "term": "Seller contact telephone number"
+  },
+  "BT-43": {
+   "pattern": "/seller/contact/email",
+   "many": false,
+   "term": "Seller contact email address"
+  },
+  "BT-44": {
+   "pattern": "/buyer/name",
+   "many": false,
+   "term": "Buyer name"
+  },
+  "BT-45": {
+   "pattern": "/buyer/trading_name",
+   "many": false,
+   "term": "Buyer trading name"
+  },
+  "BT-46": {
+   "pattern": "/buyer/identifier",
+   "many": false,
+   "term": "Buyer identifier"
+  },
+  "BT-46-1": {
+   "pattern": "/buyer/identifier/scheme_id",
+   "many": false,
+   "term": "Buyer identifier identification scheme identifier"
+  },
+  "BT-47": {
+   "pattern": "/buyer/legal_registration_id",
+   "many": false,
+   "term": "Buyer legal registration identifier"
+  },
+  "BT-47-1": {
+   "pattern": "/buyer/legal_registration_id/scheme_id",
+   "many": false,
+   "term": "Buyer legal registration identifier identification scheme identifier"
+  },
+  "BT-48": {
+   "pattern": "/buyer/vat_id",
+   "many": false,
+   "term": "Buyer VAT identifier"
+  },
+  "BT-49": {
+   "pattern": "/buyer/electronic_address",
+   "many": false,
+   "term": "Buyer electronic address"
+  },
+  "BT-49-1": {
+   "pattern": "/buyer/electronic_address/scheme_id",
+   "many": false,
+   "term": "Buyer electronic address identification scheme identifier"
+  },
+  "BT-50": {
+   "pattern": "/buyer/address/line1",
+   "many": false,
+   "term": "Address line 1"
+  },
+  "BT-51": {
+   "pattern": "/buyer/address/line2",
+   "many": false,
+   "term": "Address line 2"
+  },
+  "BT-52": {
+   "pattern": "/buyer/address/city",
+   "many": false,
+   "term": "City"
+  },
+  "BT-53": {
+   "pattern": "/buyer/address/post_code",
+   "many": false,
+   "term": "Post code"
+  },
+  "BT-54": {
+   "pattern": "/buyer/address/country_subdivision",
+   "many": false,
+   "term": "Country subdivision"
+  },
+  "BT-55": {
+   "pattern": "/buyer/address/country_code",
+   "many": false,
+   "term": "Country code"
+  },
+  "BT-56": {
+   "pattern": "/buyer/contact/name",
+   "many": false,
+   "term": "Buyer contact point"
+  },
+  "BT-57": {
+   "pattern": "/buyer/contact/phone",
+   "many": false,
+   "term": "Buyer contact telephone number"
+  },
+  "BT-58": {
+   "pattern": "/buyer/contact/email",
+   "many": false,
+   "term": "Buyer contact email address"
+  },
+  "BT-59": {
+   "pattern": "/payee/name",
+   "many": false,
+   "term": "Payee name"
+  },
+  "BT-60": {
+   "pattern": "/payee/identifier",
+   "many": false,
+   "term": "Payee identifier"
+  },
+  "BT-60-1": {
+   "pattern": "/payee/identifier/scheme_id",
+   "many": false,
+   "term": "Payee identifier identification scheme identifier"
+  },
+  "BT-61": {
+   "pattern": "/payee/legal_registration_id",
+   "many": false,
+   "term": "Payee legal registration identifier"
+  },
+  "BT-61-1": {
+   "pattern": "/payee/legal_registration_id/scheme_id",
+   "many": false,
+   "term": "Payee legal registration identifier identification scheme identifier"
+  },
+  "BT-62": {
+   "pattern": "/seller_tax_representative/name",
+   "many": false,
+   "term": "Tax representative name"
+  },
+  "BT-63": {
+   "pattern": "/seller_tax_representative/vat_id",
+   "many": false,
+   "term": "Tax representative VAT identifier"
+  },
+  "BT-64": {
+   "pattern": "/seller_tax_representative/address/line1",
+   "many": false,
+   "term": "Address line 1"
+  },
+  "BT-65": {
+   "pattern": "/seller_tax_representative/address/line2",
+   "many": false,
+   "term": "Address line 2"
+  },
+  "BT-66": {
+   "pattern": "/seller_tax_representative/address/city",
+   "many": false,
+   "term": "City"
+  },
+  "BT-67": {
+   "pattern": "/seller_tax_representative/address/post_code",
+   "many": false,
+   "term": "Post code"
+  },
+  "BT-68": {
+   "pattern": "/seller_tax_representative/address/country_subdivision",
+   "many": false,
+   "term": "Country subdivision"
+  },
+  "BT-69": {
+   "pattern": "/seller_tax_representative/address/country_code",
+   "many": false,
+   "term": "Country code"
+  },
+  "BT-70": {
+   "pattern": "/delivery/name",
+   "many": false,
+   "term": "Deliver to party name"
+  },
+  "BT-71": {
+   "pattern": "/delivery/location_id",
+   "many": false,
+   "term": "Deliver to location identifier"
+  },
+  "BT-71-1": {
+   "pattern": "/delivery/location_id/scheme_id",
+   "many": false,
+   "term": "Deliver to location identifier identification scheme identifier"
+  },
+  "BT-72": {
+   "pattern": "/delivery/date",
+   "many": false,
+   "term": "Actual delivery date"
+  },
+  "BT-73": {
+   "pattern": "/delivery/period/start_date",
+   "many": false,
+   "term": "Invoicing period start date"
+  },
+  "BT-74": {
+   "pattern": "/delivery/period/end_date",
+   "many": false,
+   "term": "Invoicing period end date"
+  },
+  "BT-75": {
+   "pattern": "/delivery/address/line1",
+   "many": false,
+   "term": "Address line 1"
+  },
+  "BT-76": {
+   "pattern": "/delivery/address/line2",
+   "many": false,
+   "term": "Address line 2"
+  },
+  "BT-77": {
+   "pattern": "/delivery/address/city",
+   "many": false,
+   "term": "City"
+  },
+  "BT-78": {
+   "pattern": "/delivery/address/post_code",
+   "many": false,
+   "term": "Post code"
+  },
+  "BT-79": {
+   "pattern": "/delivery/address/country_subdivision",
+   "many": false,
+   "term": "Country subdivision"
+  },
+  "BT-80": {
+   "pattern": "/delivery/address/country_code",
+   "many": false,
+   "term": "Country code"
+  },
+  "BT-81": {
+   "pattern": "/payment/means_code",
+   "many": false,
+   "term": "Payment means type code"
+  },
+  "BT-82": {
+   "pattern": "/payment/means_text",
+   "many": false,
+   "term": "Payment means text"
+  },
+  "BT-83": {
+   "pattern": "/payment/remittance_information",
+   "many": false,
+   "term": "Remittance information"
+  },
+  "BT-84": {
+   "pattern": "/payment/credit_transfers/~*/account_id",
+   "many": true,
+   "group": "BG-17",
+   "rel": "account_id",
+   "term": "Payment account identifier"
+  },
+  "BT-85": {
+   "pattern": "/payment/credit_transfers/~*/account_name",
+   "many": true,
+   "group": "BG-17",
+   "rel": "account_name",
+   "term": "Payment account name"
+  },
+  "BT-86": {
+   "pattern": "/payment/credit_transfers/~*/service_provider_id",
+   "many": true,
+   "group": "BG-17",
+   "rel": "service_provider_id",
+   "term": "Payment service provider identifier"
+  },
+  "BT-87": {
+   "pattern": "/payment/card/account_number",
+   "many": false,
+   "term": "Payment card primary account number"
+  },
+  "BT-88": {
+   "pattern": "/payment/card/holder_name",
+   "many": false,
+   "term": "Payment card holder name"
+  },
+  "BT-89": {
+   "pattern": "/payment/direct_debit/mandate_reference",
+   "many": false,
+   "term": "Mandate reference identifier"
+  },
+  "BT-90": {
+   "pattern": "/payment/direct_debit/creditor_id",
+   "many": false,
+   "term": "Bank assigned creditor identifier"
+  },
+  "BT-91": {
+   "pattern": "/payment/direct_debit/debited_account_id",
+   "many": false,
+   "term": "Debited account identifier"
+  },
+  "BT-92": {
+   "pattern": "/document_allowances/~*/amount",
+   "many": true,
+   "group": "BG-20",
+   "rel": "amount",
+   "term": "Document level allowance amount"
+  },
+  "BT-93": {
+   "pattern": "/document_allowances/~*/base_amount",
+   "many": true,
+   "group": "BG-20",
+   "rel": "base_amount",
+   "term": "Document level allowance base amount"
+  },
+  "BT-94": {
+   "pattern": "/document_allowances/~*/percentage",
+   "many": true,
+   "group": "BG-20",
+   "rel": "percentage",
+   "term": "Document level allowance percentage"
+  },
+  "BT-95": {
+   "pattern": "/document_allowances/~*/vat_category_code",
+   "many": true,
+   "group": "BG-20",
+   "rel": "vat_category_code",
+   "term": "Document level allowance VAT category code"
+  },
+  "BT-96": {
+   "pattern": "/document_allowances/~*/vat_rate",
+   "many": true,
+   "group": "BG-20",
+   "rel": "vat_rate",
+   "term": "Document level allowance VAT rate"
+  },
+  "BT-97": {
+   "pattern": "/document_allowances/~*/reason",
+   "many": true,
+   "group": "BG-20",
+   "rel": "reason",
+   "term": "Document level allowance reason"
+  },
+  "BT-98": {
+   "pattern": "/document_allowances/~*/reason_code",
+   "many": true,
+   "group": "BG-20",
+   "rel": "reason_code",
+   "term": "Document level allowance reason code"
+  },
+  "BT-99": {
+   "pattern": "/document_charges/~*/amount",
+   "many": true,
+   "group": "BG-21",
+   "rel": "amount",
+   "term": "Document level charge amount"
+  },
+  "BT-100": {
+   "pattern": "/document_charges/~*/base_amount",
+   "many": true,
+   "group": "BG-21",
+   "rel": "base_amount",
+   "term": "Document level charge base amount"
+  },
+  "BT-101": {
+   "pattern": "/document_charges/~*/percentage",
+   "many": true,
+   "group": "BG-21",
+   "rel": "percentage",
+   "term": "Document level charge percentage"
+  },
+  "BT-102": {
+   "pattern": "/document_charges/~*/vat_category_code",
+   "many": true,
+   "group": "BG-21",
+   "rel": "vat_category_code",
+   "term": "Document level charge VAT category code"
+  },
+  "BT-103": {
+   "pattern": "/document_charges/~*/vat_rate",
+   "many": true,
+   "group": "BG-21",
+   "rel": "vat_rate",
+   "term": "Document level charge VAT rate"
+  },
+  "BT-104": {
+   "pattern": "/document_charges/~*/reason",
+   "many": true,
+   "group": "BG-21",
+   "rel": "reason",
+   "term": "Document level charge reason"
+  },
+  "BT-105": {
+   "pattern": "/document_charges/~*/reason_code",
+   "many": true,
+   "group": "BG-21",
+   "rel": "reason_code",
+   "term": "Document level charge reason code"
+  },
+  "BT-106": {
+   "pattern": "/totals/line_net_total",
+   "many": false,
+   "term": "Sum of invoice line net amount"
+  },
+  "BT-107": {
+   "pattern": "/totals/allowance_total",
+   "many": false,
+   "term": "Sum of allowances on document level"
+  },
+  "BT-108": {
+   "pattern": "/totals/charge_total",
+   "many": false,
+   "term": "Sum of charges on document level"
+  },
+  "BT-109": {
+   "pattern": "/totals/tax_exclusive_amount",
+   "many": false,
+   "term": "Invoice total amount without VAT"
+  },
+  "BT-110": {
+   "pattern": "/totals/tax_amount",
+   "many": false,
+   "term": "Invoice total VAT amount"
+  },
+  "BT-111": {
+   "pattern": "/totals/tax_amount_accounting_currency",
+   "many": false,
+   "term": "Invoice total VAT amount in accounting currency"
+  },
+  "BT-112": {
+   "pattern": "/totals/tax_inclusive_amount",
+   "many": false,
+   "term": "Invoice total amount with VAT"
+  },
+  "BT-113": {
+   "pattern": "/totals/prepaid_amount",
+   "many": false,
+   "term": "Prepaid amount"
+  },
+  "BT-114": {
+   "pattern": "/totals/rounding_amount",
+   "many": false,
+   "term": "Rounding amount"
+  },
+  "BT-115": {
+   "pattern": "/totals/amount_due",
+   "many": false,
+   "term": "Amount due for payment"
+  },
+  "BT-116": {
+   "pattern": "/vat_breakdown/~*/taxable_amount",
+   "many": true,
+   "group": "BG-23",
+   "rel": "taxable_amount",
+   "term": "VAT category taxable amount"
+  },
+  "BT-117": {
+   "pattern": "/vat_breakdown/~*/tax_amount",
+   "many": true,
+   "group": "BG-23",
+   "rel": "tax_amount",
+   "term": "VAT category tax amount"
+  },
+  "BT-118": {
+   "pattern": "/vat_breakdown/~*/category_code",
+   "many": true,
+   "group": "BG-23",
+   "rel": "category_code",
+   "term": "VAT category code"
+  },
+  "BT-119": {
+   "pattern": "/vat_breakdown/~*/rate",
+   "many": true,
+   "group": "BG-23",
+   "rel": "rate",
+   "term": "VAT rate"
+  },
+  "BT-120": {
+   "pattern": "/vat_breakdown/~*/reason",
+   "many": true,
+   "group": "BG-23",
+   "rel": "reason",
+   "term": "VAT exemption reason text"
+  },
+  "BT-121": {
+   "pattern": "/vat_breakdown/~*/reason_code",
+   "many": true,
+   "group": "BG-23",
+   "rel": "reason_code",
+   "term": "VAT exemption reason code"
+  },
+  "BT-122": {
+   "pattern": "/supporting_documents/~*/reference",
+   "many": true,
+   "group": "BG-24",
+   "rel": "reference",
+   "term": "Supporting document reference"
+  },
+  "BT-123": {
+   "pattern": "/supporting_documents/~*/description",
+   "many": true,
+   "group": "BG-24",
+   "rel": "description",
+   "term": "Supporting document description"
+  },
+  "BT-124": {
+   "pattern": "/supporting_documents/~*/external_location",
+   "many": true,
+   "group": "BG-24",
+   "rel": "external_location",
+   "term": "External document location"
+  },
+  "BT-125": {
+   "pattern": "/supporting_documents/~*/attached_document",
+   "many": true,
+   "group": "BG-24",
+   "rel": "attached_document",
+   "term": "Attached document"
+  },
+  "BT-125-1": {
+   "pattern": "/supporting_documents/~*/attached_document/mime_code",
+   "many": true,
+   "group": "BG-24",
+   "rel": "attached_document/mime_code",
+   "term": "Attached document MIME code"
+  },
+  "BT-125-2": {
+   "pattern": "/supporting_documents/~*/attached_document/filename",
+   "many": true,
+   "group": "BG-24",
+   "rel": "attached_document/filename",
+   "term": "Attached document filename"
+  },
+  "BT-126": {
+   "pattern": "/lines/~*/id",
+   "many": true,
+   "group": "BG-25",
+   "rel": "id",
+   "term": "Invoice line identifier"
+  },
+  "BT-127": {
+   "pattern": "/lines/~*/note",
+   "many": true,
+   "group": "BG-25",
+   "rel": "note",
+   "term": "Invoice line note"
+  },
+  "BT-128": {
+   "pattern": "/lines/~*/object_identifier",
+   "many": true,
+   "group": "BG-25",
+   "rel": "object_identifier",
+   "term": "Invoice line object identifier"
+  },
+  "BT-128-1": {
+   "pattern": "/lines/~*/object_identifier/scheme_id",
+   "many": true,
+   "group": "BG-25",
+   "rel": "object_identifier/scheme_id",
+   "term": "Invoice line object identifier identification scheme identifier"
+  },
+  "BT-129": {
+   "pattern": "/lines/~*/quantity",
+   "many": true,
+   "group": "BG-25",
+   "rel": "quantity",
+   "term": "Invoiced quantity"
+  },
+  "BT-130": {
+   "pattern": "/lines/~*/unit_code",
+   "many": true,
+   "group": "BG-25",
+   "rel": "unit_code",
+   "term": "Invoiced quantity unit of measure code"
+  },
+  "BT-131": {
+   "pattern": "/lines/~*/net_amount",
+   "many": true,
+   "group": "BG-25",
+   "rel": "net_amount",
+   "term": "Invoice line net amount"
+  },
+  "BT-132": {
+   "pattern": "/lines/~*/order_line_reference",
+   "many": true,
+   "group": "BG-25",
+   "rel": "order_line_reference",
+   "term": "Referenced purchase order line reference"
+  },
+  "BT-133": {
+   "pattern": "/lines/~*/buyer_accounting_reference",
+   "many": true,
+   "group": "BG-25",
+   "rel": "buyer_accounting_reference",
+   "term": "Invoice line buyer accounting reference"
+  },
+  "BT-134": {
+   "pattern": "/lines/~*/period/start_date",
+   "many": true,
+   "group": "BG-25",
+   "rel": "period/start_date",
+   "term": "Invoice line period start date"
+  },
+  "BT-135": {
+   "pattern": "/lines/~*/period/end_date",
+   "many": true,
+   "group": "BG-25",
+   "rel": "period/end_date",
+   "term": "Invoice line period end date"
+  },
+  "BT-136": {
+   "pattern": "/lines/~*/allowances/~*/amount",
+   "many": true,
+   "group": "BG-27",
+   "rel": "amount",
+   "term": "Invoice line allowance amount"
+  },
+  "BT-137": {
+   "pattern": "/lines/~*/allowances/~*/base_amount",
+   "many": true,
+   "group": "BG-27",
+   "rel": "base_amount",
+   "term": "Invoice line allowance base amount"
+  },
+  "BT-138": {
+   "pattern": "/lines/~*/allowances/~*/percentage",
+   "many": true,
+   "group": "BG-27",
+   "rel": "percentage",
+   "term": "Invoice line allowance percentage"
+  },
+  "BT-139": {
+   "pattern": "/lines/~*/allowances/~*/reason",
+   "many": true,
+   "group": "BG-27",
+   "rel": "reason",
+   "term": "Invoice line allowance reason"
+  },
+  "BT-140": {
+   "pattern": "/lines/~*/allowances/~*/reason_code",
+   "many": true,
+   "group": "BG-27",
+   "rel": "reason_code",
+   "term": "Invoice line allowance reason code"
+  },
+  "BT-141": {
+   "pattern": "/lines/~*/charges/~*/amount",
+   "many": true,
+   "group": "BG-28",
+   "rel": "amount",
+   "term": "Invoice line charge amount"
+  },
+  "BT-142": {
+   "pattern": "/lines/~*/charges/~*/base_amount",
+   "many": true,
+   "group": "BG-28",
+   "rel": "base_amount",
+   "term": "Invoice line charge base amount"
+  },
+  "BT-143": {
+   "pattern": "/lines/~*/charges/~*/percentage",
+   "many": true,
+   "group": "BG-28",
+   "rel": "percentage",
+   "term": "Invoice line charge percentage"
+  },
+  "BT-144": {
+   "pattern": "/lines/~*/charges/~*/reason",
+   "many": true,
+   "group": "BG-28",
+   "rel": "reason",
+   "term": "Invoice line charge reason"
+  },
+  "BT-145": {
+   "pattern": "/lines/~*/charges/~*/reason_code",
+   "many": true,
+   "group": "BG-28",
+   "rel": "reason_code",
+   "term": "Invoice line charge reason code"
+  },
+  "BT-146": {
+   "pattern": "/lines/~*/price/net_price",
+   "many": true,
+   "group": "BG-25",
+   "rel": "price/net_price",
+   "term": "Item net price"
+  },
+  "BT-147": {
+   "pattern": "/lines/~*/price/discount",
+   "many": true,
+   "group": "BG-25",
+   "rel": "price/discount",
+   "term": "Item price discount"
+  },
+  "BT-148": {
+   "pattern": "/lines/~*/price/gross_price",
+   "many": true,
+   "group": "BG-25",
+   "rel": "price/gross_price",
+   "term": "Item gross price"
+  },
+  "BT-149": {
+   "pattern": "/lines/~*/price/base_quantity",
+   "many": true,
+   "group": "BG-25",
+   "rel": "price/base_quantity",
+   "term": "Item price base quantity"
+  },
+  "BT-150": {
+   "pattern": "/lines/~*/price/base_quantity_unit_code",
+   "many": true,
+   "group": "BG-25",
+   "rel": "price/base_quantity_unit_code",
+   "term": "Item price base quantity unit of measure code"
+  },
+  "BT-151": {
+   "pattern": "/lines/~*/vat/category_code",
+   "many": true,
+   "group": "BG-25",
+   "rel": "vat/category_code",
+   "term": "Invoiced item VAT category code"
+  },
+  "BT-152": {
+   "pattern": "/lines/~*/vat/rate",
+   "many": true,
+   "group": "BG-25",
+   "rel": "vat/rate",
+   "term": "Invoiced item VAT rate"
+  },
+  "BT-153": {
+   "pattern": "/lines/~*/item/name",
+   "many": true,
+   "group": "BG-25",
+   "rel": "item/name",
+   "term": "Item name"
+  },
+  "BT-154": {
+   "pattern": "/lines/~*/item/description",
+   "many": true,
+   "group": "BG-25",
+   "rel": "item/description",
+   "term": "Item description"
+  },
+  "BT-155": {
+   "pattern": "/lines/~*/item/seller_id",
+   "many": true,
+   "group": "BG-25",
+   "rel": "item/seller_id",
+   "term": "Item seller's identifier"
+  },
+  "BT-156": {
+   "pattern": "/lines/~*/item/buyer_id",
+   "many": true,
+   "group": "BG-25",
+   "rel": "item/buyer_id",
+   "term": "Item buyer's identifier"
+  },
+  "BT-157": {
+   "pattern": "/lines/~*/item/standard_id",
+   "many": true,
+   "group": "BG-25",
+   "rel": "item/standard_id",
+   "term": "Item standard identifier"
+  },
+  "BT-157-1": {
+   "pattern": "/lines/~*/item/standard_id/scheme_id",
+   "many": true,
+   "group": "BG-25",
+   "rel": "item/standard_id/scheme_id",
+   "term": "Item standard identifier identification scheme identifier"
+  },
+  "BT-158": {
+   "pattern": "/lines/~*/item/classifications/~*",
+   "many": true,
+   "group": "BG-25",
+   "rel": "item/classifications/~*",
+   "term": "Item classification identifiers"
+  },
+  "BT-158-1": {
+   "pattern": "/lines/~*/item/classifications/~*/scheme_id",
+   "many": true,
+   "group": "BT-158",
+   "rel": "scheme_id",
+   "term": "Item classification identifier identification scheme identifier"
+  },
+  "BT-158-2": {
+   "pattern": "/lines/~*/item/classifications/~*/version",
+   "many": true,
+   "group": "BT-158",
+   "rel": "version",
+   "term": "Scheme version identifier"
+  },
+  "BT-159": {
+   "pattern": "/lines/~*/item/country_of_origin",
+   "many": true,
+   "group": "BG-25",
+   "rel": "item/country_of_origin",
+   "term": "Item country of origin"
+  },
+  "BT-160": {
+   "pattern": "/lines/~*/item/attributes/~*/name",
+   "many": true,
+   "group": "BG-32",
+   "rel": "name",
+   "term": "Item attribute name"
+  },
+  "BT-161": {
+   "pattern": "/lines/~*/item/attributes/~*/value",
+   "many": true,
+   "group": "BG-32",
+   "rel": "value",
+   "term": "Item attribute value"
+  },
+  "BT-162": {
+   "pattern": "/seller/address/line3",
+   "many": false,
+   "term": "Address line 3"
+  },
+  "BT-163": {
+   "pattern": "/buyer/address/line3",
+   "many": false,
+   "term": "Address line 3"
+  },
+  "BT-164": {
+   "pattern": "/seller_tax_representative/address/line3",
+   "many": false,
+   "term": "Address line 3"
+  },
+  "BT-165": {
+   "pattern": "/delivery/address/line3",
+   "many": false,
+   "term": "Address line 3"
+  },
+  "BG-1": {
+   "pattern": "/notes/~*",
+   "many": true,
+   "term": "Invoice notes"
+  },
+  "BG-2": {
+   "pattern": "/process_control",
+   "many": false,
+   "term": "Process control"
+  },
+  "BG-3": {
+   "pattern": "/preceding_invoices/~*",
+   "many": true,
+   "term": "Preceding invoice references"
+  },
+  "BG-4": {
+   "pattern": "/seller",
+   "many": false,
+   "term": "Seller"
+  },
+  "BG-5": {
+   "pattern": "/seller/address",
+   "many": false,
+   "term": "Seller postal address"
+  },
+  "BG-6": {
+   "pattern": "/seller/contact",
+   "many": false,
+   "term": "Seller contact"
+  },
+  "BG-7": {
+   "pattern": "/buyer",
+   "many": false,
+   "term": "Buyer"
+  },
+  "BG-8": {
+   "pattern": "/buyer/address",
+   "many": false,
+   "term": "Buyer postal address"
+  },
+  "BG-9": {
+   "pattern": "/buyer/contact",
+   "many": false,
+   "term": "Buyer contact"
+  },
+  "BG-10": {
+   "pattern": "/payee",
+   "many": false,
+   "term": "Payee"
+  },
+  "BG-11": {
+   "pattern": "/seller_tax_representative",
+   "many": false,
+   "term": "Seller tax representative"
+  },
+  "BG-12": {
+   "pattern": "/seller_tax_representative/address",
+   "many": false,
+   "term": "Tax representative postal address"
+  },
+  "BG-13": {
+   "pattern": "/delivery",
+   "many": false,
+   "term": "Delivery information"
+  },
+  "BG-14": {
+   "pattern": "/delivery/period",
+   "many": false,
+   "term": "Invoicing period"
+  },
+  "BG-15": {
+   "pattern": "/delivery/address",
+   "many": false,
+   "term": "Deliver to address"
+  },
+  "BG-16": {
+   "pattern": "/payment",
+   "many": false,
+   "term": "Payment instructions"
+  },
+  "BG-17": {
+   "pattern": "/payment/credit_transfers/~*",
+   "many": true,
+   "term": "Credit transfer"
+  },
+  "BG-18": {
+   "pattern": "/payment/card",
+   "many": false,
+   "term": "Payment card information"
+  },
+  "BG-19": {
+   "pattern": "/payment/direct_debit",
+   "many": false,
+   "term": "Direct debit"
+  },
+  "BG-20": {
+   "pattern": "/document_allowances/~*",
+   "many": true,
+   "term": "Document level allowances"
+  },
+  "BG-21": {
+   "pattern": "/document_charges/~*",
+   "many": true,
+   "term": "Document level charges"
+  },
+  "BG-22": {
+   "pattern": "/totals",
+   "many": false,
+   "term": "Document totals"
+  },
+  "BG-23": {
+   "pattern": "/vat_breakdown/~*",
+   "many": true,
+   "term": "VAT breakdown"
+  },
+  "BG-24": {
+   "pattern": "/supporting_documents/~*",
+   "many": true,
+   "term": "Additional supporting documents"
+  },
+  "BG-25": {
+   "pattern": "/lines/~*",
+   "many": true,
+   "term": "Invoice lines"
+  },
+  "BG-26": {
+   "pattern": "/lines/~*/period",
+   "many": true,
+   "group": "BG-25",
+   "rel": "period",
+   "term": "Invoice line period"
+  },
+  "BG-27": {
+   "pattern": "/lines/~*/allowances/~*",
+   "many": true,
+   "group": "BG-25",
+   "rel": "allowances/~*",
+   "term": "Invoice line allowances"
+  },
+  "BG-28": {
+   "pattern": "/lines/~*/charges/~*",
+   "many": true,
+   "group": "BG-25",
+   "rel": "charges/~*",
+   "term": "Invoice line charges"
+  },
+  "BG-29": {
+   "pattern": "/lines/~*/price",
+   "many": true,
+   "group": "BG-25",
+   "rel": "price",
+   "term": "Price details"
+  },
+  "BG-30": {
+   "pattern": "/lines/~*/vat",
+   "many": true,
+   "group": "BG-25",
+   "rel": "vat",
+   "term": "Line VAT information"
+  },
+  "BG-31": {
+   "pattern": "/lines/~*/item",
+   "many": true,
+   "group": "BG-25",
+   "rel": "item",
+   "term": "Item information"
+  },
+  "BG-32": {
+   "pattern": "/lines/~*/item/attributes/~*",
+   "many": true,
+   "group": "BG-25",
+   "rel": "item/attributes/~*",
+   "term": "Item attributes"
+  }
+ },
+ "write": {
+  "BT-1": {
+   "pattern": "/invoice_number",
+   "many": false,
+   "term": "Invoice number"
+  },
+  "BT-2": {
+   "pattern": "/issue_date",
+   "many": false,
+   "term": "Invoice issue date"
+  },
+  "BT-3": {
+   "pattern": "/invoice_type_code",
+   "many": false,
+   "term": "Invoice type code"
+  },
+  "BT-5": {
+   "pattern": "/currency_code",
+   "many": false,
+   "term": "Invoice currency code"
+  },
+  "BT-6": {
+   "pattern": "/vat_accounting_currency_code",
+   "many": false,
+   "term": "VAT accounting currency code"
+  },
+  "BT-7": {
+   "pattern": "/tax_point_date",
+   "many": false,
+   "term": "Value added tax point date"
+  },
+  "BT-8": {
+   "pattern": "/tax_point_date_code",
+   "many": false,
+   "term": "Value added tax point date code"
+  },
+  "BT-9": {
+   "pattern": "/due_date",
+   "many": false,
+   "term": "Payment due date"
+  },
+  "BT-10": {
+   "pattern": "/buyer_reference",
+   "many": false,
+   "term": "Buyer reference"
+  },
+  "BT-11": {
+   "pattern": "/project_reference",
+   "many": false,
+   "term": "Project reference"
+  },
+  "BT-12": {
+   "pattern": "/contract_reference",
+   "many": false,
+   "term": "Contract reference"
+  },
+  "BT-13": {
+   "pattern": "/purchase_order_reference",
+   "many": false,
+   "term": "Purchase order reference"
+  },
+  "BT-14": {
+   "pattern": "/sales_order_reference",
+   "many": false,
+   "term": "Sales order reference"
+  },
+  "BT-15": {
+   "pattern": "/receiving_advice_reference",
+   "many": false,
+   "term": "Receiving advice reference"
+  },
+  "BT-16": {
+   "pattern": "/despatch_advice_reference",
+   "many": false,
+   "term": "Despatch advice reference"
+  },
+  "BT-17": {
+   "pattern": "/tender_or_lot_reference",
+   "many": false,
+   "term": "Tender or lot reference"
+  },
+  "BT-18": {
+   "pattern": "/object_identifier",
+   "many": false,
+   "term": "Invoiced object identifier"
+  },
+  "BT-18-1": {
+   "pattern": "/object_identifier/scheme_id",
+   "many": false,
+   "term": "Invoiced object identifier scheme identifier"
+  },
+  "BT-19": {
+   "pattern": "/buyer_accounting_reference",
+   "many": false,
+   "term": "Buyer accounting reference"
+  },
+  "BT-20": {
+   "pattern": "/payment_terms",
+   "many": false,
+   "term": "Payment terms"
+  },
+  "BT-21": {
+   "pattern": "/notes/~*/subject_code",
+   "many": true,
+   "group": "BG-1",
+   "rel": "subject_code",
+   "term": "Invoice note subject code"
+  },
+  "BT-22": {
+   "pattern": "/notes/~*/text",
+   "many": true,
+   "group": "BG-1",
+   "rel": "text",
+   "term": "Invoice note text"
+  },
+  "BT-23": {
+   "pattern": "/process_control/business_process_type",
+   "many": false,
+   "term": "Business process type"
+  },
+  "BT-24": {
+   "pattern": "/process_control/specification_id",
+   "many": false,
+   "term": "Specification identifier"
+  },
+  "BT-25": {
+   "pattern": "/preceding_invoices/~*/reference",
+   "many": true,
+   "group": "BG-3",
+   "rel": "reference",
+   "term": "Preceding invoice number"
+  },
+  "BT-26": {
+   "pattern": "/preceding_invoices/~*/issue_date",
+   "many": true,
+   "group": "BG-3",
+   "rel": "issue_date",
+   "term": "Preceding invoice issue date"
+  },
+  "BT-27": {
+   "pattern": "/seller/name",
+   "many": false,
+   "term": "Seller name"
+  },
+  "BT-28": {
+   "pattern": "/seller/trading_name",
+   "many": false,
+   "term": "Seller trading name"
+  },
+  "BT-29": {
+   "pattern": "/seller/identifiers/~*",
+   "many": true,
+   "term": "Seller identifiers"
+  },
+  "BT-29-1": {
+   "pattern": "/seller/identifiers/~*/scheme_id",
+   "many": true,
+   "group": "BT-29",
+   "rel": "scheme_id",
+   "term": "Seller identifier identification scheme identifier"
+  },
+  "BT-30": {
+   "pattern": "/seller/legal_registration_id",
+   "many": false,
+   "term": "Seller legal registration identifier"
+  },
+  "BT-30-1": {
+   "pattern": "/seller/legal_registration_id/scheme_id",
+   "many": false,
+   "term": "Seller legal registration identifier identification scheme identifier"
+  },
+  "BT-31": {
+   "pattern": "/seller/vat_id",
+   "many": false,
+   "term": "Seller VAT identifier"
+  },
+  "BT-32": {
+   "pattern": "/seller/tax_registration_id",
+   "many": false,
+   "term": "Seller tax registration identifier"
+  },
+  "BT-33": {
+   "pattern": "/seller/additional_legal_info",
+   "many": false,
+   "term": "Seller additional legal information"
+  },
+  "BT-34": {
+   "pattern": "/seller/electronic_address",
+   "many": false,
+   "term": "Seller electronic address"
+  },
+  "BT-34-1": {
+   "pattern": "/seller/electronic_address/scheme_id",
+   "many": false,
+   "term": "Seller electronic address identification scheme identifier"
+  },
+  "BT-35": {
+   "pattern": "/seller/address/line1",
+   "many": false,
+   "term": "Address line 1"
+  },
+  "BT-36": {
+   "pattern": "/seller/address/line2",
+   "many": false,
+   "term": "Address line 2"
+  },
+  "BT-37": {
+   "pattern": "/seller/address/city",
+   "many": false,
+   "term": "City"
+  },
+  "BT-38": {
+   "pattern": "/seller/address/post_code",
+   "many": false,
+   "term": "Post code"
+  },
+  "BT-39": {
+   "pattern": "/seller/address/country_subdivision",
+   "many": false,
+   "term": "Country subdivision"
+  },
+  "BT-40": {
+   "pattern": "/seller/address/country_code",
+   "many": false,
+   "term": "Country code"
+  },
+  "BT-41": {
+   "pattern": "/seller/contact/name",
+   "many": false,
+   "term": "Seller contact point"
+  },
+  "BT-42": {
+   "pattern": "/seller/contact/phone",
+   "many": false,
+   "term": "Seller contact telephone number"
+  },
+  "BT-43": {
+   "pattern": "/seller/contact/email",
+   "many": false,
+   "term": "Seller contact email address"
+  },
+  "BT-44": {
+   "pattern": "/buyer/name",
+   "many": false,
+   "term": "Buyer name"
+  },
+  "BT-45": {
+   "pattern": "/buyer/trading_name",
+   "many": false,
+   "term": "Buyer trading name"
+  },
+  "BT-46": {
+   "pattern": "/buyer/identifier",
+   "many": false,
+   "term": "Buyer identifier"
+  },
+  "BT-46-1": {
+   "pattern": "/buyer/identifier/scheme_id",
+   "many": false,
+   "term": "Buyer identifier identification scheme identifier"
+  },
+  "BT-47": {
+   "pattern": "/buyer/legal_registration_id",
+   "many": false,
+   "term": "Buyer legal registration identifier"
+  },
+  "BT-47-1": {
+   "pattern": "/buyer/legal_registration_id/scheme_id",
+   "many": false,
+   "term": "Buyer legal registration identifier identification scheme identifier"
+  },
+  "BT-48": {
+   "pattern": "/buyer/vat_id",
+   "many": false,
+   "term": "Buyer VAT identifier"
+  },
+  "BT-49": {
+   "pattern": "/buyer/electronic_address",
+   "many": false,
+   "term": "Buyer electronic address"
+  },
+  "BT-49-1": {
+   "pattern": "/buyer/electronic_address/scheme_id",
+   "many": false,
+   "term": "Buyer electronic address identification scheme identifier"
+  },
+  "BT-50": {
+   "pattern": "/buyer/address/line1",
+   "many": false,
+   "term": "Address line 1"
+  },
+  "BT-51": {
+   "pattern": "/buyer/address/line2",
+   "many": false,
+   "term": "Address line 2"
+  },
+  "BT-52": {
+   "pattern": "/buyer/address/city",
+   "many": false,
+   "term": "City"
+  },
+  "BT-53": {
+   "pattern": "/buyer/address/post_code",
+   "many": false,
+   "term": "Post code"
+  },
+  "BT-54": {
+   "pattern": "/buyer/address/country_subdivision",
+   "many": false,
+   "term": "Country subdivision"
+  },
+  "BT-55": {
+   "pattern": "/buyer/address/country_code",
+   "many": false,
+   "term": "Country code"
+  },
+  "BT-56": {
+   "pattern": "/buyer/contact/name",
+   "many": false,
+   "term": "Buyer contact point"
+  },
+  "BT-57": {
+   "pattern": "/buyer/contact/phone",
+   "many": false,
+   "term": "Buyer contact telephone number"
+  },
+  "BT-58": {
+   "pattern": "/buyer/contact/email",
+   "many": false,
+   "term": "Buyer contact email address"
+  },
+  "BT-59": {
+   "pattern": "/payee/name",
+   "many": false,
+   "term": "Payee name"
+  },
+  "BT-60": {
+   "pattern": "/payee/identifier",
+   "many": false,
+   "term": "Payee identifier"
+  },
+  "BT-60-1": {
+   "pattern": "/payee/identifier/scheme_id",
+   "many": false,
+   "term": "Payee identifier identification scheme identifier"
+  },
+  "BT-61": {
+   "pattern": "/payee/legal_registration_id",
+   "many": false,
+   "term": "Payee legal registration identifier"
+  },
+  "BT-61-1": {
+   "pattern": "/payee/legal_registration_id/scheme_id",
+   "many": false,
+   "term": "Payee legal registration identifier identification scheme identifier"
+  },
+  "BT-62": {
+   "pattern": "/seller_tax_representative/name",
+   "many": false,
+   "term": "Tax representative name"
+  },
+  "BT-63": {
+   "pattern": "/seller_tax_representative/vat_id",
+   "many": false,
+   "term": "Tax representative VAT identifier"
+  },
+  "BT-64": {
+   "pattern": "/seller_tax_representative/address/line1",
+   "many": false,
+   "term": "Address line 1"
+  },
+  "BT-65": {
+   "pattern": "/seller_tax_representative/address/line2",
+   "many": false,
+   "term": "Address line 2"
+  },
+  "BT-66": {
+   "pattern": "/seller_tax_representative/address/city",
+   "many": false,
+   "term": "City"
+  },
+  "BT-67": {
+   "pattern": "/seller_tax_representative/address/post_code",
+   "many": false,
+   "term": "Post code"
+  },
+  "BT-68": {
+   "pattern": "/seller_tax_representative/address/country_subdivision",
+   "many": false,
+   "term": "Country subdivision"
+  },
+  "BT-69": {
+   "pattern": "/seller_tax_representative/address/country_code",
+   "many": false,
+   "term": "Country code"
+  },
+  "BT-70": {
+   "pattern": "/delivery/name",
+   "many": false,
+   "term": "Deliver to party name"
+  },
+  "BT-71": {
+   "pattern": "/delivery/location_id",
+   "many": false,
+   "term": "Deliver to location identifier"
+  },
+  "BT-71-1": {
+   "pattern": "/delivery/location_id/scheme_id",
+   "many": false,
+   "term": "Deliver to location identifier identification scheme identifier"
+  },
+  "BT-72": {
+   "pattern": "/delivery/date",
+   "many": false,
+   "term": "Actual delivery date"
+  },
+  "BT-73": {
+   "pattern": "/delivery/period/start_date",
+   "many": false,
+   "term": "Invoicing period start date"
+  },
+  "BT-74": {
+   "pattern": "/delivery/period/end_date",
+   "many": false,
+   "term": "Invoicing period end date"
+  },
+  "BT-75": {
+   "pattern": "/delivery/address/line1",
+   "many": false,
+   "term": "Address line 1"
+  },
+  "BT-76": {
+   "pattern": "/delivery/address/line2",
+   "many": false,
+   "term": "Address line 2"
+  },
+  "BT-77": {
+   "pattern": "/delivery/address/city",
+   "many": false,
+   "term": "City"
+  },
+  "BT-78": {
+   "pattern": "/delivery/address/post_code",
+   "many": false,
+   "term": "Post code"
+  },
+  "BT-79": {
+   "pattern": "/delivery/address/country_subdivision",
+   "many": false,
+   "term": "Country subdivision"
+  },
+  "BT-80": {
+   "pattern": "/delivery/address/country_code",
+   "many": false,
+   "term": "Country code"
+  },
+  "BT-81": {
+   "pattern": "/payment/means_code",
+   "many": false,
+   "term": "Payment means type code"
+  },
+  "BT-82": {
+   "pattern": "/payment/means_text",
+   "many": false,
+   "term": "Payment means text"
+  },
+  "BT-83": {
+   "pattern": "/payment/remittance_information",
+   "many": false,
+   "term": "Remittance information"
+  },
+  "BT-84": {
+   "pattern": "/payment/credit_transfers/~*/account_id",
+   "many": true,
+   "group": "BG-17",
+   "rel": "account_id",
+   "term": "Payment account identifier"
+  },
+  "BT-85": {
+   "pattern": "/payment/credit_transfers/~*/account_name",
+   "many": true,
+   "group": "BG-17",
+   "rel": "account_name",
+   "term": "Payment account name"
+  },
+  "BT-86": {
+   "pattern": "/payment/credit_transfers/~*/service_provider_id",
+   "many": true,
+   "group": "BG-17",
+   "rel": "service_provider_id",
+   "term": "Payment service provider identifier"
+  },
+  "BT-87": {
+   "pattern": "/payment/card/account_number",
+   "many": false,
+   "term": "Payment card primary account number"
+  },
+  "BT-88": {
+   "pattern": "/payment/card/holder_name",
+   "many": false,
+   "term": "Payment card holder name"
+  },
+  "BT-89": {
+   "pattern": "/payment/direct_debit/mandate_reference",
+   "many": false,
+   "term": "Mandate reference identifier"
+  },
+  "BT-90": {
+   "pattern": "/payment/direct_debit/creditor_id",
+   "many": false,
+   "term": "Bank assigned creditor identifier"
+  },
+  "BT-91": {
+   "pattern": "/payment/direct_debit/debited_account_id",
+   "many": false,
+   "term": "Debited account identifier"
+  },
+  "BT-92": {
+   "pattern": "/document_allowances/~*/amount",
+   "many": true,
+   "group": "BG-20",
+   "rel": "amount",
+   "term": "Document level allowance amount"
+  },
+  "BT-93": {
+   "pattern": "/document_allowances/~*/base_amount",
+   "many": true,
+   "group": "BG-20",
+   "rel": "base_amount",
+   "term": "Document level allowance base amount"
+  },
+  "BT-94": {
+   "pattern": "/document_allowances/~*/percentage",
+   "many": true,
+   "group": "BG-20",
+   "rel": "percentage",
+   "term": "Document level allowance percentage"
+  },
+  "BT-95": {
+   "pattern": "/document_allowances/~*/vat_category_code",
+   "many": true,
+   "group": "BG-20",
+   "rel": "vat_category_code",
+   "term": "Document level allowance VAT category code"
+  },
+  "BT-96": {
+   "pattern": "/document_allowances/~*/vat_rate",
+   "many": true,
+   "group": "BG-20",
+   "rel": "vat_rate",
+   "term": "Document level allowance VAT rate"
+  },
+  "BT-97": {
+   "pattern": "/document_allowances/~*/reason",
+   "many": true,
+   "group": "BG-20",
+   "rel": "reason",
+   "term": "Document level allowance reason"
+  },
+  "BT-98": {
+   "pattern": "/document_allowances/~*/reason_code",
+   "many": true,
+   "group": "BG-20",
+   "rel": "reason_code",
+   "term": "Document level allowance reason code"
+  },
+  "BT-99": {
+   "pattern": "/document_charges/~*/amount",
+   "many": true,
+   "group": "BG-21",
+   "rel": "amount",
+   "term": "Document level charge amount"
+  },
+  "BT-100": {
+   "pattern": "/document_charges/~*/base_amount",
+   "many": true,
+   "group": "BG-21",
+   "rel": "base_amount",
+   "term": "Document level charge base amount"
+  },
+  "BT-101": {
+   "pattern": "/document_charges/~*/percentage",
+   "many": true,
+   "group": "BG-21",
+   "rel": "percentage",
+   "term": "Document level charge percentage"
+  },
+  "BT-102": {
+   "pattern": "/document_charges/~*/vat_category_code",
+   "many": true,
+   "group": "BG-21",
+   "rel": "vat_category_code",
+   "term": "Document level charge VAT category code"
+  },
+  "BT-103": {
+   "pattern": "/document_charges/~*/vat_rate",
+   "many": true,
+   "group": "BG-21",
+   "rel": "vat_rate",
+   "term": "Document level charge VAT rate"
+  },
+  "BT-104": {
+   "pattern": "/document_charges/~*/reason",
+   "many": true,
+   "group": "BG-21",
+   "rel": "reason",
+   "term": "Document level charge reason"
+  },
+  "BT-105": {
+   "pattern": "/document_charges/~*/reason_code",
+   "many": true,
+   "group": "BG-21",
+   "rel": "reason_code",
+   "term": "Document level charge reason code"
+  },
+  "BT-111": {
+   "pattern": "/tax_amount_accounting_currency",
+   "many": false,
+   "term": "Invoice total VAT amount in accounting currency"
+  },
+  "BT-113": {
+   "pattern": "/prepaid_amount",
+   "many": false,
+   "term": "Prepaid amount"
+  },
+  "BT-114": {
+   "pattern": "/rounding_amount",
+   "many": false,
+   "term": "Rounding amount"
+  },
+  "BT-118": {
+   "pattern": "/vat_breakdown/~*/category_code",
+   "many": true,
+   "group": "BG-23",
+   "rel": "category_code",
+   "term": "VAT category code"
+  },
+  "BT-119": {
+   "pattern": "/vat_breakdown/~*/rate",
+   "many": true,
+   "group": "BG-23",
+   "rel": "rate",
+   "term": "VAT rate"
+  },
+  "BT-120": {
+   "pattern": "/vat_breakdown/~*/reason",
+   "many": true,
+   "group": "BG-23",
+   "rel": "reason",
+   "term": "VAT exemption reason text"
+  },
+  "BT-121": {
+   "pattern": "/vat_breakdown/~*/reason_code",
+   "many": true,
+   "group": "BG-23",
+   "rel": "reason_code",
+   "term": "VAT exemption reason code"
+  },
+  "BT-122": {
+   "pattern": "/supporting_documents/~*/reference",
+   "many": true,
+   "group": "BG-24",
+   "rel": "reference",
+   "term": "Supporting document reference"
+  },
+  "BT-123": {
+   "pattern": "/supporting_documents/~*/description",
+   "many": true,
+   "group": "BG-24",
+   "rel": "description",
+   "term": "Supporting document description"
+  },
+  "BT-124": {
+   "pattern": "/supporting_documents/~*/external_location",
+   "many": true,
+   "group": "BG-24",
+   "rel": "external_location",
+   "term": "External document location"
+  },
+  "BT-125": {
+   "pattern": "/supporting_documents/~*/attached_document",
+   "many": true,
+   "group": "BG-24",
+   "rel": "attached_document",
+   "term": "Attached document"
+  },
+  "BT-125-1": {
+   "pattern": "/supporting_documents/~*/attached_document/mime_code",
+   "many": true,
+   "group": "BG-24",
+   "rel": "attached_document/mime_code",
+   "term": "Attached document MIME code"
+  },
+  "BT-125-2": {
+   "pattern": "/supporting_documents/~*/attached_document/filename",
+   "many": true,
+   "group": "BG-24",
+   "rel": "attached_document/filename",
+   "term": "Attached document filename"
+  },
+  "BT-126": {
+   "pattern": "/lines/~*/id",
+   "many": true,
+   "group": "BG-25",
+   "rel": "id",
+   "term": "Invoice line identifier"
+  },
+  "BT-127": {
+   "pattern": "/lines/~*/note",
+   "many": true,
+   "group": "BG-25",
+   "rel": "note",
+   "term": "Invoice line note"
+  },
+  "BT-128": {
+   "pattern": "/lines/~*/object_identifier",
+   "many": true,
+   "group": "BG-25",
+   "rel": "object_identifier",
+   "term": "Invoice line object identifier"
+  },
+  "BT-128-1": {
+   "pattern": "/lines/~*/object_identifier/scheme_id",
+   "many": true,
+   "group": "BG-25",
+   "rel": "object_identifier/scheme_id",
+   "term": "Invoice line object identifier identification scheme identifier"
+  },
+  "BT-129": {
+   "pattern": "/lines/~*/quantity",
+   "many": true,
+   "group": "BG-25",
+   "rel": "quantity",
+   "term": "Invoiced quantity"
+  },
+  "BT-130": {
+   "pattern": "/lines/~*/unit_code",
+   "many": true,
+   "group": "BG-25",
+   "rel": "unit_code",
+   "term": "Invoiced quantity unit of measure code"
+  },
+  "BT-131": {
+   "pattern": "/lines/~*/net_amount",
+   "many": true,
+   "group": "BG-25",
+   "rel": "net_amount",
+   "term": "Invoice line net amount"
+  },
+  "BT-132": {
+   "pattern": "/lines/~*/order_line_reference",
+   "many": true,
+   "group": "BG-25",
+   "rel": "order_line_reference",
+   "term": "Referenced purchase order line reference"
+  },
+  "BT-133": {
+   "pattern": "/lines/~*/buyer_accounting_reference",
+   "many": true,
+   "group": "BG-25",
+   "rel": "buyer_accounting_reference",
+   "term": "Invoice line buyer accounting reference"
+  },
+  "BT-134": {
+   "pattern": "/lines/~*/period/start_date",
+   "many": true,
+   "group": "BG-25",
+   "rel": "period/start_date",
+   "term": "Invoice line period start date"
+  },
+  "BT-135": {
+   "pattern": "/lines/~*/period/end_date",
+   "many": true,
+   "group": "BG-25",
+   "rel": "period/end_date",
+   "term": "Invoice line period end date"
+  },
+  "BT-136": {
+   "pattern": "/lines/~*/allowances/~*/amount",
+   "many": true,
+   "group": "BG-27",
+   "rel": "amount",
+   "term": "Invoice line allowance amount"
+  },
+  "BT-137": {
+   "pattern": "/lines/~*/allowances/~*/base_amount",
+   "many": true,
+   "group": "BG-27",
+   "rel": "base_amount",
+   "term": "Invoice line allowance base amount"
+  },
+  "BT-138": {
+   "pattern": "/lines/~*/allowances/~*/percentage",
+   "many": true,
+   "group": "BG-27",
+   "rel": "percentage",
+   "term": "Invoice line allowance percentage"
+  },
+  "BT-139": {
+   "pattern": "/lines/~*/allowances/~*/reason",
+   "many": true,
+   "group": "BG-27",
+   "rel": "reason",
+   "term": "Invoice line allowance reason"
+  },
+  "BT-140": {
+   "pattern": "/lines/~*/allowances/~*/reason_code",
+   "many": true,
+   "group": "BG-27",
+   "rel": "reason_code",
+   "term": "Invoice line allowance reason code"
+  },
+  "BT-141": {
+   "pattern": "/lines/~*/charges/~*/amount",
+   "many": true,
+   "group": "BG-28",
+   "rel": "amount",
+   "term": "Invoice line charge amount"
+  },
+  "BT-142": {
+   "pattern": "/lines/~*/charges/~*/base_amount",
+   "many": true,
+   "group": "BG-28",
+   "rel": "base_amount",
+   "term": "Invoice line charge base amount"
+  },
+  "BT-143": {
+   "pattern": "/lines/~*/charges/~*/percentage",
+   "many": true,
+   "group": "BG-28",
+   "rel": "percentage",
+   "term": "Invoice line charge percentage"
+  },
+  "BT-144": {
+   "pattern": "/lines/~*/charges/~*/reason",
+   "many": true,
+   "group": "BG-28",
+   "rel": "reason",
+   "term": "Invoice line charge reason"
+  },
+  "BT-145": {
+   "pattern": "/lines/~*/charges/~*/reason_code",
+   "many": true,
+   "group": "BG-28",
+   "rel": "reason_code",
+   "term": "Invoice line charge reason code"
+  },
+  "BT-146": {
+   "pattern": "/lines/~*/price/net_price",
+   "many": true,
+   "group": "BG-25",
+   "rel": "price/net_price",
+   "term": "Item net price"
+  },
+  "BT-147": {
+   "pattern": "/lines/~*/price/discount",
+   "many": true,
+   "group": "BG-25",
+   "rel": "price/discount",
+   "term": "Item price discount"
+  },
+  "BT-148": {
+   "pattern": "/lines/~*/price/gross_price",
+   "many": true,
+   "group": "BG-25",
+   "rel": "price/gross_price",
+   "term": "Item gross price"
+  },
+  "BT-149": {
+   "pattern": "/lines/~*/price/base_quantity",
+   "many": true,
+   "group": "BG-25",
+   "rel": "price/base_quantity",
+   "term": "Item price base quantity"
+  },
+  "BT-150": {
+   "pattern": "/lines/~*/price/base_quantity_unit_code",
+   "many": true,
+   "group": "BG-25",
+   "rel": "price/base_quantity_unit_code",
+   "term": "Item price base quantity unit of measure code"
+  },
+  "BT-151": {
+   "pattern": "/lines/~*/vat/category_code",
+   "many": true,
+   "group": "BG-25",
+   "rel": "vat/category_code",
+   "term": "Invoiced item VAT category code"
+  },
+  "BT-152": {
+   "pattern": "/lines/~*/vat/rate",
+   "many": true,
+   "group": "BG-25",
+   "rel": "vat/rate",
+   "term": "Invoiced item VAT rate"
+  },
+  "BT-153": {
+   "pattern": "/lines/~*/item/name",
+   "many": true,
+   "group": "BG-25",
+   "rel": "item/name",
+   "term": "Item name"
+  },
+  "BT-154": {
+   "pattern": "/lines/~*/item/description",
+   "many": true,
+   "group": "BG-25",
+   "rel": "item/description",
+   "term": "Item description"
+  },
+  "BT-155": {
+   "pattern": "/lines/~*/item/seller_id",
+   "many": true,
+   "group": "BG-25",
+   "rel": "item/seller_id",
+   "term": "Item seller's identifier"
+  },
+  "BT-156": {
+   "pattern": "/lines/~*/item/buyer_id",
+   "many": true,
+   "group": "BG-25",
+   "rel": "item/buyer_id",
+   "term": "Item buyer's identifier"
+  },
+  "BT-157": {
+   "pattern": "/lines/~*/item/standard_id",
+   "many": true,
+   "group": "BG-25",
+   "rel": "item/standard_id",
+   "term": "Item standard identifier"
+  },
+  "BT-157-1": {
+   "pattern": "/lines/~*/item/standard_id/scheme_id",
+   "many": true,
+   "group": "BG-25",
+   "rel": "item/standard_id/scheme_id",
+   "term": "Item standard identifier identification scheme identifier"
+  },
+  "BT-158": {
+   "pattern": "/lines/~*/item/classifications/~*",
+   "many": true,
+   "group": "BG-25",
+   "rel": "item/classifications/~*",
+   "term": "Item classification identifiers"
+  },
+  "BT-158-1": {
+   "pattern": "/lines/~*/item/classifications/~*/scheme_id",
+   "many": true,
+   "group": "BT-158",
+   "rel": "scheme_id",
+   "term": "Item classification identifier identification scheme identifier"
+  },
+  "BT-158-2": {
+   "pattern": "/lines/~*/item/classifications/~*/version",
+   "many": true,
+   "group": "BT-158",
+   "rel": "version",
+   "term": "Scheme version identifier"
+  },
+  "BT-159": {
+   "pattern": "/lines/~*/item/country_of_origin",
+   "many": true,
+   "group": "BG-25",
+   "rel": "item/country_of_origin",
+   "term": "Item country of origin"
+  },
+  "BT-160": {
+   "pattern": "/lines/~*/item/attributes/~*/name",
+   "many": true,
+   "group": "BG-32",
+   "rel": "name",
+   "term": "Item attribute name"
+  },
+  "BT-161": {
+   "pattern": "/lines/~*/item/attributes/~*/value",
+   "many": true,
+   "group": "BG-32",
+   "rel": "value",
+   "term": "Item attribute value"
+  },
+  "BT-162": {
+   "pattern": "/seller/address/line3",
+   "many": false,
+   "term": "Address line 3"
+  },
+  "BT-163": {
+   "pattern": "/buyer/address/line3",
+   "many": false,
+   "term": "Address line 3"
+  },
+  "BT-164": {
+   "pattern": "/seller_tax_representative/address/line3",
+   "many": false,
+   "term": "Address line 3"
+  },
+  "BT-165": {
+   "pattern": "/delivery/address/line3",
+   "many": false,
+   "term": "Address line 3"
+  },
+  "BG-1": {
+   "pattern": "/notes/~*",
+   "many": true,
+   "term": "Invoice notes"
+  },
+  "BG-2": {
+   "pattern": "/process_control",
+   "many": false,
+   "term": "Process control"
+  },
+  "BG-3": {
+   "pattern": "/preceding_invoices/~*",
+   "many": true,
+   "term": "Preceding invoice references"
+  },
+  "BG-4": {
+   "pattern": "/seller",
+   "many": false,
+   "term": "Seller"
+  },
+  "BG-5": {
+   "pattern": "/seller/address",
+   "many": false,
+   "term": "Seller postal address"
+  },
+  "BG-6": {
+   "pattern": "/seller/contact",
+   "many": false,
+   "term": "Seller contact"
+  },
+  "BG-7": {
+   "pattern": "/buyer",
+   "many": false,
+   "term": "Buyer"
+  },
+  "BG-8": {
+   "pattern": "/buyer/address",
+   "many": false,
+   "term": "Buyer postal address"
+  },
+  "BG-9": {
+   "pattern": "/buyer/contact",
+   "many": false,
+   "term": "Buyer contact"
+  },
+  "BG-10": {
+   "pattern": "/payee",
+   "many": false,
+   "term": "Payee"
+  },
+  "BG-11": {
+   "pattern": "/seller_tax_representative",
+   "many": false,
+   "term": "Seller tax representative"
+  },
+  "BG-12": {
+   "pattern": "/seller_tax_representative/address",
+   "many": false,
+   "term": "Tax representative postal address"
+  },
+  "BG-13": {
+   "pattern": "/delivery",
+   "many": false,
+   "term": "Delivery information"
+  },
+  "BG-14": {
+   "pattern": "/delivery/period",
+   "many": false,
+   "term": "Invoicing period"
+  },
+  "BG-15": {
+   "pattern": "/delivery/address",
+   "many": false,
+   "term": "Deliver to address"
+  },
+  "BG-16": {
+   "pattern": "/payment",
+   "many": false,
+   "term": "Payment instructions"
+  },
+  "BG-17": {
+   "pattern": "/payment/credit_transfers/~*",
+   "many": true,
+   "term": "Credit transfer"
+  },
+  "BG-18": {
+   "pattern": "/payment/card",
+   "many": false,
+   "term": "Payment card information"
+  },
+  "BG-19": {
+   "pattern": "/payment/direct_debit",
+   "many": false,
+   "term": "Direct debit"
+  },
+  "BG-20": {
+   "pattern": "/document_allowances/~*",
+   "many": true,
+   "term": "Document level allowances"
+  },
+  "BG-21": {
+   "pattern": "/document_charges/~*",
+   "many": true,
+   "term": "Document level charges"
+  },
+  "BG-23": {
+   "pattern": "/vat_breakdown/~*",
+   "many": true,
+   "term": "VAT breakdown"
+  },
+  "BG-24": {
+   "pattern": "/supporting_documents/~*",
+   "many": true,
+   "term": "Additional supporting documents"
+  },
+  "BG-25": {
+   "pattern": "/lines/~*",
+   "many": true,
+   "term": "Invoice lines"
+  },
+  "BG-26": {
+   "pattern": "/lines/~*/period",
+   "many": true,
+   "group": "BG-25",
+   "rel": "period",
+   "term": "Invoice line period"
+  },
+  "BG-27": {
+   "pattern": "/lines/~*/allowances/~*",
+   "many": true,
+   "group": "BG-25",
+   "rel": "allowances/~*",
+   "term": "Invoice line allowances"
+  },
+  "BG-28": {
+   "pattern": "/lines/~*/charges/~*",
+   "many": true,
+   "group": "BG-25",
+   "rel": "charges/~*",
+   "term": "Invoice line charges"
+  },
+  "BG-29": {
+   "pattern": "/lines/~*/price",
+   "many": true,
+   "group": "BG-25",
+   "rel": "price",
+   "term": "Price details"
+  },
+  "BG-30": {
+   "pattern": "/lines/~*/vat",
+   "many": true,
+   "group": "BG-25",
+   "rel": "vat",
+   "term": "Line VAT information"
+  },
+  "BG-31": {
+   "pattern": "/lines/~*/item",
+   "many": true,
+   "group": "BG-25",
+   "rel": "item",
+   "term": "Item information"
+  },
+  "BG-32": {
+   "pattern": "/lines/~*/item/attributes/~*",
+   "many": true,
+   "group": "BG-25",
+   "rel": "item/attributes/~*",
+   "term": "Item attributes"
+  }
+ }
+}

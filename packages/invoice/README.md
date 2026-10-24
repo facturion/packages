@@ -129,6 +129,9 @@ BT-136 is an allowance's). Writes mutate in place; `undefined` removes a value
 and the objects it leaves empty. The types per code are `FieldTypes` and
 `InputFieldTypes`.
 
+For other languages, the same maps ship as JSON with each code's term:
+`@facturion/invoice/fields.json` (`{ read: { "BT-10": { pattern, many, term }, … }, write: … }`).
+
 ## Allowances and charges
 
 An allowance or charge is always stated as a resolved **`amount`**. That is the
