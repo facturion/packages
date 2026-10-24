@@ -1,5 +1,11 @@
 # @facturion/invoice-renderer
 
+## 0.8.1
+
+### Patch Changes
+
+- d6a076a: highlight: a `missing-any` finding shows a missing box at rest again, one per group, for its first field the invoice prints. It showed none, so a rule with every alternative missing (the case that fires it) was invisible until focused. Fields may carry `group`, as `@facturion/rule-fields` returns them.
+
 ## 0.8.0
 
 ### Minor Changes
