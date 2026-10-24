@@ -478,7 +478,7 @@
     "PEPPOL-EN16931-R054": {
       "kind": "missing",
       "fields": [
-        { "path": "/tax_amount_accounting_currency", "role": "target" },
+        { "path": "/totals/tax_amount_accounting_currency", "role": "target" },
         { "path": "/vat_accounting_currency_code", "role": "condition" }
       ],
       "note": "The invoice names a separate currency for VAT accounting, so it also has to state the VAT total in that currency.",
@@ -487,7 +487,7 @@
     "PEPPOL-EN16931-R055": {
       "kind": "inconsistent",
       "fields": [
-        { "path": "/tax_amount_accounting_currency", "role": "operand" },
+        { "path": "/totals/tax_amount_accounting_currency", "role": "operand" },
         { "path": "/totals/tax_amount", "role": "operand" }
       ]
     },

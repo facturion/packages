@@ -538,7 +538,7 @@
       "kind": "missing",
       "fields": [
         {
-          "path": "/tax_amount_accounting_currency",
+          "path": "/totals/tax_amount_accounting_currency",
           "role": "target"
         },
         {
@@ -551,7 +551,7 @@
           "kind": "missing",
           "fields": [
             {
-              "path": "/tax_amount_accounting_currency",
+              "path": "/totals/tax_amount_accounting_currency",
               "role": "target"
             },
             {
@@ -2034,7 +2034,7 @@
       "kind": "invalid",
       "fields": [
         {
-          "path": "/tax_amount_accounting_currency",
+          "path": "/totals/tax_amount_accounting_currency",
           "role": "target"
         },
         {
