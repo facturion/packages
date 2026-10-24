@@ -1,5 +1,39 @@
 # @facturion/invoice-renderer
 
+## 0.8.0
+
+### Minor Changes
+
+- 1f9bf2f: Highlighting validation findings. `renderInvoice(…, { annotate: true })`
+  marks every rendered field with `data-path` (its JSON Pointer) and leaves a
+  hidden, labelled slot where an absent field would print. The new `highlight`
+  entry point marks findings on that markup in the browser (boxes by role,
+  coloured by severity), styled by the new `styles/highlight.css` and
+  themable through `--inv-hl-*` tokens. New `view.*` strings label the slots
+  (`address`, `buyerReference`, `card`, `city`, `contact`, `contactName`,
+  `creditTransfer`, `directDebit`, `email`, `itemAttribute`, `missing`,
+  `phone`, `postCode`). Without `annotate` the fragment is unchanged; the
+  document's embedded stylesheet gains three rules that only apply to
+  annotated markup.
+- 7dc99b0: Ported to TypeScript. The output is unchanged, byte for byte. The package now
+  ships compiled JavaScript with generated declarations (`dist/`) instead of
+  plain sources with a hand-written `index.d.ts`.
+
+  The declarations are stricter than before: a label resolver (`TFunction`)
+  receives a `LabelKey` (`view.*` strings that exist, `units.*`, and the
+  codelist namespaces), `VIEW` is keyed by `ViewKey`, and the new types `Lang`,
+  `LabelKey`, `LabelVars`, `ViewKey` and `RenderableInvoice` are exported. A
+  resolver written as `(key: string, vars?) => string` still fits.
+
+### Patch Changes
+
+- b04b3b3: An amount and its currency are joined by a no-break space again (lost in
+  0.3.0), so "1,234.56 EUR" never breaks across lines.
+- 4df42ca: Ship the TypeScript sources the source maps point at, so a debugger or a
+  bundler resolves them.
+  (The renderer's generated `styles.ts` and `fonts.ts`, the stylesheet and the
+  inlined font files as strings, stay out.)
+
 ## 0.7.1
 
 ### Patch Changes

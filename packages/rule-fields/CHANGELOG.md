@@ -1,5 +1,16 @@
 # @facturion/rule-fields
 
+## 0.1.1
+
+### Patch Changes
+
+- 4df42ca: Ship the TypeScript sources the source maps point at, so a debugger or a
+  bundler resolves them.
+  (The renderer's generated `styles.ts` and `fonts.ts`, the stylesheet and the
+  inlined font files as strings, stay out.)
+- Updated dependencies [4df42ca]
+  - @facturion/pointer-patterns@0.1.1
+
 ## 0.1.0
 
 ### Minor Changes
