@@ -1,0 +1,2136 @@
+{
+  "_meta": {
+    "status": "DRAFT — drafted by two subagents, reviewed by Claude against each rule's test; not yet human-reviewed. All 199 French BR-FR rules (XP Z12-012), both syntaxes",
+    "source": "the BR-FR-Flux2 XSLs production stages (resources/fr/br-fr-ctc/BR-FR-Flux2-{UBL,CII}.xsl, FNFE-MPE 1.4.0)",
+    "drafted": "2026-10-23",
+    "kinds": {
+      "missing": "every target must be present and is absent",
+      "missing-any": "at least one of the targets must be present; none is. When the targets carry a `group`, at least one per group must be present (\"the seller's VAT ID or tax number, and the buyer's VAT ID\"); a field result keeps its group",
+      "invalid": "the target is present but its value is wrong (format, code list, checksum)",
+      "forbidden": "the target is present but not allowed in this combination",
+      "inconsistent": "the fields disagree. In a calculation the result is the target (it is what the rule checks, and recomputing it always satisfies the rule) and the inputs are operands; in a comparison with no derived side (dates, codes that must match), every field is an operand",
+      "structural": "the XML breaks a rule the simplified JSON cannot express (a duplicated, empty or malformed element). Any sender's invoice can trip it; our own generator never should, so `generator` says why and a hit on a document we generated is a bug. Fields point at the nearest data",
+      "unrepresentable": "concerns XRechnung-extension structures the simplified JSON has no fields for; the note has to carry the whole message"
+    },
+    "anchored": "a field with \"anchored\": true applies only on the anchor's branch: it keeps the matches the anchor is, lies inside, or contains (the document itself excepted); a containing anchor must supply every ~. index, or it would widen to every item. For a rule that fires on different kinds of object, each target names its own",
+    "roles": {
+      "target": "the field to fix",
+      "condition": "a field whose value made the rule apply",
+      "operand": "an input of a calculation, or one side of a comparison with no derived side"
+    },
+    "conventions": {
+      "no rule-set conditions": "BT-24 (and anything else that only selects which rule set runs, e.g. $isCVD) is never a condition: every rule in the set already presupposes it",
+      "narrowest field": "map the field the rule tests, not its group; the group is a path prefix any consumer can walk up to. Map a group only when its entries are what is tested (\"exactly one entry such that …\"), and then with a filter",
+      "schema, not generator": "fields name what the simplified-JSON schema can hold; what an editor shows of them is a UX question",
+      "anchor": "`anchor` accepts what check_anchors.py reports for the rule (a collision, an unbound ~., a relative path off the schema), and says why it does no harm",
+      "notes": "`note` is shown to the person checking the invoice, whoever sent it: plain words, no BT codes. `generator` says why our own generator can't (or rarely does) trip the rule; `remark` is for whoever maintains this table. Neither is shown"
+    },
+    "paths": {
+      "syntax": "JSON Pointer patterns (@facturion/pointer-patterns, SPEC.md): a JSON Pointer (RFC 6901) is a pattern matching itself",
+      "/a/b": "absolute path in the @facturion/invoice model (invoice-schema.json)",
+      "~.": "the list index of the finding's anchor at this position; no anchor there → every item",
+      "~*": "every item, regardless of the anchor",
+      "~?f=v": "the entries whose member f equals 'v'; none matching → the list itself, as the place to add one",
+      "~?f!=v": "the entries whose member f is a string other than 'v'; none matching → nothing",
+      "~?a~1b=v": "a nested member: the entries whose a/b equals 'v' (~1 separates the steps)",
+      "~?!f": "the entries without member f (missing or null; an empty string counts as present); none → nothing",
+      "unmatched filters": "only a target's unmatched ~?f=v means \"add one here\"; a condition's or operand's yields nothing",
+      "0/x": "relative to the finding's anchor (Relative JSON Pointer; 0 = the anchor itself)"
+    },
+    "language": "the rule texts are French; notes are English, like the other tables"
+  },
+  "rules": {
+    "BR-FR-01_BT-1": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/invoice_number",
+          "role": "target"
+        }
+      ],
+      "note": "The invoice number can be at most 35 characters long."
+    },
+    "BR-FR-01_BT-1-1": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/invoice_number",
+          "role": "target"
+        }
+      ],
+      "note": "The invoice number can be at most 35 characters long."
+    },
+    "BR-FR-01_BT-1-2": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/invoice_number",
+          "role": "target"
+        }
+      ],
+      "note": "The invoice number may contain only letters, digits and the characters + - _ /, with no spaces.",
+      "remark": "Same test as BR-FR-02_BT-1 (UBL only), under the BR-FR-01 ID."
+    },
+    "BR-FR-01_BT-25": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/preceding_invoices/~./reference",
+          "role": "target"
+        }
+      ],
+      "note": "The number of the referenced earlier invoice can be at most 35 characters long."
+    },
+    "BR-FR-01_BT-25-1": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/preceding_invoices/~./reference",
+          "role": "target"
+        }
+      ],
+      "note": "The number of the referenced earlier invoice can be at most 35 characters long."
+    },
+    "BR-FR-01_BT-25-2": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/preceding_invoices/~./reference",
+          "role": "target"
+        }
+      ],
+      "note": "The number of the referenced earlier invoice may contain only letters, digits and the characters + - _ /, with no spaces.",
+      "remark": "Same test as BR-FR-02_BT-25 (UBL only), under the BR-FR-01 ID."
+    },
+    "BR-FR-01_EXT-FR-FE-136": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "A line of this invoice refers to an earlier invoice (a French extension the editor can't show), and that invoice's number is longer than 35 characters. Ask the sender for a corrected invoice."
+    },
+    "BR-FR-01_EXT-FR-FE-136-1": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "A line of this invoice refers to an earlier invoice (a French extension the editor can't show), and that invoice's number is longer than 35 characters. Ask the sender for a corrected invoice."
+    },
+    "BR-FR-01_EXT-FR-FE-136-2": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "A line of this invoice refers to an earlier invoice (a French extension the editor can't show), and that invoice's number contains characters other than letters, digits and + - _ /, or spaces. Ask the sender for a corrected invoice."
+    },
+    "BR-FR-02_BT-1": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/invoice_number",
+          "role": "target"
+        }
+      ],
+      "note": "The invoice number may contain only letters, digits and the characters + - _ /, with no spaces."
+    },
+    "BR-FR-02_BT-25": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/preceding_invoices/~./reference",
+          "role": "target"
+        }
+      ],
+      "note": "The number of the referenced earlier invoice may contain only letters, digits and the characters + - _ /, with no spaces."
+    },
+    "BR-FR-02_EXT-FR-FE-136": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "A line of this invoice refers to an earlier invoice (a French extension the editor can't show), and that invoice's number contains characters other than letters, digits and + - _ /, or spaces. Ask the sender for a corrected invoice."
+    },
+    "BR-FR-03_BT-2": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/issue_date",
+          "role": "target"
+        }
+      ],
+      "note": "The date must be a real calendar date in the years 2000 to 2099."
+    },
+    "BR-FR-03_BT-7": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/tax_point_date",
+          "role": "target"
+        }
+      ],
+      "note": "The date must be a real calendar date in the years 2000 to 2099."
+    },
+    "BR-FR-03_BT-9": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/due_date",
+          "role": "target"
+        }
+      ],
+      "note": "The date must be a real calendar date in the years 2000 to 2099."
+    },
+    "BR-FR-03_BT-26": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/preceding_invoices/~./issue_date",
+          "role": "target"
+        }
+      ],
+      "note": "The date must be a real calendar date in the years 2000 to 2099."
+    },
+    "BR-FR-03_BT-72": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/delivery/date",
+          "role": "target"
+        }
+      ],
+      "note": "The date must be a real calendar date in the years 2000 to 2099."
+    },
+    "BR-FR-03_BT-73": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/delivery/period/start_date",
+          "role": "target"
+        }
+      ],
+      "note": "The date must be a real calendar date in the years 2000 to 2099."
+    },
+    "BR-FR-03_BT-74": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/delivery/period/end_date",
+          "role": "target"
+        }
+      ],
+      "note": "The date must be a real calendar date in the years 2000 to 2099."
+    },
+    "BR-FR-03_BT-134": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./period/start_date",
+          "role": "target"
+        }
+      ],
+      "note": "The date must be a real calendar date in the years 2000 to 2099."
+    },
+    "BR-FR-03_BT-135": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./period/end_date",
+          "role": "target"
+        }
+      ],
+      "note": "The date must be a real calendar date in the years 2000 to 2099."
+    },
+    "BR-FR-03_EXT-FR-FE-134": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./period/start_date",
+          "role": "target"
+        }
+      ],
+      "note": "The date must be a real calendar date in the years 2000 to 2099.",
+      "remark": "CII's ID for the line period start date (BT-134); the text cites BT-134."
+    },
+    "BR-FR-03_EXT-FR-FE-135": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./period/end_date",
+          "role": "target"
+        }
+      ],
+      "note": "The date must be a real calendar date in the years 2000 to 2099.",
+      "remark": "CII's ID for the line period end date (BT-135); the text cites BT-135."
+    },
+    "BR-FR-03_EXT-FR-FE-138": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "A line of this invoice refers to an earlier invoice (a French extension the editor can't show), and that invoice's issue date is not a valid date in the years 2000 to 2099. Ask the sender for a corrected invoice."
+    },
+    "BR-FR-03_EXT-FR-FE-158": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "A line of this invoice states its own delivery date (a French extension the editor can't show), and it is not a valid date in the years 2000 to 2099. Ask the sender for a corrected invoice."
+    },
+    "BR-FR-04_BT-3": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/invoice_type_code",
+          "role": "target"
+        }
+      ],
+      "note": "French e-invoicing allows only these document types: 380, 389, 393, 501, 386, 500, 384, 471, 472, 473, 261, 262, 381, 396, 502, 503."
+    },
+    "BR-FR-04_EXT-FR-FE-02": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "The invoice refers to an earlier invoice and gives that document's type with a code French e-invoicing doesn't allow (allowed: 380, 389, 393, 501, 386, 500, 384, 471, 472, 473, 261, 262, 381, 396, 502, 503). The editor doesn't show the referenced document's type; ask the sender for a corrected invoice."
+    },
+    "BR-FR-04_EXT-FR-FE-137": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "A line of this invoice refers to an earlier invoice (a French extension the editor can't show), and gives that document's type with a code French e-invoicing doesn't allow (allowed: 380, 389, 393, 501, 386, 500, 384, 471, 472, 473, 261, 262, 381, 396, 502, 503). Ask the sender for a corrected invoice."
+    },
+    "BR-FR-05_BT-22-1": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/notes/~?subject_code=PMT",
+          "role": "target"
+        }
+      ],
+      "note": "A French invoice must state the flat-rate fee for recovery costs (in France 40 euros), as a note with subject code PMT.",
+      "remark": "UBL looks for '#PMT#' in all notes joined by '#', i.e. a note starting with #PMT#, which the parser reads as subject code PMT."
+    },
+    "BR-FR-05_BT-22-2": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/notes/~?subject_code=PMD",
+          "role": "target"
+        }
+      ],
+      "note": "A French invoice must state the late-payment penalties, as a note with subject code PMD.",
+      "remark": "UBL looks for '#PMD#' in all notes joined by '#', i.e. a note starting with #PMD#, which the parser reads as subject code PMD."
+    },
+    "BR-FR-05_BT-22-3": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/notes/~?subject_code=AAB",
+          "role": "target"
+        }
+      ],
+      "note": "A French invoice must state the early-payment discount, or that there is none, as a note with subject code AAB.",
+      "remark": "UBL looks for '#AAB#' in all notes joined by '#', i.e. a note starting with #AAB#, which the parser reads as subject code AAB."
+    },
+    "BR-FR-05_BT-22_AAB": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/notes/~?subject_code=AAB",
+          "role": "target"
+        }
+      ],
+      "note": "A French invoice must state the early-payment discount, or that there is none, as a note with subject code AAB."
+    },
+    "BR-FR-05_BT-22_PMD": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/notes/~?subject_code=PMD",
+          "role": "target"
+        }
+      ],
+      "note": "A French invoice must state the late-payment penalties, as a note with subject code PMD."
+    },
+    "BR-FR-05_BT-22_PMT": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/notes/~?subject_code=PMT",
+          "role": "target"
+        }
+      ],
+      "note": "A French invoice must state the flat-rate fee for recovery costs (in France 40 euros), as a note with subject code PMT."
+    },
+    "BR-FR-06_BT-21-1": {
+      "kind": "forbidden",
+      "fields": [
+        {
+          "path": "/notes/~?subject_code=PMT",
+          "role": "target"
+        }
+      ],
+      "note": "Only one note may have the subject code PMT; merge the notes or remove the extra ones.",
+      "remark": "UBL counts '#PMT#' in all notes joined by '#', so it also counts the marker inside a note's text; the filter marks only the notes with that subject code."
+    },
+    "BR-FR-06_BT-21-2": {
+      "kind": "forbidden",
+      "fields": [
+        {
+          "path": "/notes/~?subject_code=PMD",
+          "role": "target"
+        }
+      ],
+      "note": "Only one note may have the subject code PMD; merge the notes or remove the extra ones.",
+      "remark": "UBL counts '#PMD#' in all notes joined by '#', so it also counts the marker inside a note's text; the filter marks only the notes with that subject code."
+    },
+    "BR-FR-06_BT-21-3": {
+      "kind": "forbidden",
+      "fields": [
+        {
+          "path": "/notes/~?subject_code=AAB",
+          "role": "target"
+        }
+      ],
+      "note": "Only one note may have the subject code AAB; merge the notes or remove the extra ones.",
+      "remark": "UBL counts '#AAB#' in all notes joined by '#', so it also counts the marker inside a note's text; the filter marks only the notes with that subject code."
+    },
+    "BR-FR-06_BT-21-4": {
+      "kind": "forbidden",
+      "fields": [
+        {
+          "path": "/notes/~?subject_code=TXD",
+          "role": "target"
+        }
+      ],
+      "note": "Only one note may have the subject code TXD; merge the notes or remove the extra ones.",
+      "remark": "UBL counts '#TXD#' in all notes joined by '#', so it also counts the marker inside a note's text; the filter marks only the notes with that subject code."
+    },
+    "BR-FR-06_BT-21_AAB": {
+      "kind": "forbidden",
+      "fields": [
+        {
+          "path": "/notes/~?subject_code=AAB",
+          "role": "target"
+        }
+      ],
+      "note": "Only one note may have the subject code AAB; merge the notes or remove the extra ones."
+    },
+    "BR-FR-06_BT-21_PMD": {
+      "kind": "forbidden",
+      "fields": [
+        {
+          "path": "/notes/~?subject_code=PMD",
+          "role": "target"
+        }
+      ],
+      "note": "Only one note may have the subject code PMD; merge the notes or remove the extra ones."
+    },
+    "BR-FR-06_BT-21_PMT": {
+      "kind": "forbidden",
+      "fields": [
+        {
+          "path": "/notes/~?subject_code=PMT",
+          "role": "target"
+        }
+      ],
+      "note": "Only one note may have the subject code PMT; merge the notes or remove the extra ones."
+    },
+    "BR-FR-06_BT-21_TXD": {
+      "kind": "forbidden",
+      "fields": [
+        {
+          "path": "/notes/~?subject_code=TXD",
+          "role": "target"
+        }
+      ],
+      "note": "Only one note may have the subject code TXD; merge the notes or remove the extra ones."
+    },
+    "BR-FR-08_BT-23": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/process_control/business_process_type",
+          "role": "target"
+        }
+      ],
+      "note": "French e-invoicing requires the billing framework code in the business process field: one of B1, S1, M1, B2, S2, M2, S3, B4, S4, M4, S5, S6, B7, S7, B8, S8, M8, B9, S9, M9.",
+      "remark": "Fires when the value is absent too."
+    },
+    "BR-FR-08_BT-151-2": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./vat/category_code",
+          "role": "target"
+        }
+      ],
+      "note": "The VAT categories L and M (Canary Islands, Ceuta and Melilla) don't apply in France.",
+      "remark": "Mislabelled ID: the text says BR-FR-15/BT-151 (the UBL twin of BR-FR-15_BT-95_BT-151_LM)."
+    },
+    "BR-FR-09_BT-29": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/seller/identifiers/~?scheme_id=0009/id",
+          "role": "operand"
+        },
+        {
+          "path": "/seller/legal_registration_id/id",
+          "role": "operand"
+        }
+      ],
+      "note": "A SIRET must be 14 digits and begin with the company's 9-digit SIREN. Check the seller's SIRET (identifier with scheme 0009) against its SIREN (legal registration number with scheme 0002).",
+      "remark": "Tests the first 0009 identifier against the 0002 legal ID; a SIRET alone (no SIREN) fails too, as the SIREN is then empty."
+    },
+    "BR-FR-09_BT-46": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/buyer/identifier/id",
+          "role": "operand"
+        },
+        {
+          "path": "/buyer/legal_registration_id/id",
+          "role": "operand"
+        }
+      ],
+      "note": "A SIRET must be 14 digits and begin with the company's 9-digit SIREN. Check the buyer's SIRET (identifier with scheme 0009) against its SIREN (legal registration number with scheme 0002).",
+      "remark": "The JSON holds only the buyer's first identifier; if the SIRET isn't the first, the operand marks another identifier."
+    },
+    "BR-FR-09_BT-60": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/payee/identifier/id",
+          "role": "operand"
+        },
+        {
+          "path": "/payee/legal_registration_id/id",
+          "role": "operand"
+        }
+      ],
+      "note": "A SIRET must be 14 digits and begin with the company's 9-digit SIREN. Check the payee's SIRET (identifier with scheme 0009) against its SIREN (legal registration number with scheme 0002).",
+      "remark": "Without a payee SIREN the test takes the SIRET's first 9 digits, so it then only checks the SIRET has 14 digits. The JSON holds only the payee's first identifier."
+    },
+    "BR-FR-09_BT-71": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/delivery/location_id/id",
+          "role": "target"
+        }
+      ],
+      "note": "A SIRET must be 14 digits and begin with the company's 9-digit SIREN. Check the delivery location's SIRET (identifier with scheme 0009).",
+      "remark": "The SIREN compared is the deliver-to party's legal ID (not in the JSON) or else the SIRET's own first 9 digits, so from the JSON's view it only checks the SIRET has 14 digits."
+    },
+    "BR-FR-09_EXT-FR-FE-06": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice names an agent acting for the buyer (a French extension the editor can't show), and its SIRET is not 14 digits beginning with its 9-digit SIREN. Ask the sender for a corrected invoice."
+    },
+    "BR-FR-09_EXT-FR-FE-46": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice names a payer for the direct debit (a French extension the editor can't show), and its SIRET is not 14 digits beginning with its 9-digit SIREN. Ask the sender for a corrected invoice."
+    },
+    "BR-FR-09_EXT-FR-FE-69": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice names an agent acting for the seller (a French extension the editor can't show), and its SIRET is not 14 digits beginning with its 9-digit SIREN. Ask the sender for a corrected invoice."
+    },
+    "BR-FR-09_EXT-FR-FE-92": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice names a party the invoice is addressed to on the buyer's behalf (a French extension the editor can't show), and its SIRET is not 14 digits beginning with its 9-digit SIREN. Ask the sender for a corrected invoice.",
+      "remark": "UBL: buyer's ServiceProviderParty; CII: InvoiceeTradeParty."
+    },
+    "BR-FR-09_EXT-FR-FE-115": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice names a party issuing the invoice on the seller's behalf (a French extension the editor can't show), and its SIRET is not 14 digits beginning with its 9-digit SIREN. Ask the sender for a corrected invoice.",
+      "remark": "UBL: seller's ServiceProviderParty; CII: InvoicerTradeParty."
+    },
+    "BR-FR-09_EXT-FR-FE-146": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "A line of this invoice names its own delivery location (a French extension the editor can't show), and that location's SIRET is not 14 digits beginning with its 9-digit SIREN. Ask the sender for a corrected invoice."
+    },
+    "BR-FR-10_BT-30": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/seller/legal_registration_id",
+          "role": "target"
+        }
+      ],
+      "note": "A French invoice needs the seller's SIREN: its 9-digit company number, as the legal registration number with scheme 0002.",
+      "remark": "Fires when absent too, or when the legal ID has another scheme. UBL fires on PartyLegalEntity (only where one exists), CII on the root."
+    },
+    "BR-FR-11_BT-47": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/buyer/legal_registration_id",
+          "role": "target"
+        },
+        {
+          "path": "/notes/~?subject_code=BAR/text",
+          "role": "condition"
+        }
+      ],
+      "note": "The invoice is marked as business-to-business (a note with subject code BAR saying B2B), so it needs the buyer's SIREN: its 9-digit company number, as the legal registration number with scheme 0002.",
+      "remark": "Fires when absent too. UBL requires schemeID 0002; CII's test takes only BAR's first value and also needs the 0002 scheme."
+    },
+    "BR-FR-12_BT-49": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/buyer/electronic_address",
+          "role": "target"
+        }
+      ],
+      "note": "French e-invoicing requires the buyer's electronic address, where the invoice is delivered."
+    },
+    "BR-FR-13_BT-34": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/seller/electronic_address",
+          "role": "target"
+        }
+      ],
+      "note": "French e-invoicing requires the seller's electronic address."
+    },
+    "BR-FR-15_BT-95_BT-102": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/document_allowances/~./vat_category_code",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/document_charges/~./vat_category_code",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "note": "This VAT category isn't used in France. Use one of S, E, AE, K, G, O, Z.",
+      "remark": "CII also fires when the category is absent."
+    },
+    "BR-FR-15_BT-95_BT-102-1": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/document_allowances/~./vat_category_code",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/document_charges/~./vat_category_code",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "note": "This VAT category isn't used in France. Use one of S, E, AE, K, G, O, Z."
+    },
+    "BR-FR-15_BT-95_BT-102-2": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/document_allowances/~./vat_category_code",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/document_charges/~./vat_category_code",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "note": "The VAT categories L and M (Canary Islands, Ceuta and Melilla) don't apply in France."
+    },
+    "BR-FR-15_BT-95_BT-102_LM": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/document_allowances/~./vat_category_code",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/document_charges/~./vat_category_code",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "note": "The VAT categories L and M (Canary Islands, Ceuta and Melilla) don't apply in France."
+    },
+    "BR-FR-15_BT-95_BT-118": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./category_code",
+          "role": "target"
+        }
+      ],
+      "note": "This VAT category isn't used in France. Use one of S, E, AE, K, G, O, Z.",
+      "remark": "CII ID cites BT-95 but tests the VAT breakdown (BT-118). Fires when the category is absent too."
+    },
+    "BR-FR-15_BT-95_BT-118_LM": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./category_code",
+          "role": "target"
+        }
+      ],
+      "note": "The VAT categories L and M (Canary Islands, Ceuta and Melilla) don't apply in France."
+    },
+    "BR-FR-15_BT-95_BT-151": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./vat/category_code",
+          "role": "target"
+        }
+      ],
+      "note": "This VAT category isn't used in France. Use one of S, E, AE, K, G, O, Z.",
+      "remark": "CII ID cites BT-95 but tests the line's category (BT-151). An absent category passes only on lines whose status is GROUP or INFORMATION, which the JSON doesn't hold."
+    },
+    "BR-FR-15_BT-95_BT-151_LM": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./vat/category_code",
+          "role": "target"
+        }
+      ],
+      "note": "The VAT categories L and M (Canary Islands, Ceuta and Melilla) don't apply in France."
+    },
+    "BR-FR-15_BT-118-1": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./category_code",
+          "role": "target"
+        }
+      ],
+      "note": "This VAT category isn't used in France. Use one of S, E, AE, K, G, O, Z."
+    },
+    "BR-FR-15_BT-118-2": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./category_code",
+          "role": "target"
+        }
+      ],
+      "note": "The VAT categories L and M (Canary Islands, Ceuta and Melilla) don't apply in France."
+    },
+    "BR-FR-15_BT-151-1": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./vat/category_code",
+          "role": "target"
+        }
+      ],
+      "note": "This VAT category isn't used in France. Use one of S, E, AE, K, G, O, Z."
+    },
+    "BR-FR-16_BT-96": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/document_allowances/~./vat_rate",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/document_charges/~./vat_rate",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "note": "This VAT rate isn't one French VAT knows. Write it as a plain number without % and with at most two decimals: 20, 10, 5.5, 2.1 or 0, or a rate for Corsica or the overseas departments (such as 8.5, 13, 1.75, 1.05, 0.9).",
+      "remark": "UBL BR-FR-16_BT-96 and _BT-103 have the same context (cac:AllowanceCharge/cac:TaxCategory) and test, so both map to allowances and charges. They sit in one pattern, where _BT-96 has the higher priority: it takes every allowance and charge, and _BT-103 never fires."
+    },
+    "BR-FR-16_BT-96_BT-103": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/document_allowances/~./vat_rate",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/document_charges/~./vat_rate",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "note": "This VAT rate isn't one French VAT knows. Write it as a plain number without % and with at most two decimals: 20, 10, 5.5, 2.1 or 0, or a rate for Corsica or the overseas departments (such as 8.5, 13, 1.75, 1.05, 0.9)."
+    },
+    "BR-FR-16_BT-103": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/document_allowances/~./vat_rate",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/document_charges/~./vat_rate",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "note": "This VAT rate isn't one French VAT knows. Write it as a plain number without % and with at most two decimals: 20, 10, 5.5, 2.1 or 0, or a rate for Corsica or the overseas departments (such as 8.5, 13, 1.75, 1.05, 0.9).",
+      "remark": "UBL BR-FR-16_BT-96 and _BT-103 have the same context (cac:AllowanceCharge/cac:TaxCategory) and test, so both map to allowances and charges. They sit in one pattern, where _BT-96 has the higher priority: it takes every allowance and charge, and _BT-103 never fires."
+    },
+    "BR-FR-16_BT-119": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./rate",
+          "role": "target"
+        }
+      ],
+      "note": "This VAT rate isn't one French VAT knows. Write it as a plain number without % and with at most two decimals: 20, 10, 5.5, 2.1 or 0, or a rate for Corsica or the overseas departments (such as 8.5, 13, 1.75, 1.05, 0.9)."
+    },
+    "BR-FR-16_BT-152": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./vat/rate",
+          "role": "target"
+        }
+      ],
+      "note": "This VAT rate isn't one French VAT knows. Write it as a plain number without % and with at most two decimals: 20, 10, 5.5, 2.1 or 0, or a rate for Corsica or the overseas departments (such as 8.5, 13, 1.75, 1.05, 0.9)."
+    },
+    "BR-FR-17_BT-123": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/supporting_documents/~./description",
+          "role": "target"
+        }
+      ],
+      "note": "In French e-invoicing a supporting document's description is a code saying what it is: RIB, LISIBLE, FEUILLE_DE_STYLE, PJA, BORDEREAU_SUIVI, DOCUMENT_ANNEXE, BON_LIVRAISON, BON_COMMANDE, BORDEREAU_SUIVI_VALIDATION, ETAT_ACOMPTE, FACTURE_PAIEMENT_DIRECT or RECAPITULATIF_COTRAITANCE.",
+      "remark": "UBL fires on every AdditionalDocumentReference, CII only on TypeCode 916 (supporting documents). In UBL that includes the invoiced-object reference (type 130), whose description the JSON doesn't hold; the anchored targets then mark the object identifier.",
+      "syntax": {
+        "ubl": {
+          "fields": [
+            {
+              "path": "/supporting_documents/~./description",
+              "role": "target",
+              "anchored": true
+            },
+            {
+              "path": "/object_identifier",
+              "role": "target",
+              "anchored": true
+            }
+          ]
+        }
+      }
+    },
+    "BR-FR-18_BT-123": {
+      "kind": "forbidden",
+      "fields": [
+        {
+          "path": "/supporting_documents/~?description=LISIBLE",
+          "role": "target"
+        }
+      ],
+      "note": "Only one supporting document may be described as LISIBLE (the readable copy of the invoice); remove or re-describe the others."
+    },
+    "BR-FR-20_BT-21": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/notes/~?subject_code=BAR/text",
+          "role": "target"
+        }
+      ],
+      "note": "A note with subject code BAR must say one of B2B, B2BINT, B2C, B2CINT, OUTOFSCOPE, ARCHIVEONLY.",
+      "remark": "UBL fires on the root and tests the first BAR note only. CII fires on each BAR note.",
+      "syntax": {
+        "cii": {
+          "fields": [
+            {
+              "path": "/notes/~./text",
+              "role": "target"
+            }
+          ]
+        }
+      }
+    },
+    "BR-FR-21_BT-49": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/buyer/electronic_address/id",
+          "role": "target"
+        },
+        {
+          "path": "/buyer/electronic_address/scheme_id",
+          "role": "target"
+        },
+        {
+          "path": "/buyer/legal_registration_id/id",
+          "role": "operand"
+        },
+        {
+          "path": "/notes/~?subject_code=BAR/text",
+          "role": "condition"
+        },
+        {
+          "path": "/invoice_type_code",
+          "role": "condition"
+        }
+      ],
+      "note": "The invoice is marked as business-to-business (a note with subject code BAR saying B2B) and isn't self-billed, so it must be addressed to the buyer's French e-invoicing address: one that starts with the buyer's SIREN and uses scheme 0225.",
+      "remark": "CII's SIREN is the buyer's legal ID of any scheme; UBL's the 0002 one."
+    },
+    "BR-FR-22_BT-34": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/seller/electronic_address/id",
+          "role": "target"
+        },
+        {
+          "path": "/seller/electronic_address/scheme_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller/legal_registration_id/id",
+          "role": "operand"
+        },
+        {
+          "path": "/notes/~?subject_code=BAR/text",
+          "role": "condition"
+        },
+        {
+          "path": "/invoice_type_code",
+          "role": "condition"
+        }
+      ],
+      "note": "The invoice is self-billed and marked as business-to-business (a note with subject code BAR saying B2B), so it must carry the seller's French e-invoicing address: one that starts with the seller's SIREN and uses scheme 0225.",
+      "remark": "Self-billing types: 389, 501, 500, 471, 473, 261, 502. CII's SIREN is the seller's legal ID of any scheme; UBL's the 0002 one."
+    },
+    "BR-FR-23_BT-34": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/seller/electronic_address/id",
+          "role": "target"
+        },
+        {
+          "path": "/seller/electronic_address/scheme_id",
+          "role": "condition"
+        }
+      ],
+      "note": "An electronic address with scheme 0225 may contain only letters, digits and the characters - _ . (no spaces)."
+    },
+    "BR-FR-23_BT-49": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/buyer/electronic_address/id",
+          "role": "target"
+        },
+        {
+          "path": "/buyer/electronic_address/scheme_id",
+          "role": "condition"
+        }
+      ],
+      "note": "An electronic address with scheme 0225 may contain only letters, digits and the characters - _ . (no spaces)."
+    },
+    "BR-FR-23_EXT-FR-FE-12": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice names an agent acting for the buyer (a French extension the editor can't show), and its electronic address with scheme 0225 contains characters other than letters, digits and - _ . Ask the sender for a corrected invoice."
+    },
+    "BR-FR-23_EXT-FR-FE-29": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice names a payee with an electronic address (a French extension the editor can't show), and its electronic address with scheme 0225 contains characters other than letters, digits and - _ . Ask the sender for a corrected invoice.",
+      "remark": "The payee is in the JSON, but not its electronic address."
+    },
+    "BR-FR-23_EXT-FR-FE-52": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice names a payer for the direct debit (a French extension the editor can't show), and its electronic address with scheme 0225 contains characters other than letters, digits and - _ . Ask the sender for a corrected invoice."
+    },
+    "BR-FR-23_EXT-FR-FE-75": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice names an agent acting for the seller (a French extension the editor can't show), and its electronic address with scheme 0225 contains characters other than letters, digits and - _ . Ask the sender for a corrected invoice."
+    },
+    "BR-FR-23_EXT-FR-FE-98": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice names a party the invoice is addressed to on the buyer's behalf (a French extension the editor can't show), and its electronic address with scheme 0225 contains characters other than letters, digits and - _ . Ask the sender for a corrected invoice."
+    },
+    "BR-FR-23_EXT-FR-FE-121": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice names a party issuing the invoice on the seller's behalf (a French extension the editor can't show), and its electronic address with scheme 0225 contains characters other than letters, digits and - _ . Ask the sender for a corrected invoice."
+    },
+    "BR-FR-24_BT-29": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/seller/identifiers/~./id",
+          "role": "target"
+        },
+        {
+          "path": "/seller/identifiers/~./scheme_id",
+          "role": "condition"
+        }
+      ],
+      "note": "A private identifier (scheme 0224) may contain only letters, digits and the characters - _ . (no spaces)."
+    },
+    "BR-FR-24_BT-46": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/buyer/identifier/id",
+          "role": "target"
+        },
+        {
+          "path": "/buyer/identifier/scheme_id",
+          "role": "condition"
+        }
+      ],
+      "note": "A private identifier (scheme 0224) may contain only letters, digits and the characters - _ . (no spaces).",
+      "remark": "The JSON holds only the buyer's first identifier; a 0224 identifier in second place isn't in it."
+    },
+    "BR-FR-25_BT-34": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/seller/electronic_address/id",
+          "role": "target"
+        }
+      ],
+      "note": "An electronic address can be at most 125 characters long."
+    },
+    "BR-FR-25_BT-49": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/buyer/electronic_address/id",
+          "role": "target"
+        }
+      ],
+      "note": "An electronic address can be at most 125 characters long."
+    },
+    "BR-FR-25_EXT-FR-FE-12": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice names an agent acting for the buyer (a French extension the editor can't show), and its electronic address is longer than 125 characters. Ask the sender for a corrected invoice."
+    },
+    "BR-FR-25_EXT-FR-FE-29": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice names a payee with an electronic address (a French extension the editor can't show), and its electronic address is longer than 125 characters. Ask the sender for a corrected invoice.",
+      "remark": "The payee is in the JSON, but not its electronic address."
+    },
+    "BR-FR-25_EXT-FR-FE-52": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice names a payer for the direct debit (a French extension the editor can't show), and its electronic address is longer than 125 characters. Ask the sender for a corrected invoice."
+    },
+    "BR-FR-25_EXT-FR-FE-75": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice names an agent acting for the seller (a French extension the editor can't show), and its electronic address is longer than 125 characters. Ask the sender for a corrected invoice."
+    },
+    "BR-FR-25_EXT-FR-FE-98": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice names a party the invoice is addressed to on the buyer's behalf (a French extension the editor can't show), and its electronic address is longer than 125 characters. Ask the sender for a corrected invoice."
+    },
+    "BR-FR-25_EXT-FR-FE-121": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice names a party issuing the invoice on the seller's behalf (a French extension the editor can't show), and its electronic address is longer than 125 characters. Ask the sender for a corrected invoice."
+    },
+    "BR-FR-26_BT-29": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/seller/identifiers/~./id",
+          "role": "target"
+        },
+        {
+          "path": "/seller/identifiers/~./scheme_id",
+          "role": "condition"
+        }
+      ],
+      "note": "A private identifier (scheme 0224) can be at most 100 characters long."
+    },
+    "BR-FR-26_BT-46": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/buyer/identifier/id",
+          "role": "target"
+        },
+        {
+          "path": "/buyer/identifier/scheme_id",
+          "role": "condition"
+        }
+      ],
+      "note": "A private identifier (scheme 0224) can be at most 100 characters long.",
+      "remark": "The JSON holds only the buyer's first identifier; a 0224 identifier in second place isn't in it."
+    },
+    "BR-FR-27_BG-32": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/lines/~./item/attributes/~./name",
+          "role": "target"
+        }
+      ],
+      "note": "Each item attribute needs a name (or, in French e-invoicing, an attribute code).",
+      "remark": "The attribute code (EXT-FR-FE-159) isn't in the JSON, so the name is the only target. UBL's context ubl:Invoice/cac:Item/… can't match (Item sits inside the line), so only CII fires."
+    },
+    "BR-FR-27_BT-160": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/lines/~./item/attributes/~./name",
+          "role": "target"
+        }
+      ],
+      "note": "An item attribute has an empty name. Give it a name, or ask the sender to.",
+      "generator": "The schema requires a non-empty attribute name, and the generator skips empty values.",
+      "remark": "UBL's context ubl:Invoice/cac:Item/… can't match (Item sits inside the line), so only CII fires."
+    },
+    "BR-FR-27_EXT-FR-FE-159": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "An item attribute carries an empty attribute code (a French extension the editor can't show). Ask the sender for a corrected invoice.",
+      "remark": "UBL's context ubl:Invoice/cac:Item/… can't match (Item sits inside the line), so only CII fires."
+    },
+    "BR-FR-28-Value": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/lines/~./item/attributes/~./value",
+          "role": "target"
+        }
+      ],
+      "note": "An item attribute must have exactly one value: either a plain value or a quantity with a unit, not both and not neither. The editor holds only plain values, so a quantity value isn't shown; check it against the sender's PDF.",
+      "generator": "The JSON holds only a plain value (BT-161), which the schema requires, so the generator always writes exactly one Value."
+    },
+    "BR-FR-29_AFL": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/object_identifier/id",
+          "role": "target"
+        }
+      ],
+      "note": "An invoiced-object identifier of type AFL is empty. Fill it in, or ask the sender to.",
+      "generator": "The generator skips empty values.",
+      "remark": "Fires on any header document reference whose ID scheme (UBL) or reference type (CII) is AFL, usually the invoiced-object identifier, which keeps its anchor though the empty ID leaves it out of the JSON. On another kind of reference (a supporting document) the empty ID makes the parser drop the document, so the finding lands on the root and marks the (absent) object identifier instead; the note carries the message. (Not reported by check_anchors: no corpus document trips it; seen on a probe document.)"
+    },
+    "BR-FR-29_AVV": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/object_identifier/id",
+          "role": "target"
+        }
+      ],
+      "note": "An invoiced-object identifier of type AVV is empty. Fill it in, or ask the sender to.",
+      "generator": "The generator skips empty values.",
+      "remark": "Fires on any header document reference whose ID scheme (UBL) or reference type (CII) is AVV, usually the invoiced-object identifier, which keeps its anchor though the empty ID leaves it out of the JSON. On another kind of reference (a supporting document) the empty ID makes the parser drop the document, so the finding lands on the root and marks the (absent) object identifier instead; the note carries the message. (Not reported by check_anchors: no corpus document trips it; seen on a probe document.)"
+    },
+    "BR-FR-29_BT-18": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/object_identifier",
+          "role": "target"
+        }
+      ],
+      "note": "The invoice gives more than one invoiced-object identifier of type AFL, or of type AVV; each may appear only once. The editor shows only one invoiced-object identifier; ask the sender for a corrected invoice.",
+      "generator": "The JSON holds one invoiced-object identifier.",
+      "remark": "UBL tests within one AdditionalDocumentReference, which holds one ID, so it can't fail. CII counts the header's AdditionalReferencedDocuments by ReferenceTypeCode, whatever their TypeCode."
+    },
+    "BR-FR-30_AFL": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/lines/~./object_identifier/id",
+          "role": "target"
+        }
+      ],
+      "note": "A line's invoiced-object identifier of type AFL is empty. Fill it in, or ask the sender to.",
+      "generator": "The generator skips empty values.",
+      "remark": "UBL fires on any line DocumentReference with that scheme; the JSON reads only type 130 as the line's object identifier. CII's context IncludedSupplyChainTradeLineItem/AdditionalReferencedDocument can't match (the reference sits in SpecifiedLineTradeSettlement), so only UBL fires."
+    },
+    "BR-FR-30_AVV": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/lines/~./object_identifier/id",
+          "role": "target"
+        }
+      ],
+      "note": "A line's invoiced-object identifier of type AVV is empty. Fill it in, or ask the sender to.",
+      "generator": "The generator skips empty values.",
+      "remark": "UBL fires on any line DocumentReference with that scheme; the JSON reads only type 130 as the line's object identifier. CII's context IncludedSupplyChainTradeLineItem/AdditionalReferencedDocument can't match (the reference sits in SpecifiedLineTradeSettlement), so only UBL fires."
+    },
+    "BR-FR-30_BT-21": {
+      "kind": "forbidden",
+      "fields": [
+        {
+          "path": "/notes/~?subject_code=BAR",
+          "role": "target"
+        }
+      ],
+      "note": "Only one note with subject code BAR may give a treatment (B2B, B2BINT, B2C, B2CINT, OUTOFSCOPE or ARCHIVEONLY); remove the extra ones.",
+      "remark": "UBL only; the text says BR-FR-31 (the CII twin is BR-FR-31_BT-21)."
+    },
+    "BR-FR-30_BT-128": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/lines/~./object_identifier",
+          "role": "target"
+        }
+      ],
+      "note": "A line gives more than one invoiced-object identifier of type AFL, or of type AVV; each may appear only once. The editor shows one per line; ask the sender for a corrected invoice.",
+      "generator": "The JSON holds one invoiced-object identifier per line.",
+      "remark": "UBL tests within one DocumentReference, which holds one ID, so it can't fail; CII counts the line item's direct children, where the references never are. Neither syntax can fire as written."
+    },
+    "BR-FR-31_BT-21": {
+      "kind": "forbidden",
+      "fields": [
+        {
+          "path": "/notes/~?subject_code=BAR",
+          "role": "target"
+        }
+      ],
+      "note": "Only one note with subject code BAR may give a treatment (B2B, B2BINT, B2C, B2CINT, OUTOFSCOPE or ARCHIVEONLY); remove the extra ones."
+    },
+    "BR-FR-32-GLOBALID": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/seller/identifiers/~./id",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/buyer/identifier/id",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/payee/identifier/id",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/delivery/location_id/id",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/lines/~./item/standard_id/id",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "note": "An identifier with scheme 0002 (SIREN) or 0231 must be exactly 9 digits.",
+      "remark": "CII only. Matches every GlobalID: parties, the deliver-to location and items' standard identifiers. The JSON holds only the buyer's, payee's and delivery location's first identifier; a later one anchors at its party and marks the first. Agents and service providers nested in the buyer's or seller's party anchor at that party, so its own field is marked; parties the JSON doesn't hold at all (CII agents, invoicer, invoicee, payer) land on the root, where no anchored target applies."
+    },
+    "BR-FR-32-ID": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/seller/identifiers/~./id",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/buyer/identifier/id",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/payee/identifier/id",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/delivery",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "note": "An identifier with scheme 0002 (SIREN) or 0231 must be exactly 9 digits.",
+      "remark": "The text mentions only 0002; the test also covers 0231. UBL only (CII: BR-FR-32-GLOBALID). The JSON holds only the buyer's and payee's first identifier; a later one anchors at the party and marks the first. The deliver-to party's identifiers aren't in the JSON; its finding marks the delivery block. Agents and service providers nested in the buyer's or seller's party anchor at that party, so its own field is marked; parties the JSON doesn't hold at all (CII agents, invoicer, invoicee, payer) land on the root, where no anchored target applies."
+    },
+    "BR-FR-32-LEGALID": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/seller/legal_registration_id/id",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/buyer/legal_registration_id/id",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/payee/legal_registration_id/id",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/delivery",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "note": "A legal registration number with scheme 0002 is a SIREN and must be exactly 9 digits.",
+      "remark": "Fires on every party's legal ID with scheme 0002. The deliver-to party's legal ID isn't in the JSON; its finding marks the delivery block. Agents and service providers nested in the buyer's or seller's party anchor at that party, so its own field is marked; parties the JSON doesn't hold at all (CII agents, invoicer, invoicee, payer) land on the root, where no anchored target applies."
+    },
+    "BR-FR-BD-02_BT-30": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice uses the French two-way billing framework, where one group of lines is sold by the seller and another by the buyer. The editor can't show line groups or their sellers, so the error can't be pointed at a field; exactly one of the two top-level group lines has to be sold by the invoice's seller (same legal registration number). Ask the sender for a corrected invoice.",
+      "remark": "Tests line subtypes (EXT-FR-FE-163 GROUP/DETAIL), parent lines (EXT-FR-FE-162) and line-level parties/references the simplified JSON has no fields for. UBL only (the CII twin is BR-FR-BD-02_BT-31)."
+    },
+    "BR-FR-BD-02_BT-31": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice uses the French two-way billing framework, where one group of lines is sold by the seller and another by the buyer. The editor can't show line groups or their sellers, so the error can't be pointed at a field; exactly one of the two top-level group lines has to be sold by the invoice's seller (same legal registration number). Ask the sender for a corrected invoice.",
+      "remark": "Tests line subtypes (EXT-FR-FE-163 GROUP/DETAIL), parent lines (EXT-FR-FE-162) and line-level parties/references the simplified JSON has no fields for. CII only; its ID names BT-31 but it compares the seller's legal registration ID (BT-30), as the UBL twin BR-FR-BD-02_BT-30 does."
+    },
+    "BR-FR-BD-02_BT-47": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice uses the French two-way billing framework, where one group of lines is sold by the seller and another by the buyer. The editor can't show line groups or their sellers, so the error can't be pointed at a field; exactly one of the two top-level group lines has to be sold by the invoice's buyer (same legal registration number). Ask the sender for a corrected invoice.",
+      "remark": "Tests line subtypes (EXT-FR-FE-163 GROUP/DETAIL), parent lines (EXT-FR-FE-162) and line-level parties/references the simplified JSON has no fields for."
+    },
+    "BR-FR-BD-02_EXT-FR-FE-163": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice uses the French two-way billing framework, where one group of lines is sold by the seller and another by the buyer. The editor can't show line groups or their sellers, so the error can't be pointed at a field; the invoice needs exactly two top-level group lines. Ask the sender for a corrected invoice.",
+      "remark": "Tests line subtypes (EXT-FR-FE-163 GROUP/DETAIL), parent lines (EXT-FR-FE-162) and line-level parties/references the simplified JSON has no fields for."
+    },
+    "BR-FR-BD-13_BT-3": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/invoice_type_code",
+          "role": "operand"
+        },
+        {
+          "path": "/process_control/business_process_type",
+          "role": "operand"
+        }
+      ],
+      "note": "In the French two-way billing framework the invoice has to be a self-billed type. Either the invoice type or the billing framework is wrong.",
+      "remark": "CII only (the UBL twin is BR-FR-MV-BD_BT-3)."
+    },
+    "BR-FR-BD-14-EXT-FR-FE-136": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice uses the French two-way billing framework, where one group of lines is sold by the seller and another by the buyer. The editor can't show line groups or their sellers, so the error can't be pointed at a field; in a self-billed corrective invoice or credit note, every top-level group line has to reference the earlier invoice it corrects. Ask the sender for a corrected invoice.",
+      "remark": "Tests line subtypes (EXT-FR-FE-163 GROUP/DETAIL), parent lines (EXT-FR-FE-162) and line-level parties/references the simplified JSON has no fields for."
+    },
+    "BR-FR-BD-14-EXT-FR-FE-138": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice uses the French two-way billing framework, where one group of lines is sold by the seller and another by the buyer. The editor can't show line groups or their sellers, so the error can't be pointed at a field; in a self-billed corrective invoice or credit note, every top-level group line has to give the date of the earlier invoice it corrects. Ask the sender for a corrected invoice.",
+      "remark": "Tests line subtypes (EXT-FR-FE-163 GROUP/DETAIL), parent lines (EXT-FR-FE-162) and line-level parties/references the simplified JSON has no fields for."
+    },
+    "BR-FR-CO-03_BT-3": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/contract_reference",
+          "role": "target"
+        },
+        {
+          "path": "/delivery/period/start_date",
+          "role": "target"
+        },
+        {
+          "path": "/delivery/period/end_date",
+          "role": "target"
+        },
+        {
+          "path": "/invoice_type_code",
+          "role": "condition"
+        }
+      ],
+      "note": "A global discount credit note has to name the contract the discount comes from and the invoicing period it covers, with both a start and an end date.",
+      "remark": "UBL's context is cn:CreditNote only, so a UBL Invoice with type 262 never fires."
+    },
+    "BR-FR-CO-04_BT-3": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/preceding_invoices",
+          "role": "target"
+        },
+        {
+          "path": "/invoice_type_code",
+          "role": "condition"
+        }
+      ],
+      "note": "A corrective invoice has to reference exactly one earlier invoice, the one it corrects: none and two are both errors.",
+      "remark": "UBL only (the CII twin is BR-FR-CO-04_BT-4). Counts cac:BillingReference elements of any kind; the text's 'with its date' (BT-26) is not tested."
+    },
+    "BR-FR-CO-04_BT-4": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/preceding_invoices",
+          "role": "target"
+        },
+        {
+          "path": "/invoice_type_code",
+          "role": "condition"
+        }
+      ],
+      "note": "A corrective invoice has to reference exactly one earlier invoice, the one it corrects: none and two are both errors.",
+      "remark": "CII only (the UBL twin is BR-FR-CO-04_BT-3); its ID names BT-4 but it tests BT-3 and counts InvoiceReferencedDocument. The text's 'with its date' (BT-26) is not tested."
+    },
+    "BR-FR-CO-05_BT-3": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/preceding_invoices",
+          "role": "target"
+        },
+        {
+          "path": "/invoice_type_code",
+          "role": "condition"
+        }
+      ],
+      "note": "A credit note has to reference the invoice it credits, with that invoice's number and date. Alternatively every line can carry its own reference, but the editor can't show line-level references.",
+      "remark": "Passes with one header reference that has both ID and date, or with a dated invoice reference on every line (EXT-FR-FE-136/138, no field; UBL: lines whose BillingReference is another invoice; CII: lines without subtype or with subtype DETAIL). UBL's context is cn:CreditNote only."
+    },
+    "BR-FR-CO-07_BT-9": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/due_date",
+          "role": "operand"
+        },
+        {
+          "path": "/issue_date",
+          "role": "operand"
+        }
+      ],
+      "note": "The payment due date lies before the invoice date. That is only allowed for advance payment invoices and for invoices that are already paid.",
+      "remark": "The type code (386/500/503) and BT-23 (B2/S2/M2) are exemptions, not conditions, so they are not mapped. UBL also reads PaymentMeans/PaymentDueDate on an Invoice, which the JSON keeps only for a CreditNote."
+    },
+    "BR-FR-CO-08_BT-23": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/process_control/business_process_type",
+          "role": "operand"
+        },
+        {
+          "path": "/invoice_type_code",
+          "role": "operand"
+        }
+      ],
+      "note": "The billing framework says this is a final invoice after advance payments, but the invoice type is an advance payment invoice or credit note. One of the two is wrong."
+    },
+    "BR-FR-CO-09_BT-23-1": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/totals/prepaid_amount",
+          "role": "operand"
+        },
+        {
+          "path": "/totals/tax_inclusive_amount",
+          "role": "operand"
+        },
+        {
+          "path": "/process_control/business_process_type",
+          "role": "condition"
+        }
+      ],
+      "note": "The billing framework says this invoice is already paid, so the amount already paid has to equal the total with VAT. If the invoice isn't fully paid, the billing framework is wrong."
+    },
+    "BR-FR-CO-09_BT-23-2": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/totals/amount_due",
+          "role": "target"
+        },
+        {
+          "path": "/process_control/business_process_type",
+          "role": "condition"
+        }
+      ],
+      "note": "The billing framework says this invoice is already paid, so the amount due has to be zero. If something is still to be paid, the billing framework is wrong."
+    },
+    "BR-FR-CO-09_BT-23-3": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/due_date",
+          "role": "target"
+        },
+        {
+          "path": "/process_control/business_process_type",
+          "role": "condition"
+        }
+      ],
+      "note": "The billing framework says this invoice is already paid; the due date then states the date it was paid."
+    },
+    "BR-FR-CO-10_BT-29-1": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/seller/identifiers/~?!scheme_id/scheme_id",
+          "role": "target"
+        }
+      ],
+      "note": "Every seller identifier needs its scheme, the code saying what kind of identifier it is.",
+      "remark": "Fires on the seller, not on one identifier; ~?! marks the scheme of exactly the identifiers that have none."
+    },
+    "BR-FR-CO-10_BT-29-2": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/seller/identifiers/~*/scheme_id",
+          "role": "target"
+        }
+      ],
+      "note": "Two of the seller's identifiers use the same scheme; each scheme may appear only once.",
+      "remark": "Fires on the seller; every identifier's scheme is marked."
+    },
+    "BR-FR-CO-10_BT-46-1": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/buyer/identifier/scheme_id",
+          "role": "target"
+        }
+      ],
+      "note": "The buyer's identifier needs its scheme, the code saying what kind of identifier it is.",
+      "remark": "The JSON holds one identifier; a second one without a scheme in the XML has no field of its own."
+    },
+    "BR-FR-CO-10_BT-46-2": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/buyer/identifier/scheme_id",
+          "role": "target"
+        }
+      ],
+      "note": "The invoice gives the buyer's several identifiers with the same scheme; each scheme may appear only once. The editor holds one identifier, so only the first is shown.",
+      "generator": "The generator writes at most one identifier here."
+    },
+    "BR-FR-CO-10_BT-60-1": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/payee/identifier/scheme_id",
+          "role": "target"
+        }
+      ],
+      "note": "The payee's identifier needs its scheme, the code saying what kind of identifier it is.",
+      "remark": "The JSON holds one identifier; a second one without a scheme in the XML has no field of its own."
+    },
+    "BR-FR-CO-10_BT-60-2": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/payee/identifier/scheme_id",
+          "role": "target"
+        }
+      ],
+      "note": "The invoice gives the payee's several identifiers with the same scheme; each scheme may appear only once. The editor holds one identifier, so only the first is shown.",
+      "generator": "The generator writes at most one identifier here."
+    },
+    "BR-FR-CO-10_BT-71-1": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/delivery/location_id/scheme_id",
+          "role": "target"
+        }
+      ],
+      "note": "The delivery location's identifier needs its scheme, the code saying what kind of identifier it is.",
+      "remark": "The JSON holds one identifier; a second one without a scheme in the XML has no field of its own."
+    },
+    "BR-FR-CO-10_BT-71-2": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/delivery/location_id/scheme_id",
+          "role": "target"
+        }
+      ],
+      "note": "The invoice gives the delivery location's several identifiers with the same scheme; each scheme may appear only once. The editor holds one identifier, so only the first is shown.",
+      "generator": "The generator writes at most one identifier here."
+    },
+    "BR-FR-CO-10_EXT-FR-FE-06-1": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "The invoice gives the buyer's agent an identifier without a scheme, the code saying what kind of identifier it is. The editor can't show the buyer's agent; ask the sender for a corrected invoice."
+    },
+    "BR-FR-CO-10_EXT-FR-FE-06-2": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "The invoice gives the buyer's agent several identifiers with the same scheme; each scheme may appear only once. The editor can't show the buyer's agent; ask the sender for a corrected invoice."
+    },
+    "BR-FR-CO-10_EXT-FR-FE-46-1": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "The invoice gives the payer an identifier without a scheme, the code saying what kind of identifier it is. The editor can't show the payer; ask the sender for a corrected invoice."
+    },
+    "BR-FR-CO-10_EXT-FR-FE-46-2": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "The invoice gives the payer several identifiers with the same scheme; each scheme may appear only once. The editor can't show the payer; ask the sender for a corrected invoice."
+    },
+    "BR-FR-CO-10_EXT-FR-FE-69-1": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "The invoice gives the seller's agent an identifier without a scheme, the code saying what kind of identifier it is. The editor can't show the seller's agent; ask the sender for a corrected invoice."
+    },
+    "BR-FR-CO-10_EXT-FR-FE-69-2": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "The invoice gives the seller's agent several identifiers with the same scheme; each scheme may appear only once. The editor can't show the seller's agent; ask the sender for a corrected invoice."
+    },
+    "BR-FR-CO-10_EXT-FR-FE-92-1": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "The invoice gives the invoicee (the party invoiced on the buyer's behalf) an identifier without a scheme, the code saying what kind of identifier it is. The editor can't show the invoicee; ask the sender for a corrected invoice."
+    },
+    "BR-FR-CO-10_EXT-FR-FE-92-2": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "The invoice gives the invoicee (the party invoiced on the buyer's behalf) several identifiers with the same scheme; each scheme may appear only once. The editor can't show the invoicee; ask the sender for a corrected invoice."
+    },
+    "BR-FR-CO-10_EXT-FR-FE-115-1": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "The invoice gives the invoicer (the party invoicing on the seller's behalf) an identifier without a scheme, the code saying what kind of identifier it is. The editor can't show the invoicer; ask the sender for a corrected invoice."
+    },
+    "BR-FR-CO-10_EXT-FR-FE-115-2": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "The invoice gives the invoicer (the party invoicing on the seller's behalf) several identifiers with the same scheme; each scheme may appear only once. The editor can't show the invoicer; ask the sender for a corrected invoice."
+    },
+    "BR-FR-CO-10_EXT-FR-FE-146-1": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "The invoice gives the delivery location of a line an identifier without a scheme, the code saying what kind of identifier it is. The editor can't show the delivery location of a line; ask the sender for a corrected invoice."
+    },
+    "BR-FR-CO-10_EXT-FR-FE-146-2": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "The invoice gives the delivery location of a line several identifiers with the same scheme; each scheme may appear only once. The editor can't show the delivery location of a line; ask the sender for a corrected invoice."
+    },
+    "BR-FR-CO-12_BT-5": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/vat_accounting_currency_code",
+          "role": "target"
+        },
+        {
+          "path": "/tax_amount_accounting_currency",
+          "role": "target"
+        },
+        {
+          "path": "/currency_code",
+          "role": "condition"
+        }
+      ],
+      "note": "The invoice isn't in euros, so it has to state euros as the VAT accounting currency and give the VAT total in euros as well.",
+      "remark": "Also fires when the accounting currency is present but not EUR. Paths as the CEN table (BR-53)."
+    },
+    "BR-FR-CO-14_BT-29-1": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/notes/~?subject_code=TXD/text",
+          "role": "target"
+        },
+        {
+          "path": "/seller/identifiers/~?scheme_id=0231/scheme_id",
+          "role": "condition"
+        }
+      ],
+      "note": "The seller is identified as a member of a VAT group (scheme 0231), so the invoice needs a note with subject code TXD and exactly the text MEMBRE_ASSUJETTI_UNIQUE.",
+      "remark": "UBL reads the first #TXD# note's value from the notes joined with '#'; CII looks for any note with that code and text."
+    },
+    "BR-FR-CO-15_BT-29-1": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller/identifiers/~?scheme_id=0231/scheme_id",
+          "role": "condition"
+        }
+      ],
+      "note": "The seller is identified as a member of a VAT group (scheme 0231), so the invoice has to give the VAT group's VAT number as the seller's tax representative.",
+      "remark": "CII requires the representative's tax registration with schemeID VA."
+    },
+    "BR-FR-DEC-01_BT-92_BT-99": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/document_allowances/~./amount",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/document_charges/~./amount",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "note": "Amounts may have at most two decimals, written with a point, at most 19 digits and no sign other than a minus. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well.",
+      "remark": "Fires on document allowances and charges alike; each target is anchored to its own list."
+    },
+    "BR-FR-DEC-01_BT-93_BT-100": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/document_allowances/~./base_amount",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/document_charges/~./base_amount",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "note": "Amounts may have at most two decimals, written with a point, at most 19 digits and no sign other than a minus. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well.",
+      "remark": "Fires on the base amount of document allowances and charges alike (CII's text names only BT-93); each target is anchored to its own list."
+    },
+    "BR-FR-DEC-01_BT-106": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/totals/line_net_total",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals, written with a point, at most 19 digits and no sign other than a minus. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-FR-DEC-01_BT-107": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/totals/allowance_total",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals, written with a point, at most 19 digits and no sign other than a minus. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-FR-DEC-01_BT-108": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/totals/charge_total",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals, written with a point, at most 19 digits and no sign other than a minus. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-FR-DEC-01_BT-109": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/totals/tax_exclusive_amount",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals, written with a point, at most 19 digits and no sign other than a minus. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-FR-DEC-01_BT-110": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/totals/tax_amount",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/totals/tax_amount_accounting_currency",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "note": "Amounts may have at most two decimals, written with a point, at most 19 digits and no sign other than a minus. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well.",
+      "remark": "Its context also matches the VAT total in the accounting currency, so it fires on both totals; the anchored targets let the anchor pick the one it fired on. BR-FR-DEC-01_BT-111 has the same context in the same pattern at a lower priority, so it never fires and this rule covers BT-111 too. Line-level UBL TaxTotals (multi-vendor group lines) also match; none in the corpus."
+    },
+    "BR-FR-DEC-01_BT-111": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/totals/tax_amount",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/totals/tax_amount_accounting_currency",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "note": "Amounts may have at most two decimals, written with a point, at most 19 digits and no sign other than a minus. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well.",
+      "remark": "Dead rule, both syntaxes: same context as BR-FR-DEC-01_BT-110 in the same pattern at a lower priority, so the BT-110 template always wins and this one never fires (check_anchors lists it as unchecked). Mapped like BT-110 in case the XSL is fixed; /totals/tax_amount_accounting_currency, not /tax_amount_accounting_currency, because that is where the anchor points."
+    },
+    "BR-FR-DEC-01_BT-112": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/totals/tax_inclusive_amount",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals, written with a point, at most 19 digits and no sign other than a minus. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-FR-DEC-01_BT-113": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/totals/prepaid_amount",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals, written with a point, at most 19 digits and no sign other than a minus. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-FR-DEC-01_BT-114": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/totals/rounding_amount",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals, written with a point, at most 19 digits and no sign other than a minus. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-FR-DEC-01_BT-115": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/totals/amount_due",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals, written with a point, at most 19 digits and no sign other than a minus. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-FR-DEC-01_BT-116": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./taxable_amount",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals, written with a point, at most 19 digits and no sign other than a minus. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-FR-DEC-01_BT-117": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./tax_amount",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals, written with a point, at most 19 digits and no sign other than a minus. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-FR-DEC-01_BT-131": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./net_amount",
+          "role": "target"
+        }
+      ],
+      "note": "Amounts may have at most two decimals, written with a point, at most 19 digits and no sign other than a minus. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well."
+    },
+    "BR-FR-DEC-01_BT-136_BT-141": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./allowances/~./amount",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/lines/~./charges/~./amount",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "note": "Amounts may have at most two decimals, written with a point, at most 19 digits and no sign other than a minus. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well.",
+      "remark": "Fires on line allowances and charges alike (CII's text names only BT-136); each target is anchored to its own list."
+    },
+    "BR-FR-DEC-01_BT-137_BT-142": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./allowances/~./base_amount",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/lines/~./charges/~./base_amount",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "note": "Amounts may have at most two decimals, written with a point, at most 19 digits and no sign other than a minus. Round this one to the cent; if the invoice's other amounts were computed from it, check those as well.",
+      "remark": "Fires on line allowances and charges alike (CII's text names only BT-137); each target is anchored to its own list."
+    },
+    "BR-FR-DEC-02_BT-129": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./quantity",
+          "role": "target"
+        }
+      ],
+      "note": "Quantities may have at most four decimals, written with a point, at most 19 digits and no sign other than a minus."
+    },
+    "BR-FR-DEC-02_BT-149": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./price/base_quantity",
+          "role": "target"
+        }
+      ],
+      "note": "Quantities may have at most four decimals, written with a point, at most 19 digits and no sign other than a minus.",
+      "remark": "UBL fires on the line (base quantity present), CII on the base quantity itself."
+    },
+    "BR-FR-DEC-03_BT-146": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./price/net_price",
+          "role": "target"
+        }
+      ],
+      "note": "Prices may have at most six decimals, written with a point, and at most 19 digits. They can't be negative, except in the French two-way billing framework.",
+      "remark": "UBL fires on the line. Negative values pass only when BT-23 is S9/B9/M9 (custom:isSpecialContractBD), an exemption, so BT-23 is not mapped."
+    },
+    "BR-FR-DEC-03_BT-147": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./price/discount",
+          "role": "target"
+        }
+      ],
+      "note": "Prices may have at most six decimals, written with a point, and at most 19 digits. They can't be negative, except in the French two-way billing framework.",
+      "remark": "UBL fires on the price's AllowanceCharge. Negative values pass only when BT-23 is S9/B9/M9, an exemption, so BT-23 is not mapped."
+    },
+    "BR-FR-DEC-03_BT-148": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./price/gross_price",
+          "role": "target"
+        }
+      ],
+      "note": "Prices may have at most six decimals, written with a point, and at most 19 digits. They can't be negative, except in the French two-way billing framework.",
+      "remark": "Negative values pass only when BT-23 is S9/B9/M9, an exemption, so BT-23 is not mapped."
+    },
+    "BR-FR-DEC-04_BT-96_BT-103": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/document_allowances/~./vat_rate",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/document_charges/~./vat_rate",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "note": "VAT rates may have at most two decimals, written with a point, at most four digits in all, and no sign.",
+      "remark": "Fires on document allowances and charges alike; each target is anchored to its own list. 'Positive' in the text means unsigned: 0 passes."
+    },
+    "BR-FR-DEC-04_BT-119": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./rate",
+          "role": "target"
+        }
+      ],
+      "note": "VAT rates may have at most two decimals, written with a point, at most four digits in all, and no sign.",
+      "remark": "'Positive' in the text means unsigned: 0 passes."
+    },
+    "BR-FR-DEC-04_BT-152": {
+      "kind": "invalid",
+      "fields": [
+        {
+          "path": "/lines/~./vat/rate",
+          "role": "target"
+        }
+      ],
+      "note": "VAT rates may have at most two decimals, written with a point, at most four digits in all, and no sign.",
+      "remark": "'Positive' in the text means unsigned: 0 passes."
+    },
+    "BR-FR-MV-01_EXT-FR-FE-163": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice uses one of the French multi-vendor or two-way billing frameworks, where groups of lines are sub-invoices of different sellers. The editor can't show line groups, their sellers or their sub-invoice references, so the error can't be pointed at a field; every line has to state its subtype (group, detail or information). Ask the sender for a corrected invoice.",
+      "remark": "Tests line subtypes (EXT-FR-FE-163 GROUP/DETAIL), parent lines (EXT-FR-FE-162) and line-level parties/references the simplified JSON has no fields for."
+    },
+    "BR-FR-MV-02_EXT-FR-FE-163": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice uses the French multi-vendor billing framework, where groups of lines are sub-invoices of different sellers. The editor can't show line groups, their sellers or their sub-invoice references, so the error can't be pointed at a field; the invoice needs at least one top-level group line. Ask the sender for a corrected invoice.",
+      "remark": "Tests line subtypes (EXT-FR-FE-163 GROUP/DETAIL), parent lines (EXT-FR-FE-162) and line-level parties/references the simplified JSON has no fields for."
+    },
+    "BR-FR-MV-03_BT-128_AFL": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice uses one of the French multi-vendor or two-way billing frameworks, where groups of lines are sub-invoices of different sellers. The editor can't show line groups, their sellers or their sub-invoice references, so the error can't be pointed at a field; a top-level group line is missing its sub-invoice number (an object reference with scheme AFL). Ask the sender for a corrected invoice.",
+      "remark": "Tests line subtypes (EXT-FR-FE-163 GROUP/DETAIL), parent lines (EXT-FR-FE-162) and line-level parties/references the simplified JSON has no fields for. The JSON's line object_identifier holds only the line's first object reference, and a group line carries two (AFL and AVV), so it is not mapped there."
+    },
+    "BR-FR-MV-03_BT-128_AVV": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice uses one of the French multi-vendor or two-way billing frameworks, where groups of lines are sub-invoices of different sellers. The editor can't show line groups, their sellers or their sub-invoice references, so the error can't be pointed at a field; a top-level group line is missing its sub-invoice's billing framework (an object reference with scheme AVV), or states a multi-vendor framework there. Ask the sender for a corrected invoice.",
+      "remark": "Tests line subtypes (EXT-FR-FE-163 GROUP/DETAIL), parent lines (EXT-FR-FE-162) and line-level parties/references the simplified JSON has no fields for. The JSON's line object_identifier holds only the line's first object reference, and a group line carries two (AFL and AVV), so it is not mapped there. Text says 'different from S8, B8, M8 or S9, B9, M9'; the test only excludes M8/S8/B8."
+    },
+    "BR-FR-MV-03_EXT-FR-FE-164": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice uses one of the French multi-vendor or two-way billing frameworks, where groups of lines are sub-invoices of different sellers. The editor can't show line groups, their sellers or their sub-invoice references, so the error can't be pointed at a field; a top-level group line is missing its seller's name. Ask the sender for a corrected invoice.",
+      "remark": "Tests line subtypes (EXT-FR-FE-163 GROUP/DETAIL), parent lines (EXT-FR-FE-162) and line-level parties/references the simplified JSON has no fields for."
+    },
+    "BR-FR-MV-03_EXT-FR-FE-167": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice uses one of the French multi-vendor or two-way billing frameworks, where groups of lines are sub-invoices of different sellers. The editor can't show line groups, their sellers or their sub-invoice references, so the error can't be pointed at a field; a top-level group line is missing its seller's legal registration number. Ask the sender for a corrected invoice.",
+      "remark": "Tests line subtypes (EXT-FR-FE-163 GROUP/DETAIL), parent lines (EXT-FR-FE-162) and line-level parties/references the simplified JSON has no fields for."
+    },
+    "BR-FR-MV-03_EXT-FR-FE-177": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice uses one of the French multi-vendor or two-way billing frameworks, where groups of lines are sub-invoices of different sellers. The editor can't show line groups, their sellers or their sub-invoice references, so the error can't be pointed at a field; a top-level group line is missing its seller's country. Ask the sender for a corrected invoice.",
+      "remark": "Tests line subtypes (EXT-FR-FE-163 GROUP/DETAIL), parent lines (EXT-FR-FE-162) and line-level parties/references the simplified JSON has no fields for."
+    },
+    "BR-FR-MV-03_EXT-FR-FE-181": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice uses one of the French multi-vendor or two-way billing frameworks, where groups of lines are sub-invoices of different sellers. The editor can't show line groups, their sellers or their sub-invoice references, so the error can't be pointed at a field; a top-level group line is missing its VAT total in the invoice currency. Ask the sender for a corrected invoice.",
+      "remark": "Tests line subtypes (EXT-FR-FE-163 GROUP/DETAIL), parent lines (EXT-FR-FE-162) and line-level parties/references the simplified JSON has no fields for."
+    },
+    "BR-FR-MV-03_EXT-FR-FE-182": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice uses one of the French multi-vendor or two-way billing frameworks, where groups of lines are sub-invoices of different sellers. The editor can't show line groups, their sellers or their sub-invoice references, so the error can't be pointed at a field; a top-level group line is missing its VAT total in the VAT accounting currency. Ask the sender for a corrected invoice.",
+      "remark": "Tests line subtypes (EXT-FR-FE-163 GROUP/DETAIL), parent lines (EXT-FR-FE-162) and line-level parties/references the simplified JSON has no fields for."
+    },
+    "BR-FR-MV-05_EXT-FR-FE-BG-12": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice uses one of the French multi-vendor or two-way billing frameworks, where groups of lines are sub-invoices of different sellers. The editor can't show line groups, their sellers or their sub-invoice references, so the error can't be pointed at a field; a group line's net amount doesn't equal the sum of its sub-lines (allowing one cent per sub-line). Check the line amounts against the sender's PDF.",
+      "remark": "Tests line subtypes (EXT-FR-FE-163 GROUP/DETAIL), parent lines (EXT-FR-FE-162) and line-level parties/references the simplified JSON has no fields for."
+    },
+    "BR-FR-MV-06_EXT-FR-FE-167": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice uses one of the French multi-vendor or two-way billing frameworks, where groups of lines are sub-invoices of different sellers. The editor can't show line groups, their sellers or their sub-invoice references, so the error can't be pointed at a field; every line has to name its seller's legal registration number, the same as its parent line's. Ask the sender for a corrected invoice.",
+      "remark": "Tests line subtypes (EXT-FR-FE-163 GROUP/DETAIL), parent lines (EXT-FR-FE-162) and line-level parties/references the simplified JSON has no fields for."
+    },
+    "BR-FR-MV-07_BT-128": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice uses one of the French multi-vendor or two-way billing frameworks, where groups of lines are sub-invoices of different sellers. The editor can't show line groups, their sellers or their sub-invoice references, so the error can't be pointed at a field; every line has to carry its sub-invoice number (an object reference with scheme AFL), the same as its parent line's. Ask the sender for a corrected invoice.",
+      "remark": "Tests line subtypes (EXT-FR-FE-163 GROUP/DETAIL), parent lines (EXT-FR-FE-162) and line-level parties/references the simplified JSON has no fields for. The first half (an AFL reference on every line) could land on /lines/~./object_identifier, but that holds only the line's first object reference and has no parent link, so the rule is not mapped there."
+    },
+    "BR-FR-MV-08_BT-128": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice uses one of the French multi-vendor or two-way billing frameworks, where groups of lines are sub-invoices of different sellers. The editor can't show line groups, their sellers or their sub-invoice references, so the error can't be pointed at a field; each detail line's VAT exemption reason has to start with its sub-invoice number between # signs. Ask the sender for a corrected invoice.",
+      "remark": "Tests line subtypes (EXT-FR-FE-163 GROUP/DETAIL), parent lines (EXT-FR-FE-162) and line-level parties/references the simplified JSON has no fields for. Also a line-level VAT exemption reason, which the JSON's line VAT has no field for. CII's text names only S8/B8/M8; the test also covers S9/B9/M9."
+    },
+    "BR-FR-MV-09_EXT-FR-FE-181": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice uses one of the French multi-vendor or two-way billing frameworks, where groups of lines are sub-invoices of different sellers. The editor can't show line groups, their sellers or their sub-invoice references, so the error can't be pointed at a field; a group line's VAT total doesn't equal the sum of the VAT breakdown entries marked with its sub-invoice number. Check the VAT amounts against the sender's PDF.",
+      "remark": "Tests line subtypes (EXT-FR-FE-163 GROUP/DETAIL), parent lines (EXT-FR-FE-162) and line-level parties/references the simplified JSON has no fields for."
+    },
+    "BR-FR-MV-10_EXT-FR-FE-184": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice uses one of the French multi-vendor or two-way billing frameworks, where groups of lines are sub-invoices of different sellers. The editor can't show line groups, their sellers or their sub-invoice references, so the error can't be pointed at a field; a group line's total with VAT doesn't equal its net amount plus its VAT (allowing one cent per sub-line). Check the line amounts against the sender's PDF.",
+      "remark": "Tests line subtypes (EXT-FR-FE-163 GROUP/DETAIL), parent lines (EXT-FR-FE-162) and line-level parties/references the simplified JSON has no fields for."
+    },
+    "BR-FR-MV-11_BT-128": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice uses one of the French multi-vendor or two-way billing frameworks, where groups of lines are sub-invoices of different sellers. The editor can't show line groups, their sellers or their sub-invoice references, so the error can't be pointed at a field; the sub-invoice numbers of the main seller's group lines don't fit the invoice number: a single group of the main seller has to carry the invoice's own number, several groups each their own. Ask the sender for a corrected invoice.",
+      "remark": "Tests line subtypes (EXT-FR-FE-163 GROUP/DETAIL), parent lines (EXT-FR-FE-162) and line-level parties/references the simplified JSON has no fields for. Test and text are hard to reconcile: the test passes when the seller has exactly one matching sub-invoice, and otherwise compares the line's AFL number with BT-1."
+    },
+    "BR-FR-MV-12_BT-128": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice uses one of the French multi-vendor or two-way billing frameworks, where groups of lines are sub-invoices of different sellers. The editor can't show line groups, their sellers or their sub-invoice references, so the error can't be pointed at a field; two top-level group lines carry the same sub-invoice number; each has to be unique. Ask the sender for a corrected invoice.",
+      "remark": "Tests line subtypes (EXT-FR-FE-163 GROUP/DETAIL), parent lines (EXT-FR-FE-162) and line-level parties/references the simplified JSON has no fields for. The test compares against every preceding AFL reference in the document, not only those of group lines."
+    },
+    "BR-FR-MV-13_BT-3": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/invoice_type_code",
+          "role": "operand"
+        },
+        {
+          "path": "/process_control/business_process_type",
+          "role": "operand"
+        }
+      ],
+      "note": "In the French multi-vendor billing framework the invoice can't be a self-billed type. Either the invoice type or the billing framework is wrong."
+    },
+    "BR-FR-MV-14-EXT-FR-FE-136": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice uses the French multi-vendor billing framework, where groups of lines are sub-invoices of different sellers. The editor can't show line groups, their sellers or their sub-invoice references, so the error can't be pointed at a field; in a corrective invoice or credit note, every top-level group line has to reference the earlier invoice it corrects. Ask the sender for a corrected invoice.",
+      "remark": "Tests line subtypes (EXT-FR-FE-163 GROUP/DETAIL), parent lines (EXT-FR-FE-162) and line-level parties/references the simplified JSON has no fields for."
+    },
+    "BR-FR-MV-14-EXT-FR-FE-138": {
+      "kind": "unrepresentable",
+      "fields": [],
+      "note": "This invoice uses the French multi-vendor billing framework, where groups of lines are sub-invoices of different sellers. The editor can't show line groups, their sellers or their sub-invoice references, so the error can't be pointed at a field; in a corrective invoice or credit note, every top-level group line has to give the date of the earlier invoice it corrects. Ask the sender for a corrected invoice.",
+      "remark": "Tests line subtypes (EXT-FR-FE-163 GROUP/DETAIL), parent lines (EXT-FR-FE-162) and line-level parties/references the simplified JSON has no fields for."
+    },
+    "BR-FR-MV-BD_BT-3": {
+      "kind": "inconsistent",
+      "fields": [
+        {
+          "path": "/invoice_type_code",
+          "role": "operand"
+        },
+        {
+          "path": "/process_control/business_process_type",
+          "role": "operand"
+        }
+      ],
+      "note": "In the French two-way billing framework the invoice has to be a self-billed type. Either the invoice type or the billing framework is wrong.",
+      "remark": "UBL only (its text calls it BR-FR-BD-13; the CII twin is BR-FR-BD-13_BT-3)."
+    }
+  }
+}

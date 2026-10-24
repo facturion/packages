@@ -1,0 +1,548 @@
+{
+  "_meta": {
+    "status": "DRAFT — AI-drafted from the rule's context, test and official text; not yet human-reviewed",
+    "source": "standards/xrechnung/resources/xrechnung/3.0.2/xsl/XRechnung-{UBL,CII}-validation.xsl",
+    "drafted": "2026-10-22",
+    "kinds": {
+      "missing": "every target must be present and is absent",
+      "missing-any": "at least one of the targets must be present; none is. When the targets carry a `group`, at least one per group must be present (\"the seller's VAT ID or tax number, and the buyer's VAT ID\"); a field result keeps its group",
+      "invalid": "the target is present but its value is wrong (format, code list, checksum)",
+      "forbidden": "the target is present but not allowed in this combination",
+      "inconsistent": "the fields disagree. In a calculation the result is the target (it is what the rule checks, and recomputing it always satisfies the rule) and the inputs are operands; in a comparison with no derived side (dates, codes that must match), every field is an operand",
+      "structural": "the XML breaks a rule the simplified JSON cannot express (a duplicated, empty or malformed element). Any sender's invoice can trip it; our own generator never should, so `generator` says why and a hit on a document we generated is a bug. Fields point at the nearest data",
+      "unrepresentable": "concerns XRechnung-extension structures the simplified JSON has no fields for; the note has to carry the whole message"
+    },
+    "anchored": "a field with \"anchored\": true applies only on the anchor's branch: it keeps the matches the anchor is, lies inside, or contains (the document itself excepted); a containing anchor must supply every ~. index, or it would widen to every item. For a rule that fires on different kinds of object, each target names its own",
+    "roles": {
+      "target": "the field to fix",
+      "condition": "a field whose value made the rule apply",
+      "operand": "an input of a calculation, or one side of a comparison with no derived side"
+    },
+    "conventions": {
+      "no rule-set conditions": "BT-24 (and anything else that only selects which rule set runs, e.g. $isCVD) is never a condition: every rule in the set already presupposes it",
+      "narrowest field": "map the field the rule tests, not its group; the group is a path prefix any consumer can walk up to. Map a group only when its entries are what is tested (\"exactly one entry such that …\"), and then with a filter",
+      "schema, not generator": "fields name what the simplified-JSON schema can hold; what an editor shows of them is a UX question",
+      "anchor": "`anchor` accepts what check_anchors.py reports for the rule (a collision, an unbound ~., a relative path off the schema), and says why it does no harm",
+      "notes": "`note` is shown to the person checking the invoice, whoever sent it: plain words, no BT codes. `generator` says why our own generator can't (or rarely does) trip the rule; `remark` is for whoever maintains this table. Neither is shown"
+    },
+    "paths": {
+      "syntax": "JSON Pointer patterns (@facturion/pointer-patterns, SPEC.md): a JSON Pointer (RFC 6901) is a pattern matching itself",
+      "/a/b": "absolute path in the @facturion/invoice model (invoice-schema.json)",
+      "~.": "the list index of the finding's anchor at this position; no anchor there → every item",
+      "~*": "every item, regardless of the anchor",
+      "~?f=v": "the entries whose member f equals 'v'; none matching → the list itself, as the place to add one",
+      "~?f!=v": "the entries whose member f is a string other than 'v'; none matching → nothing",
+      "~?a~1b=v": "a nested member: the entries whose a/b equals 'v' (~1 separates the steps)",
+      "~?!f": "the entries without member f (missing or null; an empty string counts as present); none → nothing",
+      "unmatched filters": "only a target's unmatched ~?f=v means \"add one here\"; a condition's or operand's yields nothing",
+      "0/x": "relative to the finding's anchor (Relative JSON Pointer; 0 = the anchor itself)"
+    }
+  },
+  "rules": {
+    "BR-DE-1": {
+      "kind": "missing",
+      "fields": [{ "path": "/payment", "role": "target" }]
+    },
+    "BR-DE-2": {
+      "kind": "missing",
+      "fields": [{ "path": "/seller/contact", "role": "target" }]
+    },
+    "BR-DE-3": {
+      "kind": "missing",
+      "fields": [{ "path": "/seller/address/city", "role": "target" }]
+    },
+    "BR-DE-4": {
+      "kind": "missing",
+      "fields": [{ "path": "/seller/address/post_code", "role": "target" }]
+    },
+    "BR-DE-5": {
+      "kind": "missing",
+      "fields": [{ "path": "/seller/contact/name", "role": "target" }],
+      "note": "XRechnung requires a contact at the seller: a person's name or a department.",
+      "remark": "CII also accepts DepartmentName; the simplified JSON only has contact.name."
+    },
+    "BR-DE-6": {
+      "kind": "missing",
+      "fields": [{ "path": "/seller/contact/phone", "role": "target" }]
+    },
+    "BR-DE-7": {
+      "kind": "missing",
+      "fields": [{ "path": "/seller/contact/email", "role": "target" }]
+    },
+    "BR-DE-8": {
+      "kind": "missing",
+      "fields": [{ "path": "/buyer/address/city", "role": "target" }]
+    },
+    "BR-DE-9": {
+      "kind": "missing",
+      "fields": [{ "path": "/buyer/address/post_code", "role": "target" }]
+    },
+    "BR-DE-10": {
+      "kind": "missing",
+      "fields": [
+        { "path": "/delivery/address/city", "role": "target" },
+        { "path": "/delivery/address", "role": "condition" }
+      ]
+    },
+    "BR-DE-11": {
+      "kind": "missing",
+      "fields": [
+        { "path": "/delivery/address/post_code", "role": "target" },
+        { "path": "/delivery/address", "role": "condition" }
+      ]
+    },
+    "BR-DE-14": {
+      "kind": "missing",
+      "fields": [{ "path": "/vat_breakdown/~./rate", "role": "target" }],
+      "note": "Every VAT breakdown row has to state its rate, even when it is 0 %, as for exempt or reverse-charge amounts.",
+      "generator": "The generator always writes a Percent (rate or 0), so in practice this cannot fire from our JSON."
+    },
+    "BR-DE-15": {
+      "kind": "missing",
+      "fields": [{ "path": "/buyer_reference", "role": "target" }]
+    },
+    "BR-DE-16": {
+      "kind": "missing-any",
+      "fields": [
+        { "path": "/seller/vat_id", "role": "target" },
+        { "path": "/seller/tax_registration_id", "role": "target" },
+        { "path": "/seller_tax_representative", "role": "target" },
+        { "path": "/lines/~*/vat/category_code", "role": "condition" },
+        { "path": "/document_allowances/~*/vat_category_code", "role": "condition" },
+        { "path": "/document_charges/~*/vat_category_code", "role": "condition" }
+      ]
+    },
+    "BR-DE-17": {
+      "kind": "invalid",
+      "fields": [{ "path": "/invoice_type_code", "role": "target" }]
+    },
+    "BR-DE-18": {
+      "kind": "invalid",
+      "fields": [{ "path": "/payment_terms", "role": "target" }]
+    },
+    "BR-DE-19": {
+      "kind": "invalid",
+      "fields": [
+        { "path": "/payment/credit_transfers/~./account_id", "role": "target", "anchored": true },
+        { "path": "/payment/card", "role": "target", "anchored": true },
+        { "path": "/payment/means_code", "role": "condition" }
+      ],
+      "note": "The payment is a SEPA transfer, which needs a valid IBAN, and this account number isn't one. Only a warning, but a payment to it may fail: check it for typos, or for a national account number where the IBAN belongs. If the number shown is a valid IBAN, the invoice files it as another kind of account number (possible in CII only), and the sender has to correct that. If a card is marked instead, the invoice labels its card payment as a SEPA transfer, which it can't be: the sender has to correct the payment type.",
+      "remark": "The JSON has one means code for all means, so a card block carries the transfers' code 58 and the rule fires on it too; `anchored` keeps the transfer target off the card's finding and the card off a transfer's.",
+      "generator": "CII: the generator writes accounts shorter than 14 chars or not starting with two letters as ProprietaryID, so the IBAN check sees an empty IBANID."
+    },
+    "BR-DE-20": {
+      "kind": "invalid",
+      "fields": [
+        { "path": "/payment/direct_debit/debited_account_id", "role": "target" },
+        { "path": "/payment/means_code", "role": "condition" }
+      ]
+    },
+    "BR-DE-21": {
+      "kind": "invalid",
+      "fields": [{ "path": "/process_control/specification_id", "role": "target" }]
+    },
+    "BR-DE-22": {
+      "kind": "invalid",
+      "fields": [{ "path": "/supporting_documents/~*/attached_document/filename", "role": "target" }],
+      "note": "Two attached files have the same file name. XRechnung requires every attached file to have a name of its own; rename one of them.",
+      "remark": "Fires on the root, so it cannot say which documents collide; a UI could compute that from the data."
+    },
+    "BR-DE-23-a": {
+      "kind": "missing",
+      "fields": [
+        { "path": "/payment/credit_transfers", "role": "target" },
+        { "path": "/payment/means_code", "role": "condition" }
+      ]
+    },
+    "BR-DE-23-b": {
+      "kind": "forbidden",
+      "fields": [
+        { "path": "/payment/card", "role": "target" },
+        { "path": "/payment/direct_debit", "role": "target" },
+        { "path": "/payment/means_code", "role": "condition" }
+      ]
+    },
+    "BR-DE-24-a": {
+      "kind": "missing",
+      "fields": [
+        { "path": "/payment/card", "role": "target" },
+        { "path": "/payment/means_code", "role": "condition" }
+      ]
+    },
+    "BR-DE-24-b": {
+      "kind": "forbidden",
+      "fields": [
+        { "path": "/payment/credit_transfers", "role": "target" },
+        { "path": "/payment/direct_debit", "role": "target" },
+        { "path": "/payment/means_code", "role": "condition" }
+      ]
+    },
+    "BR-DE-25-a": {
+      "kind": "missing",
+      "fields": [
+        { "path": "/payment/direct_debit/mandate_reference", "role": "target" },
+        { "path": "/payment/means_code", "role": "condition" }
+      ],
+      "syntax": {
+        "cii": {
+          "kind": "missing-any",
+          "fields": [
+            { "path": "/payment/direct_debit/mandate_reference", "role": "target" },
+            { "path": "/payment/direct_debit/creditor_id", "role": "target" },
+            { "path": "/payment/direct_debit/debited_account_id", "role": "target" },
+            { "path": "/payment/means_code", "role": "condition" }
+          ]
+        }
+      },
+      "note": "The payment is marked as a SEPA direct debit, so the invoice has to carry the direct-debit details: the mandate reference and the account to be debited.",
+      "generator": "UBL tests for cac:PaymentMandate, which the generator only writes when mandate_reference is set; without it the whole direct debit (incl. debited account) is dropped from UBL."
+    },
+    "BR-DE-25-b": {
+      "kind": "forbidden",
+      "fields": [
+        { "path": "/payment/credit_transfers", "role": "target" },
+        { "path": "/payment/card", "role": "target" },
+        { "path": "/payment/means_code", "role": "condition" }
+      ]
+    },
+    "BR-DE-26": {
+      "kind": "missing",
+      "fields": [
+        { "path": "/preceding_invoices", "role": "target" },
+        { "path": "/invoice_type_code", "role": "condition" }
+      ]
+    },
+    "BR-DE-27": {
+      "kind": "invalid",
+      "fields": [{ "path": "/seller/contact/phone", "role": "target" }],
+      "note": "The phone number should contain at least three digits. Only a warning. If there is no phone number at all, this appears together with the missing-phone error, and adding one fixes both.",
+      "remark": "Fires when the phone is absent too (regex against the empty string), alongside BR-DE-6."
+    },
+    "BR-DE-28": {
+      "kind": "invalid",
+      "fields": [{ "path": "/seller/contact/email", "role": "target" }],
+      "note": "The e-mail address doesn't look valid: it needs exactly one @ with at least two characters on either side, and no dot right next to the @ or at either end. Only a warning. If there is no e-mail address at all, this appears together with the missing-e-mail error, and adding one fixes both.",
+      "remark": "Fires when the e-mail is absent too, alongside BR-DE-7."
+    },
+    "BR-DE-30": {
+      "kind": "missing",
+      "fields": [
+        { "path": "/payment/direct_debit/creditor_id", "role": "target" },
+        { "path": "/payment/direct_debit", "role": "condition" }
+      ],
+      "note": "A SEPA direct debit needs the creditor identifier of the seller (or of the payee, if someone else collects the payment).",
+      "remark": "UBL carries BT-90 as a SEPA-scheme PartyIdentification on the seller or payee, not inside PaymentMeans."
+    },
+    "BR-DE-31": {
+      "kind": "missing",
+      "fields": [
+        { "path": "/payment/direct_debit/debited_account_id", "role": "target" },
+        { "path": "/payment/direct_debit", "role": "condition" }
+      ]
+    },
+    "BR-DE-TMP-32": {
+      "kind": "missing-any",
+      "fields": [
+        { "path": "/delivery/date", "role": "target" },
+        { "path": "/delivery/period", "role": "target" },
+        { "path": "/lines/~?!period/period", "role": "target" }
+      ],
+      "note": "The invoice should say when the goods or services were supplied: a delivery date, an invoicing period, or a period on every line. A period on only some of the lines isn't enough."
+    },
+    "BR-DE-CVD-01": {
+      "kind": "missing",
+      "fields": [
+        { "path": "/contract_reference", "role": "target" }
+      ]
+    },
+    "BR-DE-CVD-02": {
+      "kind": "missing",
+      "fields": [
+        { "path": "/tender_or_lot_reference", "role": "target" }
+      ]
+    },
+    "BR-DE-CVD-03": {
+      "kind": "missing-any",
+      "fields": [
+        { "path": "/lines/~*/item/classifications/~?scheme_id=CVD", "role": "target" },
+        { "path": "/lines/~*/item/attributes/~?name=cva", "role": "target" }
+      ],
+      "note": "A clean-vehicle invoice needs at least one line that carries both the vehicle category classification and the 'cva' attribute. Having them on different lines isn't enough."
+    },
+    "BR-DE-CVD-04": {
+      "kind": "invalid",
+      "fields": [
+        { "path": "0/id", "role": "target" },
+        { "path": "0/scheme_id", "role": "condition" }
+      ]
+    },
+    "BR-DE-CVD-05": {
+      "kind": "invalid",
+      "fields": [
+        { "path": "0/value", "role": "target" },
+        { "path": "0/name", "role": "condition" }
+      ]
+    },
+    "BR-DE-CVD-06-a": {
+      "kind": "missing",
+      "fields": [
+        { "path": "/lines/~./item/attributes/~?name=cva", "role": "target" },
+        { "path": "/lines/~./item/classifications/~?scheme_id=CVD", "role": "condition" }
+      ],
+      "note": "A line with the vehicle category classification needs exactly one 'cva' attribute: none and two are both errors.",
+      "remark": "Requires exactly one 'cva' attribute, so it also fires on two; the filter then marks both."
+    },
+    "BR-DE-CVD-06-b": {
+      "kind": "missing",
+      "fields": [
+        { "path": "/lines/~./item/classifications/~?scheme_id=CVD", "role": "target" },
+        { "path": "/lines/~./item/attributes/~?name=cva", "role": "condition" }
+      ],
+      "note": "A line with the 'cva' attribute needs exactly one vehicle category classification: none and two are both errors.",
+      "remark": "Requires exactly one CVD classification, so it also fires on two; the filter then marks both."
+    },
+    "BR-TMP-CVD-01": {
+      "kind": "invalid",
+      "fields": [{ "path": "0/scheme_id", "role": "target" }]
+    },
+    "BR-TMP-2": {
+      "kind": "invalid",
+      "fields": [{ "path": "/supporting_documents/~./external_location", "role": "target" }]
+    },
+    "BR-TMP-3": {
+      "kind": "structural",
+      "fields": [
+        { "path": "/lines/~./price/base_quantity", "role": "target" },
+        { "path": "/lines/~./price/base_quantity_unit_code", "role": "target" },
+        { "path": "/lines/~./price/gross_price", "role": "condition" }
+      ],
+      "note": "The gross price and the net price of this line state different base quantities or units; XRechnung requires them to match. The editor holds one base quantity per line, so it can show only one of the two. Check the line's price with the sender.",
+      "generator": "CII only. The schema holds one base quantity (BT-149, a single element in EN 16931); CII writes it under both the gross and the net price, and the generator writes the same value to both. Gross price is a condition: without it CII has no second base quantity."
+    },
+    "BR-TMP-4": {
+      "kind": "structural",
+      "fields": [{ "path": "/supporting_documents/~./description", "role": "target" }],
+      "note": "This supporting document has more than one description; XRechnung allows one. Only a warning, but the editor shows just one of them.",
+      "generator": "CII only. The JSON has one description per document."
+    },
+    "BR-TMP-5": {
+      "kind": "structural",
+      "fields": [{ "path": "/supporting_documents/~./attached_document", "role": "target" }],
+      "note": "This supporting document carries more than one attached file; XRechnung allows one per document. Only a warning, but the editor shows just one of them.",
+      "generator": "CII only. The JSON has one attachment per document."
+    },
+    "BR-TMP-6": {
+      "kind": "structural",
+      "fields": [{ "path": "0", "role": "target" }],
+      "note": "A date is not written as year-month-day (YYYY-MM-DD). Only a warning, but the date may have been read wrongly: compare it with the sender's PDF or ask them.",
+      "generator": "UBL only. Fires on the date element itself; the JSON schema already enforces YYYY-MM-DD."
+    },
+    "BR-TMP-7": {
+      "kind": "structural",
+      "fields": [{ "path": "0", "role": "target" }],
+      "note": "A date is missing its format marker or is not written as YYYYMMDD. Only a warning, but the date may have been read wrongly: compare it with the sender's PDF or ask them.",
+      "generator": "CII only. The generator always writes format=\"102\"."
+    },
+    "BR-DEX-01": {
+      "kind": "invalid",
+      "fields": [{ "path": "/supporting_documents/~./attached_document/mime_code", "role": "target" }],
+      "note": "This attachment's file type isn't allowed. Besides the usual types (PDF, images, spreadsheets, CSV), the XRechnung extension also allows XML."
+    },
+    "BR-DEX-02": { "kind": "unrepresentable", "fields": [], "note": "This invoice uses sub-lines, an XRechnung extension that groups lines under a parent line. A line's amount should equal the sum of its sub-lines. The editor can't show sub-lines, so the error can't be pointed at a field; check the line amounts against the sender's PDF." },
+    "BR-DEX-03": { "kind": "unrepresentable", "fields": [], "note": "This invoice uses sub-lines, an XRechnung extension that groups lines under a parent line, and a sub-line is missing its VAT information. The editor can't show sub-lines, so the error can't be pointed at a field; ask the sender for a corrected invoice." },
+    "BR-DEX-04": {
+      "kind": "invalid",
+      "anchor": "The only place `0/scheme_id` can't resolve is the SEPA creditor ID (a plain string in the JSON), and the rule's test allows SEPA on the seller and payee, so it never fires there.",
+      "fields": [{ "path": "0/scheme_id", "role": "target" }],
+      "note": "The scheme code of this identifier isn't on the ISO 6523 list XRechnung allows (0088 for a GLN, for example). Check the code, or ask the sender for it."
+    },
+    "BR-DEX-05": {
+      "kind": "invalid",
+      "fields": [{ "path": "0/scheme_id", "role": "target" }],
+      "note": "The scheme code of this identifier isn't on the ISO 6523 list XRechnung allows (0088 for a GLN, for example). Check the code, or ask the sender for it."
+    },
+    "BR-DEX-06": {
+      "kind": "invalid",
+      "fields": [{ "path": "0/scheme_id", "role": "target" }],
+      "note": "The scheme code of this identifier isn't on the ISO 6523 list XRechnung allows (0088 for a GLN, for example). Check the code, or ask the sender for it."
+    },
+    "BR-DEX-07": {
+      "kind": "invalid",
+      "fields": [{ "path": "0/scheme_id", "role": "target" }],
+      "note": "The scheme code of this electronic address isn't on the list XRechnung allows (EM for an e-mail address, 0204 for a Leitweg-ID, for example). Check the code, or ask the sender for it."
+    },
+    "BR-DEX-08": {
+      "kind": "invalid",
+      "fields": [{ "path": "/delivery/location_id", "role": "target" }],
+      "note": "The scheme code of the delivery location's identifier isn't on the ISO 6523 list XRechnung allows (0088 for a GLN, for example). Check the code, or ask the sender for it."
+    },
+    "BR-DEX-09": { "kind": "unrepresentable", "fields": [], "note": "This invoice uses third-party payments, an XRechnung extension for amounts collected on someone else's behalf. The amount due doesn't add up once they are included. The editor can't show third-party payments; check the amount due against the sender's PDF." },
+    "BR-DEX-10": { "kind": "unrepresentable", "fields": [], "note": "This invoice uses third-party payments, an XRechnung extension for amounts collected on someone else's behalf, and one of them has no payment type. The editor can't show third-party payments; ask the sender for a corrected invoice." },
+    "BR-DEX-11": { "kind": "unrepresentable", "fields": [], "note": "This invoice uses third-party payments, an XRechnung extension for amounts collected on someone else's behalf, and one of them has no amount. The editor can't show third-party payments; ask the sender for a corrected invoice." },
+    "BR-DEX-12": { "kind": "unrepresentable", "fields": [], "note": "This invoice uses third-party payments, an XRechnung extension for amounts collected on someone else's behalf, and one of them has no description. The editor can't show third-party payments; ask the sender for a corrected invoice." },
+    "BR-DEX-13": { "kind": "unrepresentable", "fields": [], "note": "This invoice uses third-party payments, an XRechnung extension for amounts collected on someone else's behalf, and an amount has more than two decimal places. The editor can't show third-party payments; ask the sender for a corrected invoice." },
+    "BR-DEX-14": { "kind": "unrepresentable", "fields": [], "note": "This invoice uses third-party payments, an XRechnung extension for amounts collected on someone else's behalf, and an amount is in a different currency than the invoice. The editor can't show third-party payments; ask the sender for a corrected invoice." },
+    "BR-DEX-15": { "kind": "unrepresentable", "fields": [], "note": "This invoice seems to use sub-lines (lines grouped under a parent line). XRechnung doesn't support them in this format, and the editor can't show them. Only a warning, but check the line amounts against the sender's PDF." },
+    "PEPPOL-EN16931-R001": {
+      "kind": "missing",
+      "fields": [{ "path": "/process_control/business_process_type", "role": "target" }],
+      "note": "The invoice has to state the business process it belongs to; for PEPPOL billing that is urn:fdc:peppol.eu:2017:poacc:billing:01:1.0.",
+      "generator": "The XRechnung profiles default ProfileID, so only an explicitly empty override could trigger it."
+    },
+    "PEPPOL-EN16931-R005": {
+      "kind": "invalid",
+      "fields": [
+        { "path": "/vat_accounting_currency_code", "role": "target" },
+        { "path": "/currency_code", "role": "operand" }
+      ]
+    },
+    "PEPPOL-EN16931-R008": {
+      "kind": "structural",
+      "fields": [{ "path": "0", "role": "target" }],
+      "note": "The invoice contains a field with no value in it. That rarely changes what the invoice says, but it makes the invoice invalid; the sender's software should leave out fields it has nothing to put in.",
+      "generator": "The generator skips empty values; firing means a field slipped through as an empty string."
+    },
+    "PEPPOL-EN16931-R010": {
+      "kind": "missing",
+      "fields": [{ "path": "/buyer/electronic_address", "role": "target" }],
+      "note": "XRechnung requires the buyer's electronic address, where the invoice is delivered: for public buyers usually the Leitweg-ID, otherwise often an e-mail address.",
+      "remark": "No BT code in the text; matched by name (\"Buyer electronic address\" = BT-49)."
+    },
+    "PEPPOL-EN16931-R020": {
+      "kind": "missing",
+      "fields": [{ "path": "/seller/electronic_address", "role": "target" }],
+      "note": "XRechnung requires the seller's electronic address, where the buyer can reach the seller electronically, often an e-mail address.",
+      "remark": "No BT code in the text; matched by name (\"Seller electronic address\" = BT-34)."
+    },
+    "PEPPOL-EN16931-R040": {
+      "kind": "inconsistent",
+      "fields": [
+        { "path": "0/amount", "role": "target" },
+        { "path": "0/base_amount", "role": "operand" },
+        { "path": "0/percentage", "role": "operand" }
+      ]
+    },
+    "PEPPOL-EN16931-R041": {
+      "kind": "missing",
+      "fields": [
+        { "path": "0/base_amount", "role": "target" },
+        { "path": "0/percentage", "role": "condition" }
+      ]
+    },
+    "PEPPOL-EN16931-R042": {
+      "kind": "missing",
+      "fields": [
+        { "path": "0/percentage", "role": "target" },
+        { "path": "0/base_amount", "role": "condition" }
+      ]
+    },
+    "PEPPOL-EN16931-R043": {
+      "kind": "structural",
+      "fields": [{ "path": "0", "role": "target" }],
+      "note": "This allowance or charge doesn't say whether it reduces or increases the total. Ask the sender which one is meant before booking the invoice.",
+      "generator": "ChargeIndicator is derived from which list the entry sits in."
+    },
+    "PEPPOL-EN16931-R043-1": {
+      "kind": "structural",
+      "fields": [{ "path": "0", "role": "target" }],
+      "note": "This allowance or charge doesn't say whether it reduces or increases the total. Ask the sender which one is meant before booking the invoice.",
+      "generator": "CII document/line allowances and charges; ChargeIndicator is derived from which list the entry sits in."
+    },
+    "PEPPOL-EN16931-R043-2": {
+      "kind": "structural",
+      "fields": [{ "path": "0", "role": "target" }],
+      "note": "The price adjustment on this line doesn't say whether it is a discount or a surcharge. Ask the sender which one is meant before booking the invoice.",
+      "generator": "CII price-level allowance; the generator always writes false."
+    },
+    "PEPPOL-EN16931-R044": {
+      "kind": "structural",
+      "fields": [{ "path": "/lines/~./price/discount", "role": "target" }],
+      "note": "This line's price includes a surcharge. XRechnung allows only discounts on the price itself; a surcharge belongs on the line as a charge. The editor can't show a price surcharge, so the line's price may look different from the sender's PDF.",
+      "generator": "The JSON can only express a price-level allowance (discount), never a charge."
+    },
+    "PEPPOL-EN16931-R046": {
+      "kind": "inconsistent",
+      "fields": [
+        { "path": "/lines/~./price/net_price", "role": "target" },
+        { "path": "/lines/~./price/gross_price", "role": "operand" },
+        { "path": "/lines/~./price/discount", "role": "operand" }
+      ]
+    },
+    "PEPPOL-EN16931-R053": {
+      "kind": "structural",
+      "fields": [{ "path": "/vat_breakdown", "role": "target" }],
+      "note": "The invoice states its VAT total more than once. It's unclear which figure applies; ask the sender for a corrected invoice.",
+      "generator": "The generator writes exactly one TaxTotal with subtotals."
+    },
+    "PEPPOL-EN16931-R054": {
+      "kind": "missing",
+      "fields": [
+        { "path": "/tax_amount_accounting_currency", "role": "target" },
+        { "path": "/vat_accounting_currency_code", "role": "condition" }
+      ],
+      "note": "The invoice names a separate currency for VAT accounting, so it also has to state the VAT total in that currency.",
+      "generator": "The second TaxTotal (BT-111) is only written when the caller supplies it; BT-6 without BT-111 trips this."
+    },
+    "PEPPOL-EN16931-R055": {
+      "kind": "inconsistent",
+      "fields": [
+        { "path": "/tax_amount_accounting_currency", "role": "operand" },
+        { "path": "/totals/tax_amount", "role": "operand" }
+      ]
+    },
+    "PEPPOL-EN16931-R061": {
+      "kind": "missing",
+      "fields": [
+        { "path": "/payment/direct_debit/mandate_reference", "role": "target" },
+        { "path": "/payment/means_code", "role": "condition" }
+      ]
+    },
+    "PEPPOL-EN16931-R101": {
+      "kind": "structural",
+      "fields": [{ "path": "/lines/~./object_identifier", "role": "target" }],
+      "note": "This line refers to a document. XRechnung allows a line to reference only an identifier for the invoiced object, such as a meter or contract number; other line-level references aren't shown in the editor.",
+      "generator": "The generator only writes line document references with type 130."
+    },
+    "PEPPOL-EN16931-R110": {
+      "kind": "inconsistent",
+      "fields": [
+        { "path": "/lines/~./period/start_date", "role": "operand" },
+        { "path": "/delivery/period/start_date", "role": "operand" }
+      ]
+    },
+    "PEPPOL-EN16931-R111": {
+      "kind": "inconsistent",
+      "fields": [
+        { "path": "/lines/~./period/end_date", "role": "operand" },
+        { "path": "/delivery/period/end_date", "role": "operand" }
+      ]
+    },
+    "PEPPOL-EN16931-R120": {
+      "kind": "inconsistent",
+      "fields": [
+        { "path": "/lines/~./net_amount", "role": "target" },
+        { "path": "/lines/~./quantity", "role": "operand" },
+        { "path": "/lines/~./price/net_price", "role": "operand" },
+        { "path": "/lines/~./price/base_quantity", "role": "operand" },
+        { "path": "/lines/~./allowances", "role": "operand" },
+        { "path": "/lines/~./charges", "role": "operand" }
+      ],
+      "note": "The line's amount doesn't equal its quantity times its price, plus its charges and minus its discounts. Only a warning, and often a rounding difference, but check which figure is right.",
+      "generator": "The generator computes BT-131 itself, so this only fires through rounding in the inputs."
+    },
+    "PEPPOL-EN16931-R121": {
+      "kind": "invalid",
+      "anchor": "CII states the base quantity under both the gross and the net price; the JSON holds one, so both places are the same field.",
+      "fields": [{ "path": "/lines/~./price/base_quantity", "role": "target" }]
+    },
+    "PEPPOL-EN16931-R130": {
+      "kind": "inconsistent",
+      "anchor": "CII states the base quantity under both the gross and the net price; the JSON holds one, so both places are the same field.",
+      "fields": [
+        { "path": "/lines/~./price/base_quantity_unit_code", "role": "operand" },
+        { "path": "/lines/~./unit_code", "role": "operand" }
+      ]
+    }
+  }
+}
