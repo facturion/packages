@@ -43,7 +43,7 @@
   "scripts": {
     "generate": "node scripts/generate-styles.mjs",
     "build": "npm run generate && tsc -p tsconfig.json",
-    "prepare": "npm run build",
+    "prepare": "npm run generate",
     "pretest": "npm run generate",
     "test": "node --import tsx --test test/*.test.ts",
     "prepublishOnly": "npm test"
