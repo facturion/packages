@@ -54,7 +54,8 @@ export const invoiceSchema: Record<string, unknown> = {
     },
     "tax_amount_accounting_currency": {
       "$ref": "#/$defs/decimal",
-      "description": "BT-111 | Invoice total VAT amount in accounting currency | The invoice's total VAT converted into vat_accounting_currency_code at your exchange rate. Cannot be derived from the lines, so supply it yourself. Required together with vat_accounting_currency_code."
+      "description": "BT-111 | Invoice total VAT amount in accounting currency | The invoice's total VAT converted into vat_accounting_currency_code at your exchange rate. Cannot be derived from the lines, so supply it yourself. Required together with vat_accounting_currency_code.",
+      "writeOnly": true
     },
     "tax_point_date": {
       "type": "string",
@@ -115,7 +116,7 @@ export const invoiceSchema: Record<string, unknown> = {
         },
         "scheme_id": {
           "type": "string",
-          "description": "UNTDID 1153 scheme identifier"
+          "description": "BT-18-1 | Invoiced object identifier scheme identifier | UNTDID 1153 scheme identifier"
         }
       }
     },
@@ -220,7 +221,7 @@ export const invoiceSchema: Record<string, unknown> = {
               },
               "scheme_id": {
                 "type": "string",
-                "description": "ISO/IEC 6523 scheme identifier"
+                "description": "BT-29-1 | Seller identifier identification scheme identifier | ISO/IEC 6523 scheme identifier"
               }
             }
           }
@@ -238,7 +239,7 @@ export const invoiceSchema: Record<string, unknown> = {
             },
             "scheme_id": {
               "type": "string",
-              "description": "ISO/IEC 6523 scheme identifier"
+              "description": "BT-30-1 | Seller legal registration identifier identification scheme identifier | ISO/IEC 6523 scheme identifier"
             }
           }
         },
@@ -268,7 +269,7 @@ export const invoiceSchema: Record<string, unknown> = {
             },
             "scheme_id": {
               "type": "string",
-              "description": "Connecting Europe Facility scheme identifier"
+              "description": "BT-34-1 | Seller electronic address identification scheme identifier | Connecting Europe Facility scheme identifier"
             }
           }
         },
@@ -362,7 +363,7 @@ export const invoiceSchema: Record<string, unknown> = {
             },
             "scheme_id": {
               "type": "string",
-              "description": "ISO/IEC 6523 scheme identifier"
+              "description": "BT-46-1 | Buyer identifier identification scheme identifier | ISO/IEC 6523 scheme identifier"
             }
           }
         },
@@ -379,7 +380,7 @@ export const invoiceSchema: Record<string, unknown> = {
             },
             "scheme_id": {
               "type": "string",
-              "description": "ISO/IEC 6523 scheme identifier"
+              "description": "BT-47-1 | Buyer legal registration identifier identification scheme identifier | ISO/IEC 6523 scheme identifier"
             }
           }
         },
@@ -401,7 +402,7 @@ export const invoiceSchema: Record<string, unknown> = {
             },
             "scheme_id": {
               "type": "string",
-              "description": "Connecting Europe Facility scheme identifier"
+              "description": "BT-49-1 | Buyer electronic address identification scheme identifier | Connecting Europe Facility scheme identifier"
             }
           }
         },
@@ -490,7 +491,7 @@ export const invoiceSchema: Record<string, unknown> = {
             },
             "scheme_id": {
               "type": "string",
-              "description": "ISO/IEC 6523 scheme identifier"
+              "description": "BT-60-1 | Payee identifier identification scheme identifier | ISO/IEC 6523 scheme identifier"
             }
           }
         },
@@ -507,7 +508,7 @@ export const invoiceSchema: Record<string, unknown> = {
             },
             "scheme_id": {
               "type": "string",
-              "description": "ISO/IEC 6523 scheme identifier"
+              "description": "BT-61-1 | Payee legal registration identifier identification scheme identifier | ISO/IEC 6523 scheme identifier"
             }
           }
         }
@@ -594,7 +595,7 @@ export const invoiceSchema: Record<string, unknown> = {
             },
             "scheme_id": {
               "type": "string",
-              "description": "ISO/IEC 6523 scheme identifier"
+              "description": "BT-71-1 | Deliver to location identifier identification scheme identifier | ISO/IEC 6523 scheme identifier"
             }
           }
         },
@@ -930,11 +931,13 @@ export const invoiceSchema: Record<string, unknown> = {
     },
     "prepaid_amount": {
       "$ref": "#/$defs/decimal",
-      "description": "BT-113 | Prepaid amount | Sum of amounts already paid"
+      "description": "BT-113 | Prepaid amount | Sum of amounts already paid",
+      "writeOnly": true
     },
     "rounding_amount": {
       "$ref": "#/$defs/decimal",
-      "description": "BT-114 | Rounding amount | Amount added to round the payable amount"
+      "description": "BT-114 | Rounding amount | Amount added to round the payable amount",
+      "writeOnly": true
     },
     "totals": {
       "type": "object",
@@ -1029,15 +1032,15 @@ export const invoiceSchema: Record<string, unknown> = {
               "content": {
                 "type": "string",
                 "contentEncoding": "base64",
-                "description": "BT-125 | Base64-encoded document content"
+                "description": "Base64-encoded document content"
               },
               "mime_code": {
                 "type": "string",
-                "description": "BT-125.1 | Attached document MIME code | e.g. 'application/pdf'"
+                "description": "BT-125-1 | Attached document MIME code | e.g. 'application/pdf'"
               },
               "filename": {
                 "type": "string",
-                "description": "BT-125.2 | Attached document filename"
+                "description": "BT-125-2 | Attached document filename"
               }
             }
           }
@@ -1081,7 +1084,7 @@ export const invoiceSchema: Record<string, unknown> = {
               },
               "scheme_id": {
                 "type": "string",
-                "description": "UNTDID 1153 scheme identifier"
+                "description": "BT-128-1 | Invoice line object identifier identification scheme identifier | UNTDID 1153 scheme identifier"
               }
             }
           },
@@ -1303,7 +1306,7 @@ export const invoiceSchema: Record<string, unknown> = {
                   },
                   "scheme_id": {
                     "type": "string",
-                    "description": "ISO/IEC 6523 scheme identifier"
+                    "description": "BT-157-1 | Item standard identifier identification scheme identifier | ISO/IEC 6523 scheme identifier"
                   }
                 }
               },
@@ -1320,15 +1323,15 @@ export const invoiceSchema: Record<string, unknown> = {
                   "properties": {
                     "id": {
                       "type": "string",
-                      "description": "BT-158 | Classification identifier"
+                      "description": "Classification identifier"
                     },
                     "scheme_id": {
                       "type": "string",
-                      "description": "BT-158 scheme | UNTDID 7143 scheme identifier"
+                      "description": "BT-158-1 | Item classification identifier identification scheme identifier | UNTDID 7143 scheme identifier"
                     },
                     "version": {
                       "type": "string",
-                      "description": "BT-158 version | Scheme version identifier"
+                      "description": "BT-158-2 | Scheme version identifier"
                     }
                   }
                 }
