@@ -1,6 +1,6 @@
 {
   "name": "@facturion/pointer-patterns",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "JSON Pointer patterns: a strict superset of JSON Pointer (RFC 6901) with wildcards, an anchor-bound index and entry filters, matched against a document to concrete pointers, including places that don't exist yet.",
   "keywords": [
     "json-pointer",
