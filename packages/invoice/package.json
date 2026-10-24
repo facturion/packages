@@ -38,11 +38,13 @@
       "default": "./dist/generated/schema.js"
     },
     "./invoice-schema.json": "./data/invoice-schema.json",
+    "./fields.json": "./generated/fields.json",
     "./package.json": "./package.json"
   },
   "files": [
     "dist",
     "data/invoice-schema.json",
+    "generated/fields.json",
     "README.md",
     "LICENSE",
     "NOTICE"
@@ -50,11 +52,12 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "generate": "tsx src/generate.ts",
-    "test": "node --import tsx --test test/*.test.ts",
-    "prepare": "npm run generate && npm run build",
+    "test": "tsc -p test/tsconfig.json && node --import tsx --test test/*.test.ts",
+    "prepare": "npm run generate",
     "prepublishOnly": "npm test"
   },
   "dependencies": {
+    "@facturion/pointer-patterns": "^0.1.1",
     "ajv": "^8.17.0",
     "ajv-formats": "^3.0.1"
   },

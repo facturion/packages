@@ -4,7 +4,13 @@
   "private": true,
   "description": "Facturion's open-source packages (MIT). Monorepo home for @facturion/codelists and future siblings (e.g. @facturion/invoice-renderer).",
   "type": "module",
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/codelists",
+    "packages/pointer-patterns",
+    "packages/invoice",
+    "packages/invoice-renderer",
+    "packages/rule-fields"
+  ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",

@@ -12,7 +12,10 @@ It ships:
   types, patterns and enums still enforced), built on Ajv with date-format
   checking. Strict mode also runs the cross-field checks JSON Schema can't
   express — see [Allowances and charges](#allowances-and-charges).
-- **Derived TypeScript types** — generated from the schema.
+- **Derived TypeScript types** — generated from the schema, one per
+  direction: `InvoiceInput` (what you write) and `Invoice` (the document).
+- **Fields by code** — `field(doc, "BT-10")` and `setField(input, "BT-10", …)`,
+  typed per code, from maps generated from the schema.
 - **Money math** — `lineNet` and `computeTotals` (the net/VAT/totals chain down
   to the payable amount), and `completeInvoice`, which turns a draft into the
   invoice it becomes once issued. Pure arithmetic, no presentation.
@@ -35,10 +38,10 @@ import {
   validatePartialInvoice,
   computeTotals,
   invoiceSchema,
-  type Invoice,
+  type InvoiceInput,
 } from "@facturion/invoice";
 
-const invoice: Invoice = JSON.parse(input);
+const invoice: InvoiceInput = JSON.parse(input);
 
 // Strict gate for data you're about to process (throws InvoiceValidationError):
 assertValidInvoice(invoice);
@@ -78,6 +81,56 @@ Use it wherever a draft is shown as a document (previews, PDFs from
 what the document says with what it should have said.
 
 The raw schema is available for tooling at `@facturion/invoice/invoice-schema.json`.
+
+### Input and document
+
+The schema describes both directions. Fields only a document states (BG-22
+`totals`, the VAT breakdown's amounts) are `readOnly`; fields only a caller
+supplies are `writeOnly`: the top-level `prepaid_amount` (BT-113),
+`rounding_amount` (BT-114) and `tax_amount_accounting_currency` (BT-111), which
+the document states under `totals`. The types follow:
+
+- `InvoiceInput`: what the schema accepts, without the `readOnly` fields.
+- `Invoice`: the EN 16931 document, without the `writeOnly` fields, and with
+  what a document must state (totals, the VAT breakdown, line net amounts)
+  required. `completeInvoice(input)` returns one; so does a parser.
+
+## Fields by code
+
+Every EN 16931 business term (BT) and group (BG) in the model, by its code:
+
+```ts
+import { completeInvoice, field, fieldIn, setField, setFieldIn, addEntry } from "@facturion/invoice";
+
+const doc = completeInvoice(draft);
+field(doc, "BT-10");            // string | undefined
+field(doc, "BT-49");            // { id, scheme_id } | undefined
+field(doc, "BT-49-1");          // the scheme alone
+field(doc, "BT-113");           // /totals/prepaid_amount: the document's, never the input's
+field(doc, "BT-153");           // [{ pointer: "/lines/0/item/name", value }, …]: one per line
+
+for (const { value: line } of field(doc, "BG-25"))
+  fieldIn(line, "BT-153");      // that line's: string | undefined
+
+setField(draft, "BT-10", "PO-42");
+setField(draft, "BT-49", { id: "invoices@example.com", scheme_id: "EM" });   // an object, whole
+setField(draft, "BT-113", "50");                                              // /prepaid_amount
+setFieldIn(draft.lines[0], "BT-153", "Widget");
+addEntry(draft, "BG-25", line);
+```
+
+Reading takes an `Invoice`, writing an `InvoiceInput`, each with its own map
+(`READ_FIELDS`, `WRITE_FIELDS`), so a code has one place in each direction and
+a computed one (BT-112) isn't settable at all. A code inside a list has a
+value per entry: `field` returns them all, located; `fieldIn` and
+`setFieldIn` take one entry of the code's group, and the types admit only
+that group's codes and entries (`fieldIn(line, "BT-136")` is a type error:
+BT-136 is an allowance's). Writes mutate in place; `undefined` removes a value
+and the objects it leaves empty. The types per code are `FieldTypes` and
+`InputFieldTypes`.
+
+For other languages, the same maps ship as JSON with each code's term:
+`@facturion/invoice/fields.json` (`{ read: { "BT-10": { pattern, many, term }, … }, write: … }`).
 
 ## Allowances and charges
 

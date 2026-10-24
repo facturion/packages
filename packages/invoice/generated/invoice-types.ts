@@ -2,9 +2,9 @@
 // Do not edit by hand.
 
 /**
- * A simplified JSON input format covering the full EN 16931 semantic model. Fields marked as derived are computed by the transformation layer and should not be provided by the caller.
+ * A simplified JSON input format covering the full EN 16931 semantic model. Fields marked as derived are computed by the transformation layer and should not be provided by the caller. This is the input: what the schema accepts, without the fields only a document states.
  */
-export interface EN16931SimplifiedInvoice {
+export interface InvoiceInput {
   /**
    * BT-1 | Invoice number | Unique ID assigned by the seller
    */
@@ -79,7 +79,7 @@ export interface EN16931SimplifiedInvoice {
   object_identifier?: {
     id: string;
     /**
-     * UNTDID 1153 scheme identifier
+     * BT-18-1 | Invoiced object identifier scheme identifier | UNTDID 1153 scheme identifier
      */
     scheme_id?: string;
   };
@@ -148,7 +148,7 @@ export interface EN16931SimplifiedInvoice {
     identifiers?: {
       id: string;
       /**
-       * ISO/IEC 6523 scheme identifier
+       * BT-29-1 | Seller identifier identification scheme identifier | ISO/IEC 6523 scheme identifier
        */
       scheme_id?: string;
     }[];
@@ -158,7 +158,7 @@ export interface EN16931SimplifiedInvoice {
     legal_registration_id?: {
       id: string;
       /**
-       * ISO/IEC 6523 scheme identifier
+       * BT-30-1 | Seller legal registration identifier identification scheme identifier | ISO/IEC 6523 scheme identifier
        */
       scheme_id?: string;
     };
@@ -180,7 +180,7 @@ export interface EN16931SimplifiedInvoice {
     electronic_address?: {
       id: string;
       /**
-       * Connecting Europe Facility scheme identifier
+       * BT-34-1 | Seller electronic address identification scheme identifier | Connecting Europe Facility scheme identifier
        */
       scheme_id: string;
     };
@@ -253,7 +253,7 @@ export interface EN16931SimplifiedInvoice {
     identifier?: {
       id: string;
       /**
-       * ISO/IEC 6523 scheme identifier
+       * BT-46-1 | Buyer identifier identification scheme identifier | ISO/IEC 6523 scheme identifier
        */
       scheme_id?: string;
     };
@@ -263,7 +263,7 @@ export interface EN16931SimplifiedInvoice {
     legal_registration_id?: {
       id: string;
       /**
-       * ISO/IEC 6523 scheme identifier
+       * BT-47-1 | Buyer legal registration identifier identification scheme identifier | ISO/IEC 6523 scheme identifier
        */
       scheme_id?: string;
     };
@@ -277,7 +277,7 @@ export interface EN16931SimplifiedInvoice {
     electronic_address?: {
       id: string;
       /**
-       * Connecting Europe Facility scheme identifier
+       * BT-49-1 | Buyer electronic address identification scheme identifier | Connecting Europe Facility scheme identifier
        */
       scheme_id: string;
     };
@@ -346,7 +346,7 @@ export interface EN16931SimplifiedInvoice {
     identifier?: {
       id: string;
       /**
-       * ISO/IEC 6523 scheme identifier
+       * BT-60-1 | Payee identifier identification scheme identifier | ISO/IEC 6523 scheme identifier
        */
       scheme_id?: string;
     };
@@ -356,7 +356,7 @@ export interface EN16931SimplifiedInvoice {
     legal_registration_id?: {
       id: string;
       /**
-       * ISO/IEC 6523 scheme identifier
+       * BT-61-1 | Payee legal registration identifier identification scheme identifier | ISO/IEC 6523 scheme identifier
        */
       scheme_id?: string;
     };
@@ -421,7 +421,7 @@ export interface EN16931SimplifiedInvoice {
     location_id?: {
       id: string;
       /**
-       * ISO/IEC 6523 scheme identifier
+       * BT-71-1 | Deliver to location identifier identification scheme identifier | ISO/IEC 6523 scheme identifier
        */
       scheme_id?: string;
     };
@@ -619,14 +619,6 @@ export interface EN16931SimplifiedInvoice {
      */
     rate?: number | string;
     /**
-     * BT-116 | VAT category taxable amount | Sum of line nets plus document-level charges minus document-level allowances for this (category, rate). Computed by the transformation layer; ignored on input.
-     */
-    taxable_amount?: number | string;
-    /**
-     * BT-117 | VAT category tax amount | taxable_amount × rate / 100. Computed by the transformation layer; ignored on input.
-     */
-    tax_amount?: number | string;
-    /**
      * BT-120 | VAT exemption reason text | e.g. 'Exempt per Article 132 Directive 2006/112/EC'
      */
     reason?: string;
@@ -643,51 +635,6 @@ export interface EN16931SimplifiedInvoice {
    * BT-114 | Rounding amount | Amount added to round the payable amount
    */
   rounding_amount?: number | string;
-  /**
-   * BG-22 | Document totals | Computed by the transformation layer; populated on extraction, ignored on input. prepaid_amount (BT-113) and rounding_amount (BT-114) are supplied as top-level inputs and echoed here read-only on output, so this group is a complete BG-22 restatement; both feed amount_due.
-   */
-  totals?: {
-    /**
-     * BT-106 | Sum of invoice line net amount | Sum of all line net_amount values
-     */
-    line_net_total?: number | string;
-    /**
-     * BT-107 | Sum of allowances on document level | Sum of document_allowances[].amount
-     */
-    allowance_total?: number | string;
-    /**
-     * BT-108 | Sum of charges on document level | Sum of document_charges[].amount
-     */
-    charge_total?: number | string;
-    /**
-     * BT-109 | Invoice total amount without VAT | line_net_total − allowance_total + charge_total
-     */
-    tax_exclusive_amount?: number | string;
-    /**
-     * BT-110 | Invoice total VAT amount | Sum of vat_breakdown[].tax_amount
-     */
-    tax_amount?: number | string;
-    /**
-     * BT-111 | Invoice total VAT amount in accounting currency | Read-only echo of top-level tax_amount_accounting_currency; populated on extraction, ignored on input
-     */
-    tax_amount_accounting_currency?: number | string;
-    /**
-     * BT-112 | Invoice total amount with VAT | tax_exclusive_amount + tax_amount
-     */
-    tax_inclusive_amount?: number | string;
-    /**
-     * BT-113 | Prepaid amount | Read-only echo of top-level prepaid_amount; populated on extraction, ignored on input
-     */
-    prepaid_amount?: number | string;
-    /**
-     * BT-114 | Rounding amount | Read-only echo of top-level rounding_amount; populated on extraction, ignored on input
-     */
-    rounding_amount?: number | string;
-    /**
-     * BT-115 | Amount due for payment | tax_inclusive_amount − prepaid_amount + rounding_amount
-     */
-    amount_due?: number | string;
-  };
   /**
    * BG-24 | Additional supporting documents
    */
@@ -709,15 +656,15 @@ export interface EN16931SimplifiedInvoice {
      */
     attached_document?: {
       /**
-       * BT-125 | Base64-encoded document content
+       * Base64-encoded document content
        */
       content: string;
       /**
-       * BT-125.1 | Attached document MIME code | e.g. 'application/pdf'
+       * BT-125-1 | Attached document MIME code | e.g. 'application/pdf'
        */
       mime_code: string;
       /**
-       * BT-125.2 | Attached document filename
+       * BT-125-2 | Attached document filename
        */
       filename: string;
     };
@@ -743,7 +690,7 @@ export interface EN16931SimplifiedInvoice {
       object_identifier?: {
         id: string;
         /**
-         * UNTDID 1153 scheme identifier
+         * BT-128-1 | Invoice line object identifier identification scheme identifier | UNTDID 1153 scheme identifier
          */
         scheme_id?: string;
       };
@@ -894,7 +841,7 @@ export interface EN16931SimplifiedInvoice {
         standard_id?: {
           id: string;
           /**
-           * ISO/IEC 6523 scheme identifier
+           * BT-157-1 | Item standard identifier identification scheme identifier | ISO/IEC 6523 scheme identifier
            */
           scheme_id: string;
         };
@@ -903,15 +850,15 @@ export interface EN16931SimplifiedInvoice {
          */
         classifications?: {
           /**
-           * BT-158 | Classification identifier
+           * Classification identifier
            */
           id: string;
           /**
-           * BT-158 scheme | UNTDID 7143 scheme identifier
+           * BT-158-1 | Item classification identifier identification scheme identifier | UNTDID 7143 scheme identifier
            */
           scheme_id: string;
           /**
-           * BT-158 version | Scheme version identifier
+           * BT-158-2 | Scheme version identifier
            */
           version?: string;
         }[];
@@ -949,7 +896,7 @@ export interface EN16931SimplifiedInvoice {
       object_identifier?: {
         id: string;
         /**
-         * UNTDID 1153 scheme identifier
+         * BT-128-1 | Invoice line object identifier identification scheme identifier | UNTDID 1153 scheme identifier
          */
         scheme_id?: string;
       };
@@ -1100,7 +1047,7 @@ export interface EN16931SimplifiedInvoice {
         standard_id?: {
           id: string;
           /**
-           * ISO/IEC 6523 scheme identifier
+           * BT-157-1 | Item standard identifier identification scheme identifier | ISO/IEC 6523 scheme identifier
            */
           scheme_id: string;
         };
@@ -1109,15 +1056,1145 @@ export interface EN16931SimplifiedInvoice {
          */
         classifications?: {
           /**
-           * BT-158 | Classification identifier
+           * Classification identifier
            */
           id: string;
           /**
-           * BT-158 scheme | UNTDID 7143 scheme identifier
+           * BT-158-1 | Item classification identifier identification scheme identifier | UNTDID 7143 scheme identifier
            */
           scheme_id: string;
           /**
-           * BT-158 version | Scheme version identifier
+           * BT-158-2 | Scheme version identifier
+           */
+          version?: string;
+        }[];
+        /**
+         * BT-159 | Item country of origin | ISO 3166-1 alpha-2
+         */
+        country_of_origin?: string;
+        /**
+         * BG-32 | Item attributes | Additional item properties
+         */
+        attributes?: {
+          /**
+           * BT-160 | Item attribute name | e.g. 'Color'
+           */
+          name: string;
+          /**
+           * BT-161 | Item attribute value | e.g. 'Red'
+           */
+          value: string;
+        }[];
+      };
+    }[]
+  ];
+}
+
+/**
+ * An EN 16931 invoice as a document: everything the input carries except the caller-only fields, with BG-22 totals, the VAT breakdown and line net amounts stated. `completeInvoice` turns an input into one.
+ */
+export interface Invoice {
+  /**
+   * BT-1 | Invoice number | Unique ID assigned by the seller
+   */
+  invoice_number: string;
+  /**
+   * BT-2 | Invoice issue date | YYYY-MM-DD
+   */
+  issue_date: string;
+  /**
+   * BT-3 | Invoice type code | UNTDID 1001 numeric code (e.g. '380' = Invoice, '381' = Credit note). The full codelist is enforced by Schematron during validation; the input only checks the syntactic shape.
+   */
+  invoice_type_code: string;
+  /**
+   * BT-5 | Invoice currency code | ISO 4217 (e.g. 'EUR', 'USD')
+   */
+  currency_code: string;
+  /**
+   * BT-6 | VAT accounting currency code | ISO 4217, only if different from currency_code. Requires tax_amount_accounting_currency.
+   */
+  vat_accounting_currency_code?: string;
+  /**
+   * BT-7 | Value added tax point date | Mutually exclusive with tax_point_date_code
+   */
+  tax_point_date?: string;
+  /**
+   * BT-8 | Value added tax point date code | UNTDID 2005 (e.g. '3' = invoice date, '35' = delivery date, '432' = payment date)
+   */
+  tax_point_date_code?: string;
+  /**
+   * BT-9 | Payment due date
+   */
+  due_date?: string;
+  /**
+   * BT-10 | Buyer reference | Buyer-assigned ID for internal routing (e.g. cost center, leitweg-id for XRechnung)
+   */
+  buyer_reference?: string;
+  /**
+   * BT-11 | Project reference
+   */
+  project_reference?: string;
+  /**
+   * BT-12 | Contract reference
+   */
+  contract_reference?: string;
+  /**
+   * BT-13 | Purchase order reference
+   */
+  purchase_order_reference?: string;
+  /**
+   * BT-14 | Sales order reference
+   */
+  sales_order_reference?: string;
+  /**
+   * BT-15 | Receiving advice reference
+   */
+  receiving_advice_reference?: string;
+  /**
+   * BT-16 | Despatch advice reference
+   */
+  despatch_advice_reference?: string;
+  /**
+   * BT-17 | Tender or lot reference
+   */
+  tender_or_lot_reference?: string;
+  /**
+   * BT-18 | Invoiced object identifier | Seller-assigned ID for the object the invoice relates to (e.g. subscription number, meter, vehicle)
+   */
+  object_identifier?: {
+    id: string;
+    /**
+     * BT-18-1 | Invoiced object identifier scheme identifier | UNTDID 1153 scheme identifier
+     */
+    scheme_id?: string;
+  };
+  /**
+   * BT-19 | Buyer accounting reference | Bookkeeping reference for the buyer
+   */
+  buyer_accounting_reference?: string;
+  /**
+   * BT-20 | Payment terms | Free text describing payment conditions, penalties, etc.
+   */
+  payment_terms?: string;
+  /**
+   * BG-1 | Invoice notes | Free-text notes on the invoice
+   */
+  notes?: {
+    /**
+     * BT-21 | Invoice note subject code | UNTDID 4451
+     */
+    subject_code?: string;
+    /**
+     * BT-22 | Invoice note text
+     */
+    text: string;
+  }[];
+  /**
+   * BG-2 | Process control | Business process and specification identification
+   */
+  process_control?: {
+    /**
+     * BT-23 | Business process type | Buyer-specified business process context
+     */
+    business_process_type?: string;
+    /**
+     * BT-24 | Specification identifier | e.g. 'urn:cen.eu:en16931:2017' or a CIUS identifier
+     */
+    specification_id: string;
+  };
+  /**
+   * BG-3 | Preceding invoice references
+   */
+  preceding_invoices?: {
+    /**
+     * BT-25 | Preceding invoice number
+     */
+    reference: string;
+    /**
+     * BT-26 | Preceding invoice issue date
+     */
+    issue_date?: string;
+  }[];
+  /**
+   * BG-4 | Seller
+   */
+  seller: {
+    /**
+     * BT-27 | Seller name | Full formal name
+     */
+    name: string;
+    /**
+     * BT-28 | Seller trading name | If different from legal name
+     */
+    trading_name?: string;
+    /**
+     * BT-29 | Seller identifiers | May have multiple with different schemes
+     */
+    identifiers?: {
+      id: string;
+      /**
+       * BT-29-1 | Seller identifier identification scheme identifier | ISO/IEC 6523 scheme identifier
+       */
+      scheme_id?: string;
+    }[];
+    /**
+     * BT-30 | Seller legal registration identifier
+     */
+    legal_registration_id?: {
+      id: string;
+      /**
+       * BT-30-1 | Seller legal registration identifier identification scheme identifier | ISO/IEC 6523 scheme identifier
+       */
+      scheme_id?: string;
+    };
+    /**
+     * BT-31 | Seller VAT identifier | With country prefix (e.g. 'DE123456789')
+     */
+    vat_id?: string;
+    /**
+     * BT-32 | Seller tax registration identifier | Local tax ID (e.g. German Steuernummer)
+     */
+    tax_registration_id?: string;
+    /**
+     * BT-33 | Seller additional legal information | e.g. share capital
+     */
+    additional_legal_info?: string;
+    /**
+     * BT-34 | Seller electronic address | For receiving electronic documents
+     */
+    electronic_address?: {
+      id: string;
+      /**
+       * BT-34-1 | Seller electronic address identification scheme identifier | Connecting Europe Facility scheme identifier
+       */
+      scheme_id: string;
+    };
+    /**
+     * BG-5 | Seller postal address
+     */
+    address: {
+      /**
+       * BT-35 | Address line 1 | Street name and house number
+       */
+      line1?: string;
+      /**
+       * BT-36 | Address line 2
+       */
+      line2?: string;
+      /**
+       * BT-162 | Address line 3
+       */
+      line3?: string;
+      /**
+       * BT-37 | City
+       */
+      city?: string;
+      /**
+       * BT-38 | Post code
+       */
+      post_code?: string;
+      /**
+       * BT-39 | Country subdivision | e.g. region, state, province
+       */
+      country_subdivision?: string;
+      /**
+       * BT-40 | Country code | ISO 3166-1 alpha-2
+       */
+      country_code: string;
+    };
+    /**
+     * BG-6 | Seller contact
+     */
+    contact?: {
+      /**
+       * BT-41 | Seller contact point
+       */
+      name?: string;
+      /**
+       * BT-42 | Seller contact telephone number
+       */
+      phone?: string;
+      /**
+       * BT-43 | Seller contact email address
+       */
+      email?: string;
+    };
+  };
+  /**
+   * BG-7 | Buyer
+   */
+  buyer: {
+    /**
+     * BT-44 | Buyer name
+     */
+    name: string;
+    /**
+     * BT-45 | Buyer trading name
+     */
+    trading_name?: string;
+    /**
+     * BT-46 | Buyer identifier
+     */
+    identifier?: {
+      id: string;
+      /**
+       * BT-46-1 | Buyer identifier identification scheme identifier | ISO/IEC 6523 scheme identifier
+       */
+      scheme_id?: string;
+    };
+    /**
+     * BT-47 | Buyer legal registration identifier
+     */
+    legal_registration_id?: {
+      id: string;
+      /**
+       * BT-47-1 | Buyer legal registration identifier identification scheme identifier | ISO/IEC 6523 scheme identifier
+       */
+      scheme_id?: string;
+    };
+    /**
+     * BT-48 | Buyer VAT identifier
+     */
+    vat_id?: string;
+    /**
+     * BT-49 | Buyer electronic address
+     */
+    electronic_address?: {
+      id: string;
+      /**
+       * BT-49-1 | Buyer electronic address identification scheme identifier | Connecting Europe Facility scheme identifier
+       */
+      scheme_id: string;
+    };
+    /**
+     * BG-8 | Buyer postal address
+     */
+    address: {
+      /**
+       * BT-50 | Address line 1
+       */
+      line1?: string;
+      /**
+       * BT-51 | Address line 2
+       */
+      line2?: string;
+      /**
+       * BT-163 | Address line 3
+       */
+      line3?: string;
+      /**
+       * BT-52 | City
+       */
+      city?: string;
+      /**
+       * BT-53 | Post code
+       */
+      post_code?: string;
+      /**
+       * BT-54 | Country subdivision
+       */
+      country_subdivision?: string;
+      /**
+       * BT-55 | Country code | ISO 3166-1 alpha-2
+       */
+      country_code: string;
+    };
+    /**
+     * BG-9 | Buyer contact
+     */
+    contact?: {
+      /**
+       * BT-56 | Buyer contact point
+       */
+      name?: string;
+      /**
+       * BT-57 | Buyer contact telephone number
+       */
+      phone?: string;
+      /**
+       * BT-58 | Buyer contact email address
+       */
+      email?: string;
+    };
+  };
+  /**
+   * BG-10 | Payee | Only if different from seller
+   */
+  payee?: {
+    /**
+     * BT-59 | Payee name
+     */
+    name: string;
+    /**
+     * BT-60 | Payee identifier
+     */
+    identifier?: {
+      id: string;
+      /**
+       * BT-60-1 | Payee identifier identification scheme identifier | ISO/IEC 6523 scheme identifier
+       */
+      scheme_id?: string;
+    };
+    /**
+     * BT-61 | Payee legal registration identifier
+     */
+    legal_registration_id?: {
+      id: string;
+      /**
+       * BT-61-1 | Payee legal registration identifier identification scheme identifier | ISO/IEC 6523 scheme identifier
+       */
+      scheme_id?: string;
+    };
+  };
+  /**
+   * BG-11 | Seller tax representative
+   */
+  seller_tax_representative?: {
+    /**
+     * BT-62 | Tax representative name
+     */
+    name: string;
+    /**
+     * BT-63 | Tax representative VAT identifier
+     */
+    vat_id: string;
+    /**
+     * BG-12 | Tax representative postal address
+     */
+    address: {
+      /**
+       * BT-64 | Address line 1
+       */
+      line1?: string;
+      /**
+       * BT-65 | Address line 2
+       */
+      line2?: string;
+      /**
+       * BT-164 | Address line 3
+       */
+      line3?: string;
+      /**
+       * BT-66 | City
+       */
+      city?: string;
+      /**
+       * BT-67 | Post code
+       */
+      post_code?: string;
+      /**
+       * BT-68 | Country subdivision
+       */
+      country_subdivision?: string;
+      /**
+       * BT-69 | Country code | ISO 3166-1 alpha-2
+       */
+      country_code: string;
+    };
+  };
+  /**
+   * BG-13 | Delivery information
+   */
+  delivery?: {
+    /**
+     * BT-70 | Deliver to party name
+     */
+    name?: string;
+    /**
+     * BT-71 | Deliver to location identifier
+     */
+    location_id?: {
+      id: string;
+      /**
+       * BT-71-1 | Deliver to location identifier identification scheme identifier | ISO/IEC 6523 scheme identifier
+       */
+      scheme_id?: string;
+    };
+    /**
+     * BT-72 | Actual delivery date
+     */
+    date?: string;
+    /**
+     * BG-14 | Invoicing period
+     */
+    period?: {
+      /**
+       * BT-73 | Invoicing period start date
+       */
+      start_date?: string;
+      /**
+       * BT-74 | Invoicing period end date
+       */
+      end_date?: string;
+    };
+    /**
+     * BG-15 | Deliver to address
+     */
+    address?: {
+      /**
+       * BT-75 | Address line 1
+       */
+      line1?: string;
+      /**
+       * BT-76 | Address line 2
+       */
+      line2?: string;
+      /**
+       * BT-165 | Address line 3
+       */
+      line3?: string;
+      /**
+       * BT-77 | City
+       */
+      city?: string;
+      /**
+       * BT-78 | Post code
+       */
+      post_code?: string;
+      /**
+       * BT-79 | Country subdivision
+       */
+      country_subdivision?: string;
+      /**
+       * BT-80 | Country code | ISO 3166-1 alpha-2
+       */
+      country_code: string;
+    };
+  };
+  /**
+   * BG-16 | Payment instructions
+   */
+  payment?: {
+    /**
+     * BT-81 | Payment means type code | UNTDID 4461 (e.g. '30' = credit transfer, '58' = SEPA credit transfer, '49' = direct debit)
+     */
+    means_code: string;
+    /**
+     * BT-82 | Payment means text
+     */
+    means_text?: string;
+    /**
+     * BT-83 | Remittance information | Payment reference text used to link payment to invoice
+     */
+    remittance_information?: string;
+    /**
+     * BG-17 | Credit transfer
+     */
+    credit_transfers?: {
+      /**
+       * BT-84 | Payment account identifier | e.g. IBAN
+       */
+      account_id: string;
+      /**
+       * BT-85 | Payment account name
+       */
+      account_name?: string;
+      /**
+       * BT-86 | Payment service provider identifier | e.g. BIC
+       */
+      service_provider_id?: string;
+    }[];
+    /**
+     * BG-18 | Payment card information
+     */
+    card?: {
+      /**
+       * BT-87 | Payment card primary account number | First 6, last 4 digits max
+       */
+      account_number: string;
+      /**
+       * BT-88 | Payment card holder name
+       */
+      holder_name?: string;
+    };
+    /**
+     * BG-19 | Direct debit
+     */
+    direct_debit?: {
+      /**
+       * BT-89 | Mandate reference identifier
+       */
+      mandate_reference?: string;
+      /**
+       * BT-90 | Bank assigned creditor identifier
+       */
+      creditor_id?: string;
+      /**
+       * BT-91 | Debited account identifier
+       */
+      debited_account_id?: string;
+    };
+  };
+  /**
+   * BG-20 | Document level allowances
+   */
+  document_allowances?: {
+    /**
+     * BT-92 | Document level allowance amount | Without VAT
+     */
+    amount: number | string;
+    /**
+     * BT-93 | Document level allowance base amount | The amount BT-94 was applied to. Conventionally the sum of line net amounts carrying this entry's vat_rate — not the document total, and not a running balance after other allowances.
+     */
+    base_amount?: number | string;
+    /**
+     * BT-94 | Document level allowance percentage | Documents how BT-92 was derived; it is never applied on your behalf. Supply the resolved BT-92 yourself. Where both BT-93 and BT-94 are given they must agree with BT-92 to within one cent.
+     */
+    percentage?: number | string;
+    /**
+     * BT-95 | Document level allowance VAT category code | UNTDID 5305
+     */
+    vat_category_code: string;
+    /**
+     * BT-96 | Document level allowance VAT rate
+     */
+    vat_rate?: number | string;
+    /**
+     * BT-97 | Document level allowance reason
+     */
+    reason?: string;
+    /**
+     * BT-98 | Document level allowance reason code | UNTDID 5189
+     */
+    reason_code?: string;
+  }[];
+  /**
+   * BG-21 | Document level charges
+   */
+  document_charges?: {
+    /**
+     * BT-99 | Document level charge amount | Without VAT
+     */
+    amount: number | string;
+    /**
+     * BT-100 | Document level charge base amount | The amount BT-101 was applied to. Conventionally the sum of line net amounts carrying this entry's vat_rate — not the document total, and not a running balance after other charges.
+     */
+    base_amount?: number | string;
+    /**
+     * BT-101 | Document level charge percentage | Documents how BT-99 was derived; it is never applied on your behalf. Supply the resolved BT-99 yourself. Where both BT-100 and BT-101 are given they must agree with BT-99 to within one cent.
+     */
+    percentage?: number | string;
+    /**
+     * BT-102 | Document level charge VAT category code | UNTDID 5305
+     */
+    vat_category_code: string;
+    /**
+     * BT-103 | Document level charge VAT rate
+     */
+    vat_rate?: number | string;
+    /**
+     * BT-104 | Document level charge reason
+     */
+    reason?: string;
+    /**
+     * BT-105 | Document level charge reason code | UNTDID 7161
+     */
+    reason_code?: string;
+  }[];
+  /**
+   * BG-23 | VAT breakdown | One entry per (category_code, rate) pair used in the invoice. On input you supply category_code/rate/reason/reason_code; taxable_amount and tax_amount are computed by the transformation layer.
+   */
+  vat_breakdown: {
+    /**
+     * BT-118 | VAT category code | Must match a category_code used in lines or document allowances/charges
+     */
+    category_code: string;
+    /**
+     * BT-119 | VAT rate | To distinguish multiple entries with the same category but different rates (typically 0)
+     */
+    rate?: number | string;
+    /**
+     * BT-116 | VAT category taxable amount | Sum of line nets plus document-level charges minus document-level allowances for this (category, rate). Computed by the transformation layer; ignored on input.
+     */
+    taxable_amount: number | string;
+    /**
+     * BT-117 | VAT category tax amount | taxable_amount × rate / 100. Computed by the transformation layer; ignored on input.
+     */
+    tax_amount: number | string;
+    /**
+     * BT-120 | VAT exemption reason text | e.g. 'Exempt per Article 132 Directive 2006/112/EC'
+     */
+    reason?: string;
+    /**
+     * BT-121 | VAT exemption reason code | Connecting Europe Facility codelist (e.g. 'VATEX-EU-132')
+     */
+    reason_code?: string;
+  }[];
+  /**
+   * BG-22 | Document totals | Computed by the transformation layer; populated on extraction, ignored on input. prepaid_amount (BT-113) and rounding_amount (BT-114) are supplied as top-level inputs and echoed here read-only on output, so this group is a complete BG-22 restatement; both feed amount_due.
+   */
+  totals: {
+    /**
+     * BT-106 | Sum of invoice line net amount | Sum of all line net_amount values
+     */
+    line_net_total: number | string;
+    /**
+     * BT-107 | Sum of allowances on document level | Sum of document_allowances[].amount
+     */
+    allowance_total?: number | string;
+    /**
+     * BT-108 | Sum of charges on document level | Sum of document_charges[].amount
+     */
+    charge_total?: number | string;
+    /**
+     * BT-109 | Invoice total amount without VAT | line_net_total − allowance_total + charge_total
+     */
+    tax_exclusive_amount: number | string;
+    /**
+     * BT-110 | Invoice total VAT amount | Sum of vat_breakdown[].tax_amount
+     */
+    tax_amount?: number | string;
+    /**
+     * BT-111 | Invoice total VAT amount in accounting currency | Read-only echo of top-level tax_amount_accounting_currency; populated on extraction, ignored on input
+     */
+    tax_amount_accounting_currency?: number | string;
+    /**
+     * BT-112 | Invoice total amount with VAT | tax_exclusive_amount + tax_amount
+     */
+    tax_inclusive_amount: number | string;
+    /**
+     * BT-113 | Prepaid amount | Read-only echo of top-level prepaid_amount; populated on extraction, ignored on input
+     */
+    prepaid_amount?: number | string;
+    /**
+     * BT-114 | Rounding amount | Read-only echo of top-level rounding_amount; populated on extraction, ignored on input
+     */
+    rounding_amount?: number | string;
+    /**
+     * BT-115 | Amount due for payment | tax_inclusive_amount − prepaid_amount + rounding_amount
+     */
+    amount_due: number | string;
+  };
+  /**
+   * BG-24 | Additional supporting documents
+   */
+  supporting_documents?: {
+    /**
+     * BT-122 | Supporting document reference
+     */
+    reference: string;
+    /**
+     * BT-123 | Supporting document description
+     */
+    description?: string;
+    /**
+     * BT-124 | External document location | URL
+     */
+    external_location?: string;
+    /**
+     * BT-125 | Attached document | Base64-encoded binary object
+     */
+    attached_document?: {
+      /**
+       * Base64-encoded document content
+       */
+      content: string;
+      /**
+       * BT-125-1 | Attached document MIME code | e.g. 'application/pdf'
+       */
+      mime_code: string;
+      /**
+       * BT-125-2 | Attached document filename
+       */
+      filename: string;
+    };
+  }[];
+  /**
+   * BG-25 | Invoice lines
+   *
+   * @minItems 1
+   */
+  lines: [
+    {
+      /**
+       * BT-126 | Invoice line identifier
+       */
+      id: string;
+      /**
+       * BT-127 | Invoice line note
+       */
+      note?: string;
+      /**
+       * BT-128 | Invoice line object identifier
+       */
+      object_identifier?: {
+        id: string;
+        /**
+         * BT-128-1 | Invoice line object identifier identification scheme identifier | UNTDID 1153 scheme identifier
+         */
+        scheme_id?: string;
+      };
+      /**
+       * BT-129 | Invoiced quantity
+       */
+      quantity: number | string;
+      /**
+       * BT-130 | Invoiced quantity unit of measure code | UN/ECE Rec 20 / Rec 21
+       */
+      unit_code: string;
+      /**
+       * BT-131 | Invoice line net amount | Optional: derived from quantity * price if omitted. Provide to override computation.
+       */
+      net_amount: number | string;
+      /**
+       * BT-132 | Referenced purchase order line reference
+       */
+      order_line_reference?: string;
+      /**
+       * BT-133 | Invoice line buyer accounting reference
+       */
+      buyer_accounting_reference?: string;
+      /**
+       * BG-26 | Invoice line period
+       */
+      period?: {
+        /**
+         * BT-134 | Invoice line period start date
+         */
+        start_date?: string;
+        /**
+         * BT-135 | Invoice line period end date
+         */
+        end_date?: string;
+      };
+      /**
+       * BG-27 | Invoice line allowances
+       */
+      allowances?: {
+        /**
+         * BT-136 | Invoice line allowance amount
+         */
+        amount: number | string;
+        /**
+         * BT-137 | Invoice line allowance base amount | The amount BT-138 was applied to. Conventionally this line's quantity × net_price ÷ base_quantity, before any other allowance or charge on the line.
+         */
+        base_amount?: number | string;
+        /**
+         * BT-138 | Invoice line allowance percentage | Documents how BT-136 was derived; it is never applied on your behalf. Supply the resolved BT-136 yourself. Where both BT-137 and BT-138 are given they must agree with BT-136 to within one cent.
+         */
+        percentage?: number | string;
+        /**
+         * BT-139 | Invoice line allowance reason
+         */
+        reason?: string;
+        /**
+         * BT-140 | Invoice line allowance reason code | UNTDID 5189
+         */
+        reason_code?: string;
+      }[];
+      /**
+       * BG-28 | Invoice line charges
+       */
+      charges?: {
+        /**
+         * BT-141 | Invoice line charge amount
+         */
+        amount: number | string;
+        /**
+         * BT-142 | Invoice line charge base amount | The amount BT-143 was applied to. Conventionally this line's quantity × net_price ÷ base_quantity, before any other allowance or charge on the line.
+         */
+        base_amount?: number | string;
+        /**
+         * BT-143 | Invoice line charge percentage | Documents how BT-141 was derived; it is never applied on your behalf. Supply the resolved BT-141 yourself. Where both BT-142 and BT-143 are given they must agree with BT-141 to within one cent.
+         */
+        percentage?: number | string;
+        /**
+         * BT-144 | Invoice line charge reason
+         */
+        reason?: string;
+        /**
+         * BT-145 | Invoice line charge reason code | UNTDID 7161
+         */
+        reason_code?: string;
+      }[];
+      /**
+       * BG-29 | Price details
+       */
+      price: {
+        /**
+         * BT-146 | Item net price | Price per unit after discount, excl. VAT
+         */
+        net_price: number | string;
+        /**
+         * BT-147 | Item price discount | Discount applied to gross price to arrive at net price
+         */
+        discount?: number | string;
+        /**
+         * BT-148 | Item gross price | Price per unit before discount
+         */
+        gross_price?: number | string;
+        /**
+         * BT-149 | Item price base quantity | Number of units to which the price applies (default: 1)
+         */
+        base_quantity?: number | string;
+        /**
+         * BT-150 | Item price base quantity unit of measure code | Must equal unit_code (BT-130)
+         */
+        base_quantity_unit_code?: string;
+      };
+      /**
+       * BG-30 | Line VAT information
+       */
+      vat: {
+        /**
+         * BT-151 | Invoiced item VAT category code | UNTDID 5305 (e.g. 'S' = standard, 'Z' = zero, 'E' = exempt)
+         */
+        category_code: string;
+        /**
+         * BT-152 | Invoiced item VAT rate | Percentage
+         */
+        rate?: number | string;
+      };
+      /**
+       * BG-31 | Item information
+       */
+      item: {
+        /**
+         * BT-153 | Item name
+         */
+        name: string;
+        /**
+         * BT-154 | Item description
+         */
+        description?: string;
+        /**
+         * BT-155 | Item seller's identifier
+         */
+        seller_id?: string;
+        /**
+         * BT-156 | Item buyer's identifier
+         */
+        buyer_id?: string;
+        /**
+         * BT-157 | Item standard identifier | e.g. GTIN/EAN
+         */
+        standard_id?: {
+          id: string;
+          /**
+           * BT-157-1 | Item standard identifier identification scheme identifier | ISO/IEC 6523 scheme identifier
+           */
+          scheme_id: string;
+        };
+        /**
+         * BT-158 | Item classification identifiers
+         */
+        classifications?: {
+          /**
+           * Classification identifier
+           */
+          id: string;
+          /**
+           * BT-158-1 | Item classification identifier identification scheme identifier | UNTDID 7143 scheme identifier
+           */
+          scheme_id: string;
+          /**
+           * BT-158-2 | Scheme version identifier
+           */
+          version?: string;
+        }[];
+        /**
+         * BT-159 | Item country of origin | ISO 3166-1 alpha-2
+         */
+        country_of_origin?: string;
+        /**
+         * BG-32 | Item attributes | Additional item properties
+         */
+        attributes?: {
+          /**
+           * BT-160 | Item attribute name | e.g. 'Color'
+           */
+          name: string;
+          /**
+           * BT-161 | Item attribute value | e.g. 'Red'
+           */
+          value: string;
+        }[];
+      };
+    },
+    ...{
+      /**
+       * BT-126 | Invoice line identifier
+       */
+      id: string;
+      /**
+       * BT-127 | Invoice line note
+       */
+      note?: string;
+      /**
+       * BT-128 | Invoice line object identifier
+       */
+      object_identifier?: {
+        id: string;
+        /**
+         * BT-128-1 | Invoice line object identifier identification scheme identifier | UNTDID 1153 scheme identifier
+         */
+        scheme_id?: string;
+      };
+      /**
+       * BT-129 | Invoiced quantity
+       */
+      quantity: number | string;
+      /**
+       * BT-130 | Invoiced quantity unit of measure code | UN/ECE Rec 20 / Rec 21
+       */
+      unit_code: string;
+      /**
+       * BT-131 | Invoice line net amount | Optional: derived from quantity * price if omitted. Provide to override computation.
+       */
+      net_amount: number | string;
+      /**
+       * BT-132 | Referenced purchase order line reference
+       */
+      order_line_reference?: string;
+      /**
+       * BT-133 | Invoice line buyer accounting reference
+       */
+      buyer_accounting_reference?: string;
+      /**
+       * BG-26 | Invoice line period
+       */
+      period?: {
+        /**
+         * BT-134 | Invoice line period start date
+         */
+        start_date?: string;
+        /**
+         * BT-135 | Invoice line period end date
+         */
+        end_date?: string;
+      };
+      /**
+       * BG-27 | Invoice line allowances
+       */
+      allowances?: {
+        /**
+         * BT-136 | Invoice line allowance amount
+         */
+        amount: number | string;
+        /**
+         * BT-137 | Invoice line allowance base amount | The amount BT-138 was applied to. Conventionally this line's quantity × net_price ÷ base_quantity, before any other allowance or charge on the line.
+         */
+        base_amount?: number | string;
+        /**
+         * BT-138 | Invoice line allowance percentage | Documents how BT-136 was derived; it is never applied on your behalf. Supply the resolved BT-136 yourself. Where both BT-137 and BT-138 are given they must agree with BT-136 to within one cent.
+         */
+        percentage?: number | string;
+        /**
+         * BT-139 | Invoice line allowance reason
+         */
+        reason?: string;
+        /**
+         * BT-140 | Invoice line allowance reason code | UNTDID 5189
+         */
+        reason_code?: string;
+      }[];
+      /**
+       * BG-28 | Invoice line charges
+       */
+      charges?: {
+        /**
+         * BT-141 | Invoice line charge amount
+         */
+        amount: number | string;
+        /**
+         * BT-142 | Invoice line charge base amount | The amount BT-143 was applied to. Conventionally this line's quantity × net_price ÷ base_quantity, before any other allowance or charge on the line.
+         */
+        base_amount?: number | string;
+        /**
+         * BT-143 | Invoice line charge percentage | Documents how BT-141 was derived; it is never applied on your behalf. Supply the resolved BT-141 yourself. Where both BT-142 and BT-143 are given they must agree with BT-141 to within one cent.
+         */
+        percentage?: number | string;
+        /**
+         * BT-144 | Invoice line charge reason
+         */
+        reason?: string;
+        /**
+         * BT-145 | Invoice line charge reason code | UNTDID 7161
+         */
+        reason_code?: string;
+      }[];
+      /**
+       * BG-29 | Price details
+       */
+      price: {
+        /**
+         * BT-146 | Item net price | Price per unit after discount, excl. VAT
+         */
+        net_price: number | string;
+        /**
+         * BT-147 | Item price discount | Discount applied to gross price to arrive at net price
+         */
+        discount?: number | string;
+        /**
+         * BT-148 | Item gross price | Price per unit before discount
+         */
+        gross_price?: number | string;
+        /**
+         * BT-149 | Item price base quantity | Number of units to which the price applies (default: 1)
+         */
+        base_quantity?: number | string;
+        /**
+         * BT-150 | Item price base quantity unit of measure code | Must equal unit_code (BT-130)
+         */
+        base_quantity_unit_code?: string;
+      };
+      /**
+       * BG-30 | Line VAT information
+       */
+      vat: {
+        /**
+         * BT-151 | Invoiced item VAT category code | UNTDID 5305 (e.g. 'S' = standard, 'Z' = zero, 'E' = exempt)
+         */
+        category_code: string;
+        /**
+         * BT-152 | Invoiced item VAT rate | Percentage
+         */
+        rate?: number | string;
+      };
+      /**
+       * BG-31 | Item information
+       */
+      item: {
+        /**
+         * BT-153 | Item name
+         */
+        name: string;
+        /**
+         * BT-154 | Item description
+         */
+        description?: string;
+        /**
+         * BT-155 | Item seller's identifier
+         */
+        seller_id?: string;
+        /**
+         * BT-156 | Item buyer's identifier
+         */
+        buyer_id?: string;
+        /**
+         * BT-157 | Item standard identifier | e.g. GTIN/EAN
+         */
+        standard_id?: {
+          id: string;
+          /**
+           * BT-157-1 | Item standard identifier identification scheme identifier | ISO/IEC 6523 scheme identifier
+           */
+          scheme_id: string;
+        };
+        /**
+         * BT-158 | Item classification identifiers
+         */
+        classifications?: {
+          /**
+           * Classification identifier
+           */
+          id: string;
+          /**
+           * BT-158-1 | Item classification identifier identification scheme identifier | UNTDID 7143 scheme identifier
+           */
+          scheme_id: string;
+          /**
+           * BT-158-2 | Scheme version identifier
            */
           version?: string;
         }[];

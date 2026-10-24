@@ -8,7 +8,11 @@
 
 export { invoiceSchema } from "../generated/schema.js";
 
-export type { EN16931SimplifiedInvoice, EN16931SimplifiedInvoice as Invoice } from "../generated/invoice-types.js";
+// `Invoice` is the EN 16931 document (a parsed invoice, a completed draft),
+// `InvoiceInput` what the schema accepts; see src/generate.ts.
+export type { Invoice, InvoiceInput } from "../generated/invoice-types.js";
+/** @deprecated The input type, now `InvoiceInput`. */
+export type { InvoiceInput as EN16931SimplifiedInvoice } from "../generated/invoice-types.js";
 
 export {
   validateInvoice,
@@ -37,3 +41,19 @@ export type {
   VatBreakdownEntry,
   Completion,
 } from "./model.js";
+
+export { field, fieldIn, setField, setFieldIn, addEntry, addEntryIn, READ_FIELDS, WRITE_FIELDS } from "./fields.js";
+export type {
+  FieldTypes,
+  InputFieldTypes,
+  FieldCode,
+  SettableCode,
+  SingleCode,
+  ManyCode,
+  GroupedCode,
+  SettableSingleCode,
+  SettableGroupedCode,
+  ListCode,
+  GroupedListCode,
+  Located,
+} from "./fields.js";

@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { buildArtifacts, GEN_DIR } from "../src/generate.js";
 
 test("committed generated artifacts match a fresh regeneration", async () => {
-  const { schemaTs, typesTs } = await buildArtifacts();
+  const { schemaTs, typesTs, fieldsTs, fieldsJson } = await buildArtifacts();
   assert.equal(
     readFileSync(join(GEN_DIR, "schema.ts"), "utf8"),
     schemaTs,
@@ -15,5 +15,15 @@ test("committed generated artifacts match a fresh regeneration", async () => {
     readFileSync(join(GEN_DIR, "invoice-types.ts"), "utf8"),
     typesTs,
     "generated/invoice-types.ts is stale — run `npm run generate`",
+  );
+  assert.equal(
+    readFileSync(join(GEN_DIR, "fields.ts"), "utf8"),
+    fieldsTs,
+    "generated/fields.ts is stale — run `npm run generate`",
+  );
+  assert.equal(
+    readFileSync(join(GEN_DIR, "fields.json"), "utf8"),
+    fieldsJson,
+    "generated/fields.json is stale — run `npm run generate`",
   );
 });
