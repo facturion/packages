@@ -119,7 +119,7 @@ export function amt(value: unknown, lang: Lang = DEFAULT_LANG): string {
 /** `amt(value)` suffixed with a currency code when there is one. */
 export function curAmt(value: unknown, cur?: string, lang: Lang = DEFAULT_LANG): string {
   // U+00A0 (no-break space) keeps the amount and its currency on one line.
-  return cur ? `${amt(value, lang)} ${esc(cur)}` : amt(value, lang);
+  return cur ? `${amt(value, lang)}\u00a0${esc(cur)}` : amt(value, lang);
 }
 
 /** Quantities, rates, percentages: unlimited precision, localized separators. */
