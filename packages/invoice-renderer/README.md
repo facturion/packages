@@ -70,6 +70,50 @@ The bundled stylesheet is also importable directly:
 `@facturion/invoice-renderer/styles/fonts.css` beside it so a browser preview
 draws the same face as the PDF.
 
+## Highlighting findings
+
+`renderInvoice(invoice, { t, lang, annotate: true })` marks every rendered
+field with `data-path`, the JSON Pointer of the value it shows
+(`/seller/vat_id`, `/lines/2/period/end_date`; a merged totals row lists
+several, whitespace-separated). Where an absent field would print, it leaves a
+hidden slot, `<span class="inv-slot" data-slot="/buyer_reference" hidden>`,
+holding the field's label and the word for "missing" in the document
+language. Without `annotate` the markup is the plain rendering, byte for byte.
+
+The `highlight` entry point marks validation findings on that markup in the
+browser, and `styles/highlight.css` is the default look: at rest each finding
+tints what it asks to fix and shows a missing field as a dashed box where it
+would print; a focused finding outlines every field it involves, by role.
+
+```ts
+import { renderInvoice, makeT } from "@facturion/invoice-renderer";
+import { highlight } from "@facturion/invoice-renderer/highlight";
+import "@facturion/invoice-renderer/styles/invoice.css";
+import "@facturion/invoice-renderer/styles/highlight.css";
+
+el.innerHTML = renderInvoice(invoice, { t: makeT("de"), lang: "de", annotate: true });
+const marks = highlight(el, findings);   // [{ severity, kind?, fields: [{ role, state, pointer | list }] }]
+marks.show();                             // every finding at rest
+marks.show(2);                            // …and finding 2 in focus
+marks.findingsAt(event.target);           // which findings mark what the pointer is over
+marks.offInvoice(2);                      // its fields the invoice doesn't print
+```
+
+The fields are what `fieldsFor` in
+[`@facturion/rule-fields`](https://www.npmjs.com/package/@facturion/rule-fields)
+returns, but any `{ role, state, pointer }` works: `role` is `target` (to
+fix), `condition` (made the rule apply) or `operand` (compared); `state` is
+`present`, `absent` or `add-entry` (with `list`). The most severe finding on a
+field owns its colour.
+
+Restyle through the `--inv-hl-*` tokens on `.invoice-paper` (colours per
+severity and role, outline width and offset, fills), or replace the
+stylesheet and keep the classes: `inv-hl` on every mark, `inv-hl--rest` /
+`inv-hl--focus`, the role (`inv-hl--target`, `--condition`, `--operand`, and
+`--approx` where only a containing block is rendered), the severity
+(`inv-hl--error`, `--warning`, `--information`), and `inv-slot--shown` on a
+revealed slot.
+
 ## Typeface
 
 The document is set in [IBM Plex Sans](https://github.com/IBM/plex) (SIL Open
