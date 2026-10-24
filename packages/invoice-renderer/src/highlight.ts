@@ -19,7 +19,11 @@ export type Severity = "error" | "warning" | "information";
 export type HighlightRole = "target" | "condition" | "operand";
 
 /** One field of a finding. */
-export type HighlightField = { readonly role: HighlightRole } & (
+export type HighlightField = {
+  readonly role: HighlightRole;
+  /** For a `missing-any` target: the group it satisfies (one per group will do). */
+  readonly group?: string;
+} & (
   /** A place in the invoice, holding a value or where the missing one would go. */
   | { readonly state: "present" | "absent"; readonly pointer: string }
   /** A list lacking an entry the rule asks for. */
@@ -29,7 +33,8 @@ export type HighlightField = { readonly role: HighlightRole } & (
 export interface HighlightFinding {
   readonly severity: Severity;
   /** The rule's kind. For `missing-any` (one of several fields would do) the
-   *  rest state shows no "missing" boxes, only the focused one does. */
+   *  rest state shows one "missing" box per group, its first field the
+   *  invoice has a place for; the focused finding shows them all. */
   readonly kind?: string;
   readonly fields: readonly HighlightField[];
 }
@@ -128,13 +133,21 @@ export function highlight(root: ParentNode, findings: readonly HighlightFinding[
   function show(focus: number | null = null) {
     clear();
     findings.forEach((f, i) => {
+      // missing-any: one box per group, so three boxes don't read as three
+      // missing fields when any one would do. The table's order is preference.
+      const boxed = new Set<string>();
       for (const field of restFields(f)) {
         const loc = locate(pointerOf(field));
         if (!loc) continue;
         index(loc.el, i);
         if (loc.how === "exact") {
           if (claim(loc.el, f.severity, false)) loc.el.classList.add("inv-hl", "inv-hl--rest");
-        } else if (loc.how === "slot" && field.state !== "present" && f.kind !== "missing-any") {
+        } else if (loc.how === "slot" && field.state !== "present") {
+          if (f.kind === "missing-any") {
+            const group = field.group ?? "";
+            if (boxed.has(group)) continue;
+            boxed.add(group);
+          }
           if (claim(loc.el, f.severity, false)) {
             reveal(loc.el);
             loc.el.classList.add("inv-hl", "inv-hl--rest", `inv-hl--${field.role}`);
