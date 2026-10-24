@@ -30,6 +30,7 @@
   },
   "files": [
     "dist",
+    "src",
     "test/vectors.json",
     "SPEC.md",
     "README.md",

@@ -39,6 +39,9 @@
   },
   "files": [
     "dist",
+    "src",
+    "!src/fonts.ts",
+    "!src/styles.ts",
     "styles",
     "fonts",
     "README.md",
