@@ -19,7 +19,7 @@ import Ajv2020Default from "ajv/dist/2020.js";
 import addFormatsDefault from "ajv-formats";
 import type { ErrorObject, SchemaObject, ValidateFunction } from "ajv";
 import { invoiceSchema } from "../generated/schema.js";
-import type { EN16931SimplifiedInvoice } from "../generated/invoice-types.js";
+import type { Invoice, InvoiceInput } from "../generated/invoice-types.js";
 import { checkAdjustmentDerivations } from "./adjustments.js";
 
 // ajv and ajv-formats are CJS; under NodeNext the default import is typed as
@@ -91,7 +91,7 @@ export const validatePartialInvoice: ValidateFunction = addFormats(
 ).compile(stripRequired(invoiceSchema) as SchemaObject);
 
 /** Throw `InvoiceValidationError` unless `input` satisfies the full schema. */
-export function assertValidInvoice(input: unknown): asserts input is EN16931SimplifiedInvoice {
+export function assertValidInvoice(input: unknown): asserts input is InvoiceInput {
   if (!validateInvoice(input)) {
     throw new InvoiceValidationError("Invalid invoice data", validateInvoice.errors);
   }
@@ -115,5 +115,6 @@ type DeepPartial<T> = T extends readonly (infer U)[]
     : T;
 
 /** The shape `validatePartialInvoice` accepts: the invoice with nothing
- *  required. What drafts, previews and the renderer work with. */
-export type PartialInvoice = DeepPartial<EN16931SimplifiedInvoice>;
+ *  required, the fields of both directions (input and document). What drafts,
+ *  previews and the renderer work with. */
+export type PartialInvoice = DeepPartial<InvoiceInput & Invoice>;

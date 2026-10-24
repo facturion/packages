@@ -11,6 +11,8 @@
  *  (a draft or preview may omit otherwise-required fields). Decimal fields
  *  accept a number or a decimal string, matching the schema's `decimal` type. */
 
+import type { Invoice, InvoiceInput } from "../generated/invoice-types.js";
+
 type Decimal = number | string;
 
 interface MoneyLine {
@@ -246,6 +248,8 @@ const defined = <T extends object>(o: T): T =>
  *
  *  This is where derived values come from. Renderers show what they are given,
  *  so a draft goes through here first. */
+export function completeInvoice(draft: InvoiceInput): Invoice;
+export function completeInvoice<T extends ComputableInvoice>(draft: T): T & Completion;
 export function completeInvoice<T extends ComputableInvoice>(draft: T): T & Completion {
   const t = computeTotals(draft);
   const lines = (draft.lines || []).map((l) => ({ ...l, net_amount: lineNet(l) }));
