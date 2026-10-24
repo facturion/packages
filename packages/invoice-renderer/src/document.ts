@@ -2,17 +2,17 @@
 // the bundled stylesheet inlined and a default label resolver. This is what an
 // HTML→PDF service (e.g. headless Chromium) consumes.
 //
-// The CSS and the document face are embedded as JS strings (./styles.js and
-// ./fonts.js, generated from styles/invoice.css and the IBM Plex Sans files),
+// The CSS and the document face are embedded as strings (./styles.ts and
+// ./fonts.ts, generated from styles/invoice.css and the IBM Plex Sans files),
 // so this module has no filesystem dependency and works in the browser as well
 // as in Node — and the page needs no network to draw its own letters.
 
-import { renderInvoice } from "./render.js";
-import { makeT, DEFAULT_LANG } from "./i18n.js";
+import { renderInvoice, type RenderableInvoice } from "./render.js";
+import { makeT, DEFAULT_LANG, type Lang, type TFunction } from "./i18n.js";
 import { invoiceCss } from "./styles.js";
 import { fontFacesCss } from "./fonts.js";
 
-const _HTML_LANG = { en: "en", de: "de" };
+const _HTML_LANG: Readonly<Record<Lang, string>> = { en: "en", de: "de" };
 
 /**
  * Build a standalone HTML document for an invoice.
@@ -22,7 +22,10 @@ const _HTML_LANG = { en: "en", de: "de" };
  * @param opts.t   Override the label resolver (advanced; bypasses the bundled
  *                 strings + codelists default).
  */
-export function renderInvoiceDocument(invoice, { lang = DEFAULT_LANG, t } = {}) {
+export function renderInvoiceDocument(
+  invoice: RenderableInvoice,
+  { lang = DEFAULT_LANG, t }: { lang?: Lang; t?: TFunction } = {},
+): string {
   const resolve = t ?? makeT(lang);
   const fragment = renderInvoice(invoice, { t: resolve, lang });
   const htmlLang = _HTML_LANG[lang] || DEFAULT_LANG;

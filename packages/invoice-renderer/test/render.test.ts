@@ -45,7 +45,8 @@ test("formatters", () => {
   assert.equal(esc('<a href="x">'), "&lt;a href=&quot;x&quot;&gt;");
   assert.equal(amt("10"), "10.00");
   // amount and currency joined by a U+00A0 no-break space
-  assert.match(curAmt("10", "EUR"), /^10\.00.EUR$/);
+  // A no-break space keeps the amount and its currency on one line.
+  assert.equal(curAmt("10", "EUR"), "10.00\u00a0EUR");
 });
 
 test("formatters: language-determined separators, never the process locale", () => {
