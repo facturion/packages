@@ -38,7 +38,6 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "tsc -p test/tsconfig.json && node --import tsx --test test/*.test.ts",
-    "prepare": "npm run build",
     "prepublishOnly": "npm test"
   },
   "dependencies": {
