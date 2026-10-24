@@ -1,6 +1,6 @@
 {
   "name": "@facturion/rule-fields",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Which fields of an e-invoice an EN 16931 / XRechnung / French CTC validation rule concerns, and in what role (to fix, made it apply, compared): tables over the @facturion/invoice model, and the matching that turns a validation finding into fields.",
   "keywords": [
     "en16931",
