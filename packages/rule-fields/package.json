@@ -45,7 +45,7 @@
     "@facturion/pointer-patterns": "^0.1.1"
   },
   "devDependencies": {
-    "@facturion/invoice": "^0.5.1",
+    "@facturion/invoice": "^0.6.0",
     "@types/node": "^22.0.0",
     "tsx": "^4.19.0",
     "typescript": "^5.6.0"
