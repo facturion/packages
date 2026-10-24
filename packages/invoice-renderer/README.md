@@ -83,7 +83,11 @@ language. Without `annotate` the markup is the plain rendering, byte for byte.
 The `highlight` entry point marks validation findings on that markup in the
 browser, and `styles/highlight.css` is the default look: at rest each finding
 tints what it asks to fix and shows a missing field as a dashed box where it
-would print; a focused finding outlines every field it involves, by role.
+would print; a focused finding outlines every field it involves, by role. A
+finding that any one of several fields would satisfy (`kind: "missing-any"`)
+shows one box at rest, for its first field the invoice prints (one per
+`group`, where fields carry one), so it doesn't read as several missing
+fields; focused, it shows them all.
 
 ```ts
 import { renderInvoice, makeT } from "@facturion/invoice-renderer";

@@ -50,8 +50,30 @@ test("rest: missing fields show their slot, labelled and localized", () => {
   assert.equal(phone.textContent, "Telefon fehlt");
   const ref = root.querySelector('[data-slot="/buyer_reference"]') as HTMLElement;
   assert.ok(ref.classList.contains("inv-hl--warning"));
-  // missing-any shows no boxes at rest.
-  assert.equal((root.querySelector('[data-slot="/seller/vat_id"]') as HTMLElement).hidden, true);
+  // missing-any: its first field with a place on the invoice.
+  assert.equal((root.querySelector('[data-slot="/seller/vat_id"]') as HTMLElement).hidden, false);
+});
+
+test("rest: missing-any shows one box per group, the first one the invoice has a place for", () => {
+  const { root } = page();
+  const slot = (p: string) => root.querySelector(`[data-slot="${p}"]`) as HTMLElement;
+  const absent = (pointer: string, group?: string) => ({ role: "target" as const, state: "absent" as const, pointer, ...(group ? { group } : {}) });
+  const hl = highlight(root, [
+    { severity: "error", kind: "missing-any", fields: [absent("/specification_identifier"), absent("/seller/vat_id"), absent("/buyer_reference")] },
+  ]);
+  hl.show();
+  assert.equal(slot("/seller/vat_id").hidden, false);
+  assert.equal(slot("/buyer_reference").hidden, true);
+  // Focused, it shows every alternative.
+  hl.show(0);
+  assert.equal(slot("/buyer_reference").hidden, false);
+
+  highlight(root, [
+    { severity: "error", kind: "missing-any", fields: [absent("/seller/vat_id", "a"), absent("/seller/contact/phone", "a"), absent("/buyer_reference", "b")] },
+  ]).show();
+  assert.equal(slot("/seller/vat_id").hidden, false);
+  assert.equal(slot("/seller/contact/phone").hidden, true);
+  assert.equal(slot("/buyer_reference").hidden, false);
 });
 
 test("rest: the most severe finding owns an element's colour", () => {
