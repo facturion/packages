@@ -526,11 +526,12 @@ function linesBlock(invoice: RenderableInvoice, t: TFunction, lang: Lang, a: Ann
 
     // Line-level allowances and charges: shown inline under the description,
     // with their percentage/base derivation and reason (code) when present.
+    // A no-break space (U+00A0) keeps each sign on the line of its amount.
     (line.allowances || []).forEach((x, i) => {
-      meta.push(`<div class="inv-line-allowance"${a.at(`${L}/allowances/${i}`)}>− ${amt(x.amount, lang)} · ${esc(acReason(x, viewLabel(t, "documentAllowance"), t, lang))}</div>`);
+      meta.push(`<div class="inv-line-allowance"${a.at(`${L}/allowances/${i}`)}>− ${amt(x.amount, lang)} · ${esc(acReason(x, viewLabel(t, "documentAllowance"), t, lang))}</div>`);
     });
     (line.charges || []).forEach((x, i) => {
-      meta.push(`<div class="inv-line-charge"${a.at(`${L}/charges/${i}`)}>+ ${amt(x.amount, lang)} · ${esc(acReason(x, viewLabel(t, "documentCharge"), t, lang))}</div>`);
+      meta.push(`<div class="inv-line-charge"${a.at(`${L}/charges/${i}`)}>+ ${amt(x.amount, lang)} · ${esc(acReason(x, viewLabel(t, "documentCharge"), t, lang))}</div>`);
     });
 
     // Show gross + discount alongside the net price when the invoice carries
@@ -538,9 +539,9 @@ function linesBlock(invoice: RenderableInvoice, t: TFunction, lang: Lang, a: Ann
     let priceCell = a.wrap(`${L}/price/net_price`, amt(netPrice, lang));
     if (grossPrice != null && (discount != null || Number(grossPrice) !== Number(netPrice))) {
       const was = viewLabel(t, "priceBefore", { price: amt(grossPrice, lang) });
-      const disc = discount != null ? ` (− ${amt(discount, lang)})` : "";
+      const disc = discount != null ? ` (− ${amt(discount, lang)})` : "";
       priceCell += a.on
-        ? `<div class="inv-line-price-gross"${a.at(`${L}/price/gross_price`)}>${esc(was)}${discount != null ? ` (− ${a.wrap(`${L}/price/discount`, amt(discount, lang))})` : ""}</div>`
+        ? `<div class="inv-line-price-gross"${a.at(`${L}/price/gross_price`)}>${esc(was)}${discount != null ? ` (− ${a.wrap(`${L}/price/discount`, amt(discount, lang))})` : ""}</div>`
         : `<div class="inv-line-price-gross">${esc(was + disc)}</div>`;
     }
     // BT-149/150: a price expressed per N units, not per 1.
@@ -574,32 +575,35 @@ function linesBlock(invoice: RenderableInvoice, t: TFunction, lang: Lang, a: Ann
       : `${num(qty, lang)}${unit ? ` ${esc(unitLabel(unit, qty, t))}` : ""}`;
 
     return `
-    <tr${a.at(L)}>
-      <td class="inv-col-id"${a.at(`${L}/id`)}>${esc(line.id)}</td>
-      <td class="inv-col-desc">
+    <tr role="row"${a.at(L)}>
+      <td role="cell" class="inv-col-id"${a.at(`${L}/id`)}>${esc(line.id)}</td>
+      <td role="cell" class="inv-col-desc">
         <div class="inv-line-name"${a.at(`${L}/item/name`)}>${esc(name)}</div>
         ${desc ? `<div class="inv-line-desc"${a.at(`${L}/item/description`)}>${esc(desc)}</div>` : ""}
         ${meta.join("")}
       </td>
-      <td class="inv-col-num">${qtyCell}</td>
-      <td class="inv-col-num"${a.at(`${L}/price`)}>${priceCell}</td>
-      <td class="inv-col-num"${a.at(`${L}/vat`)}>${vatCell}</td>
-      <td class="inv-col-num"${a.at(`${L}/net_amount`)}>${amt(total, lang)}</td>
+      <td role="cell" class="inv-col-num inv-col-qty">${qtyCell}</td>
+      <td role="cell" class="inv-col-num inv-col-price"${a.at(`${L}/price`)}>${priceCell}</td>
+      <td role="cell" class="inv-col-num inv-col-vat"${a.at(`${L}/vat`)}>${vatCell}</td>
+      <td role="cell" class="inv-col-num inv-col-net"${a.at(`${L}/net_amount`)}>${amt(total, lang)}</td>
     </tr>`;
   }).join("");
 
+  // The roles restate what the elements already are: a narrow paper lays the
+  // rows out as grids (styles/invoice.css), and some engines (WebKit) drop a
+  // table's semantics once its parts stop being displayed as table parts.
   return `
     <div class="inv-lines-wrap"${a.at("/lines")}>
-      <table class="data-table inv-lines">
-        <thead><tr>
-          <th class="inv-col-id">${viewLabel(t, "lineNo")}</th>
-          <th class="inv-col-desc">${viewLabel(t, "description")}</th>
-          <th class="inv-col-num">${viewLabel(t, "quantity")}</th>
-          <th class="inv-col-num">${viewLabel(t, "unitPrice")}</th>
-          <th class="inv-col-num">${viewLabel(t, "taxRate")}</th>
-          <th class="inv-col-num">${viewLabel(t, "lineTotal")}</th>
+      <table role="table" class="data-table inv-lines">
+        <thead role="rowgroup"><tr role="row">
+          <th role="columnheader" class="inv-col-id">${viewLabel(t, "lineNo")}</th>
+          <th role="columnheader" class="inv-col-desc">${viewLabel(t, "description")}</th>
+          <th role="columnheader" class="inv-col-num inv-col-qty">${viewLabel(t, "quantity")}</th>
+          <th role="columnheader" class="inv-col-num inv-col-price">${viewLabel(t, "unitPrice")}</th>
+          <th role="columnheader" class="inv-col-num inv-col-vat">${viewLabel(t, "taxRate")}</th>
+          <th role="columnheader" class="inv-col-num inv-col-net">${viewLabel(t, "lineTotal")}</th>
         </tr></thead>
-        <tbody>${rows}</tbody>
+        <tbody role="rowgroup">${rows}</tbody>
       </table>
     </div>`;
 }

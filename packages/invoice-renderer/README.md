@@ -70,6 +70,20 @@ The bundled stylesheet is also importable directly:
 `@facturion/invoice-renderer/styles/fonts.css` beside it so a browser preview
 draws the same face as the PDF.
 
+### Narrow hosts
+
+The document lays itself out for the width it is given, not the viewport's:
+`.invoice-paper` is a size container (`container: invoice-paper / inline-size`),
+and below 540px of content width the header and parties stack, the totals take
+the full width and each invoice line becomes a two-row block, the way a receipt
+reads (`4 × 58.90` under the item, the rate under the line amount). A preview
+in a side panel and a phone get the same treatment; printed on A4 the paper is
+wider than the breakpoint, so a PDF keeps the table.
+
+A size container takes no width from its content, so give the paper (or its
+wrapper) a definite width where it sits in a shrink-to-fit context, such as a
+flex row or an inline-block (`width: 100%`); otherwise it collapses.
+
 ## Highlighting findings
 
 `renderInvoice(invoice, { t, lang, annotate: true })` marks every rendered
