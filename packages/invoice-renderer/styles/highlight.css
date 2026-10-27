@@ -36,6 +36,17 @@
   transition: background-color 0.12s, outline-color 0.12s;
 }
 
+/* The line table's wrapper scrolls (overflow-x: auto, invoice.css) and so
+ * clips at its padding edge, which sits flush with the table: an outline
+ * drawn past the table's outer cells or rows lost its outer side. Pad the
+ * wrapper by an outline's reach and pull it out by as much again, so the
+ * outlines fit inside it and the table doesn't move. */
+.invoice-paper .inv-lines-wrap {
+  --inv-hl-reach: calc(var(--inv-hl-width) + var(--inv-hl-offset));
+  padding: var(--inv-hl-reach);
+  margin: calc(-1 * var(--inv-hl-reach)) calc(-1 * var(--inv-hl-reach)) calc(var(--space-4) - var(--inv-hl-reach));
+}
+
 /* At rest: what to fix. */
 .invoice-paper .inv-hl--rest {
   background-color: color-mix(in srgb, var(--inv-hl) var(--inv-hl-rest-fill), transparent);

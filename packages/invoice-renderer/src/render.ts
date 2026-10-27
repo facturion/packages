@@ -138,8 +138,15 @@ export function fmtDate(value: unknown, lang: Lang = DEFAULT_LANG): string {
   return `${m[1]}-${m[2]}-${m[3]}`;
 }
 
+/** Units a document prints as the bare quantity. C62 is "one", a count with
+ *  no unit of measure: its codelist label ("Unitless") describes the code for
+ *  a picker, but beside a quantity ("4 Unitless") it reads as a unit, which it
+ *  is not. The code itself stays in the data, and the XML, untouched. */
+const BARE_UNITS: ReadonlySet<string> = new Set(["C62"]);
+
+/** The unit as printed beside a quantity; "" when there is none to print. */
 function unitLabel(code: string | undefined, qty: unknown, t: TFunction): string {
-  if (!code) return "";
+  if (!code || BARE_UNITS.has(code)) return "";
   const plural = Number(qty) !== 1;
   const key: LabelKey = `units.${code}${plural ? "_plural" : ""}`;
   const label = t(key);
@@ -526,11 +533,12 @@ function linesBlock(invoice: RenderableInvoice, t: TFunction, lang: Lang, a: Ann
 
     // Line-level allowances and charges: shown inline under the description,
     // with their percentage/base derivation and reason (code) when present.
+    // A no-break space (U+00A0) keeps each sign on the line of its amount.
     (line.allowances || []).forEach((x, i) => {
-      meta.push(`<div class="inv-line-allowance"${a.at(`${L}/allowances/${i}`)}>− ${amt(x.amount, lang)} · ${esc(acReason(x, viewLabel(t, "documentAllowance"), t, lang))}</div>`);
+      meta.push(`<div class="inv-line-allowance"${a.at(`${L}/allowances/${i}`)}>− ${amt(x.amount, lang)} · ${esc(acReason(x, viewLabel(t, "documentAllowance"), t, lang))}</div>`);
     });
     (line.charges || []).forEach((x, i) => {
-      meta.push(`<div class="inv-line-charge"${a.at(`${L}/charges/${i}`)}>+ ${amt(x.amount, lang)} · ${esc(acReason(x, viewLabel(t, "documentCharge"), t, lang))}</div>`);
+      meta.push(`<div class="inv-line-charge"${a.at(`${L}/charges/${i}`)}>+ ${amt(x.amount, lang)} · ${esc(acReason(x, viewLabel(t, "documentCharge"), t, lang))}</div>`);
     });
 
     // Show gross + discount alongside the net price when the invoice carries
@@ -538,25 +546,23 @@ function linesBlock(invoice: RenderableInvoice, t: TFunction, lang: Lang, a: Ann
     let priceCell = a.wrap(`${L}/price/net_price`, amt(netPrice, lang));
     if (grossPrice != null && (discount != null || Number(grossPrice) !== Number(netPrice))) {
       const was = viewLabel(t, "priceBefore", { price: amt(grossPrice, lang) });
-      const disc = discount != null ? ` (− ${amt(discount, lang)})` : "";
+      const disc = discount != null ? ` (− ${amt(discount, lang)})` : "";
       priceCell += a.on
-        ? `<div class="inv-line-price-gross"${a.at(`${L}/price/gross_price`)}>${esc(was)}${discount != null ? ` (− ${a.wrap(`${L}/price/discount`, amt(discount, lang))})` : ""}</div>`
+        ? `<div class="inv-line-price-gross"${a.at(`${L}/price/gross_price`)}>${esc(was)}${discount != null ? ` (− ${a.wrap(`${L}/price/discount`, amt(discount, lang))})` : ""}</div>`
         : `<div class="inv-line-price-gross">${esc(was + disc)}</div>`;
     }
     // BT-149/150: a price expressed per N units, not per 1.
     const baseQty = line.price?.base_quantity;
     if (baseQty != null && Number(baseQty) !== 1) {
-      const baseUnit = line.price?.base_quantity_unit_code;
+      const baseUnit = unitLabel(line.price?.base_quantity_unit_code, baseQty, t);
       if (a.on) {
         const qtyHtml = a.wrap(`${L}/price/base_quantity`, num(baseQty, lang)) +
-          (baseUnit ? ` ${a.wrap(`${L}/price/base_quantity_unit_code`, esc(unitLabel(baseUnit, baseQty, t)))}` : "");
+          (baseUnit ? ` ${a.wrap(`${L}/price/base_quantity_unit_code`, esc(baseUnit))}` : "");
         // The "per {qty}" string is escaped as a whole; here the qty carries
         // markup, so it goes in after escaping, in place of a placeholder.
         priceCell += `<div class="inv-line-price-base">${esc(viewLabel(t, "perBase", { qty: "\u0000" })).replace("\u0000", qtyHtml)}</div>`;
       } else {
-        const qtyText = baseUnit
-          ? `${num(baseQty, lang)} ${unitLabel(baseUnit, baseQty, t)}`
-          : num(baseQty, lang);
+        const qtyText = baseUnit ? `${num(baseQty, lang)} ${baseUnit}` : num(baseQty, lang);
         priceCell += `<div class="inv-line-price-base">${esc(viewLabel(t, "perBase", { qty: qtyText }))}</div>`;
       }
     }
@@ -569,37 +575,43 @@ function linesBlock(invoice: RenderableInvoice, t: TFunction, lang: Lang, a: Ann
       vatCell += `${vatCell ? " " : ""}<span class="inv-line-vatcat"${a.at(`${L}/vat/category_code`)}>${esc(taxCat)}</span>`;
     }
 
+    // A bare unit (C62) prints nothing, so it has no mark of its own: a
+    // finding on it outlines the line instead (highlight's ancestor fallback).
+    const unitText = unitLabel(unit, qty, t);
     const qtyCell = a.on
-      ? `${qty != null && qty !== "" ? a.wrap(`${L}/quantity`, num(qty, lang)) : a.slot(`${L}/quantity`, viewLabel(t, "quantity"))}${unit ? ` ${a.wrap(`${L}/unit_code`, esc(unitLabel(unit, qty, t)))}` : ""}`
-      : `${num(qty, lang)}${unit ? ` ${esc(unitLabel(unit, qty, t))}` : ""}`;
+      ? `${qty != null && qty !== "" ? a.wrap(`${L}/quantity`, num(qty, lang)) : a.slot(`${L}/quantity`, viewLabel(t, "quantity"))}${unitText ? ` ${a.wrap(`${L}/unit_code`, esc(unitText))}` : ""}`
+      : `${num(qty, lang)}${unitText ? ` ${esc(unitText)}` : ""}`;
 
     return `
-    <tr${a.at(L)}>
-      <td class="inv-col-id"${a.at(`${L}/id`)}>${esc(line.id)}</td>
-      <td class="inv-col-desc">
+    <tr role="row"${a.at(L)}>
+      <td role="cell" class="inv-col-id"${a.at(`${L}/id`)}>${esc(line.id)}</td>
+      <td role="cell" class="inv-col-desc">
         <div class="inv-line-name"${a.at(`${L}/item/name`)}>${esc(name)}</div>
         ${desc ? `<div class="inv-line-desc"${a.at(`${L}/item/description`)}>${esc(desc)}</div>` : ""}
         ${meta.join("")}
       </td>
-      <td class="inv-col-num">${qtyCell}</td>
-      <td class="inv-col-num"${a.at(`${L}/price`)}>${priceCell}</td>
-      <td class="inv-col-num"${a.at(`${L}/vat`)}>${vatCell}</td>
-      <td class="inv-col-num"${a.at(`${L}/net_amount`)}>${amt(total, lang)}</td>
+      <td role="cell" class="inv-col-num inv-col-qty">${qtyCell}</td>
+      <td role="cell" class="inv-col-num inv-col-price"${a.at(`${L}/price`)}>${priceCell}</td>
+      <td role="cell" class="inv-col-num inv-col-vat"${a.at(`${L}/vat`)}>${vatCell}</td>
+      <td role="cell" class="inv-col-num inv-col-net"${a.at(`${L}/net_amount`)}>${amt(total, lang)}</td>
     </tr>`;
   }).join("");
 
+  // The roles restate what the elements already are: a narrow paper lays the
+  // rows out as grids (styles/invoice.css), and some engines (WebKit) drop a
+  // table's semantics once its parts stop being displayed as table parts.
   return `
     <div class="inv-lines-wrap"${a.at("/lines")}>
-      <table class="data-table inv-lines">
-        <thead><tr>
-          <th class="inv-col-id">${viewLabel(t, "lineNo")}</th>
-          <th class="inv-col-desc">${viewLabel(t, "description")}</th>
-          <th class="inv-col-num">${viewLabel(t, "quantity")}</th>
-          <th class="inv-col-num">${viewLabel(t, "unitPrice")}</th>
-          <th class="inv-col-num">${viewLabel(t, "taxRate")}</th>
-          <th class="inv-col-num">${viewLabel(t, "lineTotal")}</th>
+      <table role="table" class="data-table inv-lines">
+        <thead role="rowgroup"><tr role="row">
+          <th role="columnheader" class="inv-col-id">${viewLabel(t, "lineNo")}</th>
+          <th role="columnheader" class="inv-col-desc">${viewLabel(t, "description")}</th>
+          <th role="columnheader" class="inv-col-num inv-col-qty">${viewLabel(t, "quantity")}</th>
+          <th role="columnheader" class="inv-col-num inv-col-price">${viewLabel(t, "unitPrice")}</th>
+          <th role="columnheader" class="inv-col-num inv-col-vat">${viewLabel(t, "taxRate")}</th>
+          <th role="columnheader" class="inv-col-num inv-col-net">${viewLabel(t, "lineTotal")}</th>
         </tr></thead>
-        <tbody>${rows}</tbody>
+        <tbody role="rowgroup">${rows}</tbody>
       </table>
     </div>`;
 }

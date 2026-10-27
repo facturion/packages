@@ -96,7 +96,7 @@ test("renderInvoice: German document localizes dates and amounts", () => {
   assert.match(html, /15\.01\.2026/); // issue date
   assert.match(html, /01\.02\.2026/); // due date
   assert.match(html, /2\.500,00/);    // line total 2.5 × 1000, German separators
-  assert.match(html, />2,5 /);        // quantity with decimal comma
+  assert.match(html, />2,5</);        // quantity with decimal comma (C62: no unit)
 });
 
 test("renderInvoice: preceding invoices (BG-3) surface in the header", () => {
@@ -234,7 +234,7 @@ test("renderInvoice: the line total is the stated net amount", () => {
 test("renderInvoice: a draft that wasn't completed shows no made-up totals", () => {
   const html = renderInvoice(invoice, { t: en });
   assert.doesNotMatch(html, /Subtotal|Amount due|23\.80|20\.00 EUR/);
-  assert.match(html, /<td class="inv-col-num">—<\/td>/); // line total not stated
+  assert.match(html, /<td role="cell" class="inv-col-num inv-col-net">—<\/td>/); // line total not stated
 });
 
 test("renderInvoice: VAT accounting currency renders (BT-6 + BT-111)", () => {
@@ -297,7 +297,19 @@ test("renderInvoice: price base quantity qualifies the unit price (BT-149/150)",
     { t: en },
   );
   assert.match(html, /inv-line-price-base/);
-  assert.match(html, /per 100/);
+  assert.match(html, /per 100</);
+});
+
+test("renderInvoice: C62 prints the bare quantity, other units their label", () => {
+  const line = (unit_code) => ({ ...invoice.lines[0], quantity: "4", unit_code });
+  const html = (unit_code, opts = {}) => renderInvoice({ ...invoice, lines: [line(unit_code)] }, { t: de, lang: "de", ...opts });
+  assert.match(html("C62"), /<td role="cell" class="inv-col-num inv-col-qty">4<\/td>/);
+  assert.doesNotMatch(html("C62"), /Ohne Einheit/);
+  assert.match(html("H87"), /<td role="cell" class="inv-col-num inv-col-qty">4 Stück<\/td>/);
+  // Annotated, the unit has no empty mark to outline; the quantity keeps its own.
+  const annotated = html("C62", { annotate: true });
+  assert.doesNotMatch(annotated, /data-path="\/lines\/0\/unit_code"/);
+  assert.match(annotated, /data-path="\/lines\/0\/quantity"/);
 });
 
 test("renderInvoice: price discount is stated, not just implied (BT-147)", () => {
@@ -311,7 +323,7 @@ test("renderInvoice: price discount is stated, not just implied (BT-147)", () =>
     },
     { t: en },
   );
-  assert.match(html, /was 120\.00 \(− 20\.00\)/);
+  assert.match(html, /was 120\.00 \(− 20\.00\)/); // the sign stays with its amount
 });
 
 test("renderInvoice: party identifiers, electronic addresses and schemes (BT-29/34/46/49)", () => {

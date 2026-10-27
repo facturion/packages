@@ -91,8 +91,12 @@
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
   border-radius: var(--radius-md);
-  padding: var(--space-10);
+  /* A percentage resolves against the host's width, so the margin shrinks
+   * with a narrow paper instead of eating a phone screen. */
+  padding: clamp(var(--space-4), 5%, var(--space-10));
   box-shadow: var(--shadow-lg);
+  /* The narrow layout below queries this container, not the viewport. */
+  container: invoice-paper / inline-size;
   font-size: var(--text-sm);
   line-height: 1.6;
 }
@@ -184,14 +188,14 @@
 
 .inv-parties-secondary {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
   gap: var(--space-6);
   margin-bottom: var(--space-5);
 }
 
 .inv-references {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
   gap: var(--space-1) var(--space-6);
   margin-bottom: var(--space-4);
   padding: var(--space-3) var(--space-4);
@@ -322,6 +326,12 @@
   color: var(--text-muted);
 }
 
+/* (0,3,0) outranks the table base's left alignment, which .inv-col-num on
+ * its own (0,1,0) never did: the line table's numbers sat left. */
+.invoice-paper .data-table .inv-col-num {
+  text-align: right;
+}
+
 .inv-col-id {
   width: 3rem;
   color: var(--text-line-id);
@@ -334,6 +344,15 @@
 .inv-col-num {
   text-align: right;
   white-space: nowrap;
+}
+
+/* Quantity and price may wrap between words ("12,5 / Stunden", "statt
+ * 189,00 / (− 24,50)"): unwrapped, their text sets the table's minimum
+ * width, and a paper just above the narrow breakpoint would scroll the
+ * last column out of sight. Amounts keep their sign through U+00A0. */
+.inv-lines .inv-col-qty,
+.inv-lines .inv-col-price {
+  white-space: normal;
 }
 
 .inv-line-name {
@@ -458,18 +477,106 @@
   }
 }
 
-@media (max-width: 600px) {
-.inv-parties {
-    grid-template-columns: 1fr;
-  }
-
-.inv-header {
+/* Narrow rendering. The paper is embedded in previews, side panels and
+ * phones alike, so what decides the layout is the width the paper itself
+ * gets, not the viewport's: a container query on .invoice-paper. Printed on
+ * A4 the paper is ~680px wide, above the breakpoint, so a PDF never sees
+ * this layout. */
+@container invoice-paper (max-width: 540px) {
+  .inv-header {
     flex-direction: column;
     gap: var(--space-3);
   }
 
-.inv-header-right {
+  .inv-header-right {
     text-align: left;
+  }
+
+  .inv-parties {
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+
+  .inv-references {
+    gap: var(--space-1);
+  }
+
+  /* The totals take the full width: a 280px box pushed right leaves the
+   * labels no room on a phone. */
+  .inv-totals-wrap {
+    display: block;
+  }
+
+  .inv-totals {
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* Each line becomes a two-row block, the way a receipt reads:
+   *
+   *    1  Item name and description …          900.00
+   *       10 h  × 90.00   19 %
+   *
+   * The cells stay where they are in the markup (and so every data-path
+   * with them); only the grid places them. qty × price says what the two
+   * numbers are without the column headers, so the header row is hidden
+   * visually but kept for screen readers. */
+  .inv-lines-wrap {
+    overflow-x: visible;
+  }
+
+  .inv-lines,
+  .inv-lines tbody {
+    display: block;
+  }
+
+  .inv-lines thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .inv-lines tbody tr {
+    display: grid;
+    grid-template-columns: 1.75rem auto 1fr auto;
+    column-gap: var(--space-3);
+    row-gap: var(--space-1);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .invoice-paper .inv-lines tbody td {
+    padding: 0;
+    border: 0;
+  }
+
+  /* The rate sits under the line amount, so every line keeps one right
+   * edge however wide its price sub-lines run. */
+  .inv-lines .inv-col-id    { grid-area: 1 / 1; width: auto; }
+  .inv-lines .inv-col-desc  { grid-area: 1 / 2 / 2 / 4; min-width: 0; overflow-wrap: anywhere; }
+  .inv-lines .inv-col-net   { grid-area: 1 / 4; font-weight: 500; color: var(--text-strong); }
+  .inv-lines .inv-col-qty   { grid-area: 2 / 2; }
+  .inv-lines .inv-col-price { grid-area: 2 / 3; }
+  .inv-lines .inv-col-vat   { grid-area: 2 / 4; color: var(--text-muted); }
+
+  .invoice-paper .data-table .inv-col-qty,
+  .invoice-paper .data-table .inv-col-price {
+    text-align: left;
+  }
+
+  .inv-lines .inv-col-qty:empty,
+  .inv-lines .inv-col-vat:empty {
+    display: none;
+  }
+
+  /* "× 90.00" reads as a unit price after the quantity; the sub-lines
+   * (price before discount, per-base-quantity) stay stacked under it. */
+  .inv-lines .inv-col-qty:not(:empty) + .inv-col-price::before {
+    content: "× ";
+    color: var(--text-muted);
   }
 }
 
