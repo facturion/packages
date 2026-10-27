@@ -1,5 +1,20 @@
 # @facturion/invoice-renderer
 
+## 0.9.0
+
+### Minor Changes
+
+- 8ed110d: A quantity in unit C62 prints as the bare number (`4`, not `4 Unitless` / `4 Ohne Einheit`), also as a price's base quantity (`per 100`). C62 is a count with no unit of measure; its codelist label describes the code for a picker and stays as it is. With nothing printed, the unit has no mark of its own: a highlighted finding on it outlines the line.
+- 3553e84: The document lays itself out for a narrow host. `.invoice-paper` is a size container, and below 540px of content width the header and parties stack, the totals take the full width and each line becomes a two-row block (`qty × price` under the item, the rate under the line amount) instead of a table that scrolls sideways. The layout follows the paper's own width, so a side-panel preview gets it too, and an A4 print never does. The old `@media (max-width: 600px)` rules are gone. A paper in a shrink-to-fit context (a flex row, an inline-block) needs a definite width now, or it collapses.
+
+  Markup: the line table's number cells also carry `inv-col-qty`, `inv-col-price`, `inv-col-vat` and `inv-col-net` (`inv-col-num` stays), and the table's parts carry their ARIA roles, which WebKit drops once they stop being displayed as table parts. The sign of a line's discount, allowance or charge is joined to its amount by U+00A0.
+
+  Fixed: the line table's numbers are right-aligned again; the table base rule outranked `.inv-col-num`. Quantity and price cells may wrap, so a paper just above the breakpoint no longer scrolls the last column out of sight.
+
+### Patch Changes
+
+- 45670eb: highlight: outlines at the line table's outer edge are drawn whole. The table's scrolling wrapper clipped the outer side of a focused line, of its first or last cell, and of the first and last rows; `highlight.css` now pads the wrapper by an outline's reach (`--inv-hl-width` + `--inv-hl-offset`) without moving the table.
+
 ## 0.8.2
 
 ### Patch Changes
