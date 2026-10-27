@@ -138,8 +138,15 @@ export function fmtDate(value: unknown, lang: Lang = DEFAULT_LANG): string {
   return `${m[1]}-${m[2]}-${m[3]}`;
 }
 
+/** Units a document prints as the bare quantity. C62 is "one", a count with
+ *  no unit of measure: its codelist label ("Unitless") describes the code for
+ *  a picker, but beside a quantity ("4 Unitless") it reads as a unit, which it
+ *  is not. The code itself stays in the data, and the XML, untouched. */
+const BARE_UNITS: ReadonlySet<string> = new Set(["C62"]);
+
+/** The unit as printed beside a quantity; "" when there is none to print. */
 function unitLabel(code: string | undefined, qty: unknown, t: TFunction): string {
-  if (!code) return "";
+  if (!code || BARE_UNITS.has(code)) return "";
   const plural = Number(qty) !== 1;
   const key: LabelKey = `units.${code}${plural ? "_plural" : ""}`;
   const label = t(key);
@@ -547,17 +554,15 @@ function linesBlock(invoice: RenderableInvoice, t: TFunction, lang: Lang, a: Ann
     // BT-149/150: a price expressed per N units, not per 1.
     const baseQty = line.price?.base_quantity;
     if (baseQty != null && Number(baseQty) !== 1) {
-      const baseUnit = line.price?.base_quantity_unit_code;
+      const baseUnit = unitLabel(line.price?.base_quantity_unit_code, baseQty, t);
       if (a.on) {
         const qtyHtml = a.wrap(`${L}/price/base_quantity`, num(baseQty, lang)) +
-          (baseUnit ? ` ${a.wrap(`${L}/price/base_quantity_unit_code`, esc(unitLabel(baseUnit, baseQty, t)))}` : "");
+          (baseUnit ? ` ${a.wrap(`${L}/price/base_quantity_unit_code`, esc(baseUnit))}` : "");
         // The "per {qty}" string is escaped as a whole; here the qty carries
         // markup, so it goes in after escaping, in place of a placeholder.
         priceCell += `<div class="inv-line-price-base">${esc(viewLabel(t, "perBase", { qty: "\u0000" })).replace("\u0000", qtyHtml)}</div>`;
       } else {
-        const qtyText = baseUnit
-          ? `${num(baseQty, lang)} ${unitLabel(baseUnit, baseQty, t)}`
-          : num(baseQty, lang);
+        const qtyText = baseUnit ? `${num(baseQty, lang)} ${baseUnit}` : num(baseQty, lang);
         priceCell += `<div class="inv-line-price-base">${esc(viewLabel(t, "perBase", { qty: qtyText }))}</div>`;
       }
     }
@@ -570,9 +575,12 @@ function linesBlock(invoice: RenderableInvoice, t: TFunction, lang: Lang, a: Ann
       vatCell += `${vatCell ? " " : ""}<span class="inv-line-vatcat"${a.at(`${L}/vat/category_code`)}>${esc(taxCat)}</span>`;
     }
 
+    // A bare unit (C62) prints nothing, so it has no mark of its own: a
+    // finding on it outlines the line instead (highlight's ancestor fallback).
+    const unitText = unitLabel(unit, qty, t);
     const qtyCell = a.on
-      ? `${qty != null && qty !== "" ? a.wrap(`${L}/quantity`, num(qty, lang)) : a.slot(`${L}/quantity`, viewLabel(t, "quantity"))}${unit ? ` ${a.wrap(`${L}/unit_code`, esc(unitLabel(unit, qty, t)))}` : ""}`
-      : `${num(qty, lang)}${unit ? ` ${esc(unitLabel(unit, qty, t))}` : ""}`;
+      ? `${qty != null && qty !== "" ? a.wrap(`${L}/quantity`, num(qty, lang)) : a.slot(`${L}/quantity`, viewLabel(t, "quantity"))}${unitText ? ` ${a.wrap(`${L}/unit_code`, esc(unitText))}` : ""}`
+      : `${num(qty, lang)}${unitText ? ` ${esc(unitText)}` : ""}`;
 
     return `
     <tr role="row"${a.at(L)}>
