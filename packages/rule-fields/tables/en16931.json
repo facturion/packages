@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "status": "DRAFT — AI-drafted (two subagents + a generator script), reviewed by Claude against each rule's test; not yet human-reviewed. 188 of the CEN core rules: those whose anchor alone points at the wrong place, at nothing, only at the containing block, or is unreliable (the VAT-breakdown rules)",
+    "status": "DRAFT — AI-drafted (two subagents + a generator script), reviewed by Claude against each rule's test; not yet human-reviewed. 188 of the CEN core rules: those whose anchor alone points at the wrong place, at nothing, only at the containing block, or is unreliable (the VAT-breakdown rules). Plus 103 of the CEN syntax-binding rules (CII-SR-*, UBL-SR-*), drafted 2026-11-13 with a generator script and checked by tripping each in a real document: those that count or require a field the model holds, since they fire on the containing block (often the document itself)",
     "source": "standards/xrechnung/resources/{ubl/2.1,cii/16b}/xsl/EN16931-{UBL,CII}-validation.xsl",
     "drafted": "2026-10-23",
     "kinds": {
@@ -37,7 +37,7 @@
       "unmatched filters": "only a target's unmatched ~?f=v means \"add one here\"; a condition's or operand's yields nothing",
       "0/x": "relative to the finding's anchor (Relative JSON Pointer; 0 = the anchor itself)"
     },
-    "not mapped": "rules that fire on the field itself (BR-CL-01/03/04/05/06/14/15/17/18/19/20/22: the anchor is exact) and the syntax rules (UBL-*/CII-*)"
+    "not mapped": "rules that fire on the field itself (BR-CL-01/03/04/05/06/14/15/17/18/19/20/22: the anchor is exact); the data-type rules (UBL-DT-*, CII-DT-*) and UBL-CR-*, which fire on the element itself; the syntax rules that forbid an element the model has no field for (most CII-SR-*), which anchor at the block that holds it; CII-SR-186 (an attribute the model doesn't hold), CII-SR-471 (no such child in CII; its message is about a different check) and CII-SR-483/485/486/488–494 (summation amounts outside EN 16931)"
   },
   "rules": {
     "BR-01": {
@@ -3842,6 +3842,1263 @@
           "role": "condition"
         }
       ]
+    },
+    "CII-SR-003": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/process_control/business_process_type",
+          "role": "target"
+        }
+      ],
+      "note": "The business process appears more than once, where the standard allows only one. This is only a warning, but the editor shows only the first: check it against the sender's PDF.",
+      "generator": "CII only. The JSON holds one business process, so the generator writes one element."
+    },
+    "CII-SR-009": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/process_control/specification_id",
+          "role": "target"
+        }
+      ],
+      "note": "The invoice must name exactly one standard it follows; it names none or several. A receiving system can't tell which rules apply, so ask the sender for a corrected invoice.",
+      "generator": "CII only. The generator always writes one specification identifier for the chosen format."
+    },
+    "CII-SR-010": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/process_control/specification_id",
+          "role": "target"
+        }
+      ],
+      "note": "The invoice must name exactly one standard it follows; the place for it is empty or repeated. A receiving system can't tell which rules apply, so ask the sender for a corrected invoice.",
+      "generator": "CII only. The generator always writes one specification identifier for the chosen format."
+    },
+    "CII-SR-014": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/invoice_type_code",
+          "role": "target"
+        }
+      ],
+      "note": "The invoice must state exactly one document type (invoice, credit note, …); it states none or several. Ask the sender for a corrected invoice.",
+      "generator": "CII only. The generator writes exactly one type code."
+    },
+    "CII-SR-030": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/notes/~./text",
+          "role": "target"
+        }
+      ],
+      "note": "The text of this note appears more than once, where the standard allows only one. This is only a warning, but the editor shows only the first: check it against the sender's PDF.",
+      "generator": "CII only. The JSON holds one text per note, so the generator writes one element."
+    },
+    "CII-SR-039": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/lines/~./note",
+          "role": "target"
+        }
+      ],
+      "note": "This line's note appears more than once, where the standard allows only one. This is only a warning, but the editor shows only the first: check it against the sender's PDF.",
+      "generator": "CII only. The JSON holds one note per line, so the generator writes one element."
+    },
+    "CII-SR-040": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/lines/~./note",
+          "role": "target"
+        }
+      ],
+      "note": "This line's note text appears more than once, where the standard allows only one. This is only a warning, but the editor shows only the first: check it against the sender's PDF.",
+      "generator": "CII only. The JSON holds one note per line, so the generator writes one element."
+    },
+    "CII-SR-046": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/lines/~./item/standard_id/scheme_id",
+          "role": "target"
+        }
+      ],
+      "note": "This line's item has a standard identifier (such as a GTIN) without saying which scheme it belongs to. Ask the sender which scheme the identifier is from.",
+      "generator": "CII only. The schema requires a scheme with the standard identifier, and the generator writes it as schemeID."
+    },
+    "CII-SR-069": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/lines/~./item/attributes/~./name",
+          "role": "target"
+        }
+      ],
+      "note": "An attribute of this line's item has no name, or several. Each attribute needs exactly one name; check the item's attributes with the sender.",
+      "generator": "CII only. The schema requires one name per attribute."
+    },
+    "CII-SR-072": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/lines/~./item/attributes/~./value",
+          "role": "target"
+        }
+      ],
+      "note": "An attribute of this line's item has no value, or several. Each attribute needs exactly one value; check the item's attributes with the sender.",
+      "generator": "CII only. The schema requires one value per attribute."
+    },
+    "CII-SR-090": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/lines/~./item/country_of_origin",
+          "role": "target"
+        }
+      ],
+      "note": "This line's item gives a country of origin without a country code, or with several. Check the country of origin with the sender.",
+      "generator": "CII only. The generator writes one country code when the country of origin is set."
+    },
+    "CII-SR-119": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/lines/~./price/discount",
+          "role": "target"
+        }
+      ],
+      "note": "The price adjustment on this line is not a plain discount with an amount. Only discounts are allowed on the price itself, so the editor may show a different price than the sender's PDF; check the line's price with the sender.",
+      "generator": "CII only. The JSON holds a price discount only; the generator writes it with ChargeIndicator false and its amount."
+    },
+    "CII-SR-439": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/lines/~./price/net_price",
+          "role": "target"
+        }
+      ],
+      "note": "This line must state exactly one net price; it states none or several. Check the line's price against the sender's PDF.",
+      "generator": "CII only. The generator writes one net price per line."
+    },
+    "CII-SR-440": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/lines/~./price/discount",
+          "role": "target"
+        }
+      ],
+      "note": "The discount on this line's price appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "CII only. The JSON holds one price discount per line, so the generator writes one element."
+    },
+    "CII-SR-441": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/lines/~./price/net_price",
+          "role": "target"
+        }
+      ],
+      "note": "This line's net price appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "CII only. The JSON holds one net price per line, so the generator writes one element."
+    },
+    "CII-SR-449": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/delivery/location_id",
+          "role": "target"
+        }
+      ],
+      "note": "The delivery location is identified twice, by its own identifier and by a global one; the standard allows only one. This is only a warning, but the editor shows just one of them: check it against the sender's PDF.",
+      "generator": "CII only. The JSON holds one location identifier; the generator writes it as GlobalID with a scheme, ID without."
+    },
+    "CII-SR-450": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/buyer/identifier",
+          "role": "target"
+        }
+      ],
+      "note": "The buyer is identified twice, by its own identifier and by a global one; the standard allows only one. This is only a warning, but the editor shows just one of them: check it against the sender's PDF.",
+      "generator": "CII only. The JSON holds one buyer identifier; the generator writes it as GlobalID with a scheme, ID without."
+    },
+    "CII-SR-451": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/payee/identifier",
+          "role": "target"
+        }
+      ],
+      "note": "The payee is identified twice, by its own identifier and by a global one; the standard allows only one. This is only a warning, but the editor shows just one of them: check it against the sender's PDF.",
+      "generator": "CII only. The JSON holds one payee identifier; the generator writes it as GlobalID with a scheme, ID without."
+    },
+    "CII-SR-452": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/payment_terms",
+          "role": "target"
+        },
+        {
+          "path": "/due_date",
+          "role": "target"
+        },
+        {
+          "path": "/payment/direct_debit/mandate_reference",
+          "role": "target"
+        }
+      ],
+      "note": "The payment terms appears more than once, where the standard allows only one. This is only a warning, but the editor shows only the first, with its due date and mandate reference: check it against the sender's PDF.",
+      "generator": "CII only. The JSON holds one set of payment terms (terms text, due date, mandate reference); the generator writes one SpecifiedTradePaymentTerms.",
+      "remark": "The duplicated block holds three fields; all are targets, since any of them may differ between the copies."
+    },
+    "CII-SR-453": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/payment_terms",
+          "role": "target"
+        }
+      ],
+      "note": "The payment terms text appears more than once, where the standard allows only one. This is only a warning, but the editor shows only the first: check it against the sender's PDF.",
+      "generator": "CII only. The JSON holds one payment terms text, so the generator writes one element."
+    },
+    "CII-SR-454": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/lines/~./vat/category_code",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~./vat/rate",
+          "role": "target"
+        }
+      ],
+      "note": "This line must state its VAT exactly once; it states it not at all or several times. Ask the sender which VAT category and rate apply to the line.",
+      "generator": "CII only. The generator writes one ApplicableTradeTax per line."
+    },
+    "CII-SR-455": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/seller/contact",
+          "role": "target"
+        }
+      ],
+      "note": "The seller's contact appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first contact, ask the sender for a corrected invoice.",
+      "generator": "CII only. The JSON holds one seller contact, so the generator writes one element."
+    },
+    "CII-SR-456": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/buyer/contact",
+          "role": "target"
+        }
+      ],
+      "note": "The buyer's contact appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first contact, ask the sender for a corrected invoice.",
+      "generator": "CII only. The JSON holds one buyer contact, so the generator writes one element."
+    },
+    "CII-SR-457": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/tender_or_lot_reference",
+          "role": "target"
+        }
+      ],
+      "note": "The tender or lot reference appears more than once, where the standard allows only one. This is only a warning, but the editor shows only the first: check it against the sender's PDF.",
+      "generator": "CII only. The JSON holds one tender or lot reference, so the generator writes one element."
+    },
+    "CII-SR-458": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/object_identifier",
+          "role": "target"
+        }
+      ],
+      "note": "The invoiced object identifier appears more than once, where the standard allows only one. This is only a warning, but the editor shows only the first: check it against the sender's PDF.",
+      "generator": "CII only. The JSON holds one invoiced object identifier, so the generator writes one element."
+    },
+    "CII-SR-459": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/seller/electronic_address",
+          "role": "target"
+        }
+      ],
+      "note": "The seller's electronic address appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "CII only. The JSON holds one seller electronic address, so the generator writes one element."
+    },
+    "CII-SR-460": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/buyer/electronic_address",
+          "role": "target"
+        }
+      ],
+      "note": "The buyer's electronic address appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "CII only. The JSON holds one buyer electronic address, so the generator writes one element."
+    },
+    "CII-SR-461": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/tax_point_date",
+          "role": "target"
+        }
+      ],
+      "note": "The VAT point date appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "CII only. The JSON holds one VAT point date, so the generator writes one element."
+    },
+    "CII-SR-462": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/tax_point_date_code",
+          "role": "target"
+        }
+      ],
+      "note": "The VAT breakdown gives different codes for when VAT becomes due; the invoice may use only one. The editor shows just one of them, so ask the sender for a corrected invoice.",
+      "generator": "CII only. The JSON holds one code; the generator writes the same code in every breakdown entry."
+    },
+    "CII-SR-463": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "0",
+          "role": "target"
+        }
+      ],
+      "note": "This allowance or charge doesn't say whether it reduces or increases the total. Ask the sender which one is meant before booking the invoice.",
+      "generator": "CII only. ChargeIndicator is derived from which list the entry sits in."
+    },
+    "CII-SR-465": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/seller/contact/name",
+          "role": "target"
+        }
+      ],
+      "note": "The seller's contact gives both a person and a department; the standard has room for one contact name. This is only a warning, but the editor shows just one of them: check it against the sender's PDF.",
+      "generator": "CII only. The JSON holds one contact name; the generator writes it as PersonName."
+    },
+    "CII-SR-466": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/buyer/contact/name",
+          "role": "target"
+        }
+      ],
+      "note": "The buyer's contact gives both a person and a department; the standard has room for one contact name. This is only a warning, but the editor shows just one of them: check it against the sender's PDF.",
+      "generator": "CII only. The JSON holds one contact name; the generator writes it as PersonName."
+    },
+    "CII-SR-467": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/payment/means_code",
+          "role": "target"
+        }
+      ],
+      "note": "The invoice's payment means give different payment types (for example a transfer and a direct debit). The invoice may use only one, and the editor shows just one of them; ask the sender how the invoice is to be paid.",
+      "generator": "CII only. The JSON holds one means code; the generator writes it on every payment means."
+    },
+    "CII-SR-468": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/payment/means_text",
+          "role": "target"
+        }
+      ],
+      "note": "The invoice's payment means describe the payment type in different words; the invoice may use one description. The editor shows just one of them; check it against the sender's PDF.",
+      "generator": "CII only. The JSON holds one means text; the generator writes it on every payment means."
+    },
+    "CII-SR-469": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/payment/remittance_information",
+          "role": "target"
+        }
+      ],
+      "note": "The payment reference appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "CII only. The JSON holds one payment reference, so the generator writes one element."
+    },
+    "CII-SR-470": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/payment/credit_transfers/~*/account_id",
+          "role": "target"
+        },
+        {
+          "path": "/payment/means_code",
+          "role": "condition"
+        }
+      ],
+      "note": "The invoice asks for payment by bank transfer but at least one of its bank accounts has no account number (IBAN or other). Ask the sender for the account to pay into.",
+      "generator": "CII only. The schema requires an account identifier on every credit transfer.",
+      "remark": "Counts the payment means under the header settlement, so the root anchor can't say which account; ~* marks each. A block with no account at all yields no credit transfer, and then nothing is marked but the condition."
+    },
+    "CII-SR-472": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/document_allowances/~./vat_category_code",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/document_allowances/~./vat_rate",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/document_charges/~./vat_category_code",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/document_charges/~./vat_rate",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "note": "The VAT category of this allowance or charge appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "CII only. The JSON holds one VAT category and rate per document-level allowance or charge; line-level ones carry no VAT of their own.",
+      "remark": "The official message speaks of a missing VAT rate; the test counts CategoryTradeTax (at most one). Mapped by the test. Line allowances and charges have no VAT fields, so only the document-level branches are targets.",
+      "anchor": "On a line allowance or charge the rule can only fire on VAT the line-level entry doesn't hold in the JSON (EN 16931 gives it none); the anchor still names the entry."
+    },
+    "CII-SR-473": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "0/amount",
+          "role": "target"
+        }
+      ],
+      "note": "The amount of this allowance or charge appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "CII only. The JSON holds one amount per allowance or charge, so the generator writes one element."
+    },
+    "CII-SR-474": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/lines/~./object_identifier",
+          "role": "target"
+        }
+      ],
+      "note": "The invoiced object identifier on this line appears more than once, where the standard allows only one. This is only a warning, but the editor shows only the first: check it against the sender's PDF.",
+      "generator": "CII only. The JSON holds one object identifier per line, so the generator writes one element."
+    },
+    "CII-SR-475": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/supporting_documents/~*/description",
+          "role": "target"
+        }
+      ],
+      "note": "More than one supporting document carries a description. The check counts descriptions across all supporting documents together, so it also fires when each document has one description, which is allowed. Only a warning; if each document has a single description, nothing needs correcting.",
+      "generator": "CII only. The JSON has one description per document; the generator writes one Name for each, so it trips this rule whenever two supporting documents have descriptions.",
+      "remark": "The test counts across all TypeCode 916 references in the header, not per document (that is XRechnung's BR-TMP-4), so every document is a target: ~* rather than ~., which the root anchor couldn't bind."
+    },
+    "CII-SR-476": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/supporting_documents/~*/attached_document",
+          "role": "target"
+        }
+      ],
+      "note": "More than one supporting document carries an attached file. The check counts attachments across all supporting documents together, so it also fires when each document has one attachment, which is allowed. Only a warning; if each document has a single attachment, nothing needs correcting.",
+      "generator": "CII only. The JSON has one attachment per document; the generator writes one for each, so it trips this rule whenever two supporting documents have attachments.",
+      "remark": "Counts across all TypeCode 916 references, like CII-SR-475; ~* for the same reason."
+    },
+    "CII-SR-477": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/totals/line_net_total",
+          "role": "target"
+        }
+      ],
+      "note": "The sum of the line amounts appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first and recomputes totals, ask the sender for a corrected invoice.",
+      "generator": "CII only. The JSON holds one sum of the line amounts, so the generator writes one element."
+    },
+    "CII-SR-478": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/totals/charge_total",
+          "role": "target"
+        }
+      ],
+      "note": "The total of the charges appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first and recomputes totals, ask the sender for a corrected invoice.",
+      "generator": "CII only. The JSON holds one total of the charges, so the generator writes one element."
+    },
+    "CII-SR-479": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/totals/allowance_total",
+          "role": "target"
+        }
+      ],
+      "note": "The total of the allowances appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first and recomputes totals, ask the sender for a corrected invoice.",
+      "generator": "CII only. The JSON holds one total of the allowances, so the generator writes one element."
+    },
+    "CII-SR-480": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/totals/tax_exclusive_amount",
+          "role": "target"
+        }
+      ],
+      "note": "The total without VAT appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first and recomputes totals, ask the sender for a corrected invoice.",
+      "generator": "CII only. The JSON holds one total without vat, so the generator writes one element."
+    },
+    "CII-SR-481": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/totals/rounding_amount",
+          "role": "target"
+        }
+      ],
+      "note": "The rounding amount appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first and recomputes totals, ask the sender for a corrected invoice.",
+      "generator": "CII only. The JSON holds one rounding amount, so the generator writes one element."
+    },
+    "CII-SR-482": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/totals/tax_inclusive_amount",
+          "role": "target"
+        }
+      ],
+      "note": "The total with VAT appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first and recomputes totals, ask the sender for a corrected invoice.",
+      "generator": "CII only. The JSON holds one total with vat, so the generator writes one element."
+    },
+    "CII-SR-484": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/totals/prepaid_amount",
+          "role": "target"
+        }
+      ],
+      "note": "The prepaid amount appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first and recomputes totals, ask the sender for a corrected invoice.",
+      "generator": "CII only. The JSON holds one prepaid amount, so the generator writes one element."
+    },
+    "CII-SR-487": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/totals/amount_due",
+          "role": "target"
+        }
+      ],
+      "note": "The amount due appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first and recomputes totals, ask the sender for a corrected invoice.",
+      "generator": "CII only. The JSON holds one amount due, so the generator writes one element."
+    },
+    "UBL-SR-01": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/contract_reference",
+          "role": "target"
+        }
+      ],
+      "note": "The contract reference appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one contract reference, so the generator writes one element."
+    },
+    "UBL-SR-02": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/receiving_advice_reference",
+          "role": "target"
+        }
+      ],
+      "note": "The receiving advice reference appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one receiving advice reference, so the generator writes one element."
+    },
+    "UBL-SR-03": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/despatch_advice_reference",
+          "role": "target"
+        }
+      ],
+      "note": "The despatch advice reference appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one despatch advice reference, so the generator writes one element."
+    },
+    "UBL-SR-04": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/object_identifier",
+          "role": "target"
+        }
+      ],
+      "note": "The invoiced object identifier appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one invoiced object identifier, so the generator writes one element."
+    },
+    "UBL-SR-05": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/payment_terms",
+          "role": "target"
+        }
+      ],
+      "note": "The payment terms text appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one payment terms text, so the generator writes one element."
+    },
+    "UBL-SR-06": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/preceding_invoices/~./reference",
+          "role": "target"
+        },
+        {
+          "path": "/preceding_invoices/~./issue_date",
+          "role": "target"
+        }
+      ],
+      "note": "The preceding invoice in this reference appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one invoice per preceding-invoice entry; the generator writes one BillingReference for each."
+    },
+    "UBL-SR-07": {
+      "kind": "missing",
+      "fields": [
+        {
+          "path": "/preceding_invoices/~./reference",
+          "role": "target"
+        }
+      ],
+      "note": "A reference to a preceding invoice doesn't give that invoice's number. Ask the sender which invoice this one refers to.",
+      "generator": "UBL only. The schema requires the number of each preceding invoice."
+    },
+    "UBL-SR-08": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/delivery/period",
+          "role": "target"
+        }
+      ],
+      "note": "The invoicing period appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one invoicing period, so the generator writes one element."
+    },
+    "UBL-SR-09": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/seller/name",
+          "role": "target"
+        }
+      ],
+      "note": "The seller's name appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one seller name, so the generator writes one element."
+    },
+    "UBL-SR-10": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/seller/trading_name",
+          "role": "target"
+        }
+      ],
+      "note": "The seller's trading name appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one seller trading name, so the generator writes one element."
+    },
+    "UBL-SR-11": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/seller/legal_registration_id",
+          "role": "target"
+        }
+      ],
+      "note": "The seller's legal registration identifier appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one seller legal registration identifier, so the generator writes one element."
+    },
+    "UBL-SR-12": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target"
+        }
+      ],
+      "note": "The seller's VAT ID appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one seller vat id, so the generator writes one element."
+    },
+    "UBL-SR-13": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/seller/tax_registration_id",
+          "role": "target"
+        }
+      ],
+      "note": "The seller's tax number appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one seller tax number, so the generator writes one element."
+    },
+    "UBL-SR-14": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/seller/additional_legal_info",
+          "role": "target"
+        }
+      ],
+      "note": "The seller's additional legal information appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one seller additional legal information, so the generator writes one element."
+    },
+    "UBL-SR-15": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/buyer/name",
+          "role": "target"
+        }
+      ],
+      "note": "The buyer's name appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one buyer name, so the generator writes one element."
+    },
+    "UBL-SR-16": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/buyer/identifier",
+          "role": "target"
+        }
+      ],
+      "note": "The buyer's identifier appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one buyer identifier, so the generator writes one element."
+    },
+    "UBL-SR-17": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/buyer/legal_registration_id",
+          "role": "target"
+        }
+      ],
+      "note": "The buyer's legal registration identifier appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one buyer legal registration identifier, so the generator writes one element."
+    },
+    "UBL-SR-18": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/buyer/vat_id",
+          "role": "target"
+        }
+      ],
+      "note": "The buyer's VAT ID appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one buyer vat id, so the generator writes one element."
+    },
+    "UBL-SR-19": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/payee/name",
+          "role": "target"
+        },
+        {
+          "path": "/seller/name",
+          "role": "condition"
+        }
+      ],
+      "note": "The payee's name appears more than once, or is the same as the seller's. A payee is stated only when someone other than the seller is to be paid; ask the sender who receives the payment.",
+      "generator": "UBL only. The JSON holds one payee name; the generator writes the payee only when it is given, and not when it equals the seller.",
+      "remark": "The test also fails when the payee has no PartyName (a comparison with an empty sequence is false); BR-17 already reports that case."
+    },
+    "UBL-SR-20": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/payee/identifier",
+          "role": "target"
+        },
+        {
+          "path": "/payee/name",
+          "role": "condition"
+        },
+        {
+          "path": "/seller/name",
+          "role": "condition"
+        }
+      ],
+      "note": "The payee has more than one identifier, or the payee's name is the same as the seller's. A payee is stated only when someone other than the seller is to be paid; ask the sender who receives the payment.",
+      "generator": "UBL only. The JSON holds one payee identifier."
+    },
+    "UBL-SR-21": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/payee/legal_registration_id",
+          "role": "target"
+        },
+        {
+          "path": "/payee/name",
+          "role": "condition"
+        },
+        {
+          "path": "/seller/name",
+          "role": "condition"
+        }
+      ],
+      "note": "The payee has more than one legal registration identifier, or the payee's name is the same as the seller's. A payee is stated only when someone other than the seller is to be paid; ask the sender who receives the payment.",
+      "generator": "UBL only. The JSON holds one payee legal registration identifier."
+    },
+    "UBL-SR-22": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/seller_tax_representative/name",
+          "role": "target"
+        }
+      ],
+      "note": "The tax representative's name appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one tax representative name, so the generator writes one element."
+    },
+    "UBL-SR-23": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target"
+        }
+      ],
+      "note": "The tax representative's VAT ID appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one tax representative vat id, so the generator writes one element."
+    },
+    "UBL-SR-24": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/delivery",
+          "role": "target"
+        }
+      ],
+      "note": "The delivery information appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one delivery information, so the generator writes one element."
+    },
+    "UBL-SR-25": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/delivery/name",
+          "role": "target"
+        }
+      ],
+      "note": "The name of the party delivered to appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one deliver-to name, so the generator writes one element."
+    },
+    "UBL-SR-26": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/payment/remittance_information",
+          "role": "target"
+        }
+      ],
+      "note": "The payment reference appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one payment reference, so the generator writes one element."
+    },
+    "UBL-SR-27": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/payment/means_code",
+          "role": "target"
+        }
+      ],
+      "note": "The payment type code appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one payment type code, so the generator writes one element."
+    },
+    "UBL-SR-28": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/payment/direct_debit/mandate_reference",
+          "role": "target"
+        }
+      ],
+      "note": "The direct debit mandate reference appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one direct debit mandate reference, so the generator writes one element."
+    },
+    "UBL-SR-29": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/payment/direct_debit/creditor_id",
+          "role": "target"
+        }
+      ],
+      "note": "The creditor identifier for direct debit appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one creditor identifier for direct debit, so the generator writes one element."
+    },
+    "UBL-SR-30": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/document_allowances/~./reason",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/lines/~./allowances/~./reason",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "note": "The reason for this allowance appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one reason per allowance.",
+      "remark": "Anchored: the context also matches price-level allowances, which have no reason in the JSON.",
+      "anchor": "On a price-level allowance the rule can only fire on reasons the JSON doesn't hold; the anchor still names the line's price."
+    },
+    "UBL-SR-31": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/document_charges/~./reason",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/lines/~./charges/~./reason",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "note": "The reason for this charge appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one reason per charge."
+    },
+    "UBL-SR-32": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/vat_breakdown/~./reason",
+          "role": "target"
+        }
+      ],
+      "note": "The VAT exemption reason appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one vat exemption reason, so the generator writes one element."
+    },
+    "UBL-SR-33": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/supporting_documents/~./description",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "note": "This supporting document's description appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one description per supporting document.",
+      "remark": "Anchored: the context also matches the invoiced object reference, which has no description in the JSON.",
+      "anchor": "On the invoiced object reference the rule can only fire on descriptions the JSON doesn't hold; the anchor still names the reference."
+    },
+    "UBL-SR-34": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/lines/~./note",
+          "role": "target"
+        }
+      ],
+      "note": "This line's note appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one note per line, so the generator writes one element."
+    },
+    "UBL-SR-35": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/lines/~./order_line_reference",
+          "role": "target"
+        }
+      ],
+      "note": "This line's purchase order line reference appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one purchase order line reference per line, so the generator writes one element."
+    },
+    "UBL-SR-36": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/lines/~./period",
+          "role": "target"
+        }
+      ],
+      "note": "This line's invoicing period appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one invoicing period per line, so the generator writes one element."
+    },
+    "UBL-SR-37": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/lines/~./price/discount",
+          "role": "target"
+        }
+      ],
+      "note": "The discount on this line's price appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one discount on price per line, so the generator writes one element."
+    },
+    "UBL-SR-39": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/project_reference",
+          "role": "target"
+        }
+      ],
+      "note": "The project reference appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one project reference, so the generator writes one element."
+    },
+    "UBL-SR-40": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/buyer/trading_name",
+          "role": "target"
+        }
+      ],
+      "note": "The buyer's trading name appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one buyer trading name, so the generator writes one element."
+    },
+    "UBL-SR-42": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target"
+        },
+        {
+          "path": "/seller/tax_registration_id",
+          "role": "target"
+        }
+      ],
+      "note": "The seller states more than two tax registrations; the standard has room for a VAT ID and one other tax number. The editor shows just two of them, so ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one VAT ID and one tax number; the generator writes a PartyTaxScheme for each."
+    },
+    "UBL-SR-43": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/supporting_documents/~./reference",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "note": "This supporting document's reference carries a scheme identifier. A scheme is only allowed on the invoiced object identifier; the editor doesn't show it. Ask the sender whether the document is meant as the invoiced object.",
+      "generator": "UBL only. The generator writes a schemeID only on the invoiced object reference (type 130).",
+      "anchor": "The context also matches the invoiced object reference (type 130), where the test always passes."
+    },
+    "UBL-SR-44": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/payment/remittance_information",
+          "role": "target"
+        }
+      ],
+      "note": "The invoice gives different payment references; it may use only one, though the same one may repeat. The editor shows just one of them, so ask the sender which reference to pay with.",
+      "generator": "UBL only. The JSON holds one payment reference; the generator writes it on every payment means."
+    },
+    "UBL-SR-45": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/due_date",
+          "role": "target"
+        }
+      ],
+      "note": "The payment due date appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one payment due date, so the generator writes one element."
+    },
+    "UBL-SR-46": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/payment/means_text",
+          "role": "target"
+        }
+      ],
+      "note": "The description of the payment type appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one description of the payment type, so the generator writes one element."
+    },
+    "UBL-SR-47": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/payment/means_code",
+          "role": "target"
+        }
+      ],
+      "note": "The invoice's payment means give different payment types (for example a transfer and a direct debit). The invoice may use only one, and the editor shows just one of them; ask the sender how the invoice is to be paid.",
+      "generator": "UBL only. The JSON holds one means code; the generator writes it on every payment means."
+    },
+    "UBL-SR-48": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/lines/~./vat/category_code",
+          "role": "target"
+        },
+        {
+          "path": "/lines/~./vat/rate",
+          "role": "target"
+        }
+      ],
+      "note": "This line must state its VAT category exactly once; it states it not at all or several times. Ask the sender which VAT category and rate apply to the line.",
+      "generator": "UBL only. The generator writes one ClassifiedTaxCategory per item."
+    },
+    "UBL-SR-49": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/tax_point_date_code",
+          "role": "target"
+        }
+      ],
+      "note": "The code for when VAT becomes due appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one code for when vat becomes due, so the generator writes one element."
+    },
+    "UBL-SR-50": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/lines/~./item/description",
+          "role": "target"
+        }
+      ],
+      "note": "This line's item description appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one item description per line, so the generator writes one element."
+    },
+    "UBL-SR-51": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/seller/address/line3",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/buyer/address/line3",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/seller_tax_representative/address/line3",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/delivery/address/line3",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "note": "An additional address line appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one third address line; the generator writes one AddressLine."
+    },
+    "UBL-SR-52": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/lines/~./object_identifier",
+          "role": "target"
+        }
+      ],
+      "note": "This line's invoiced object identifier appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one invoiced object identifier per line, so the generator writes one element."
+    },
+    "UBL-SR-53": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/seller/vat_id",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/seller/tax_registration_id",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/buyer/vat_id",
+          "role": "target",
+          "anchored": true
+        },
+        {
+          "path": "/seller_tax_representative/vat_id",
+          "role": "target",
+          "anchored": true
+        }
+      ],
+      "note": "A tax registration names its tax scheme but not the registration number itself. Ask the sender for the missing VAT ID or tax number.",
+      "generator": "UBL only. The generator writes a PartyTaxScheme only with its CompanyID.",
+      "remark": "Each PartyTaxScheme anchors at the registration it was read as (/seller/vat_id or /seller/tax_registration_id), so the anchored target picks the right one.",
+      "anchor": "A buyer's non-VAT registration anchors at /buyer/tax_registration_id, which EN 16931 has no field for; the finding keeps its anchor and names no field."
+    },
+    "UBL-SR-54": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/payment/card",
+          "role": "target"
+        }
+      ],
+      "note": "Payment card information appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one payment card information, so the generator writes one element."
+    },
+    "UBL-SR-55": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/payment/direct_debit",
+          "role": "target"
+        }
+      ],
+      "note": "The direct debit mandate appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one direct debit mandate, so the generator writes one element."
+    },
+    "UBL-SR-56": {
+      "kind": "structural",
+      "fields": [
+        {
+          "path": "/tender_or_lot_reference",
+          "role": "target"
+        }
+      ],
+      "note": "The tender or lot reference appears more than once, where the standard allows only one, so the invoice is invalid. Since the editor shows only the first, ask the sender for a corrected invoice.",
+      "generator": "UBL only. The JSON holds one tender or lot reference, so the generator writes one element."
     }
   }
 }

@@ -14,7 +14,7 @@ npm install @facturion/rule-fields
 
 | Table | Rules |
 |---|---|
-| `tables/en16931.json` | EN 16931 core (CEN), the rules whose location alone points at the wrong place or at nothing |
+| `tables/en16931.json` | EN 16931 core (CEN), the rules whose location alone points at the wrong place or at nothing, and the CII/UBL syntax-binding rules (CII-SR-\*, UBL-SR-\*) that count or require a field |
 | `tables/xrechnung.json` | XRechnung 3.0 (BR-DE-*, BR-TMP-*, and the PEPPOL rules XRechnung runs) |
 | `tables/fr.json` | The French e-invoicing rules (BR-FR-*, XP Z12-012) |
 | `tables/facturion.json` | Facturion's optional German VAT content pack (FCT-VAT-DE-*) |
