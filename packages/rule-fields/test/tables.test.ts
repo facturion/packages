@@ -55,7 +55,7 @@ function schemaProblems(p: Pattern): string[] {
 
 test("tables: load, and no rule is in two tables", () => {
   const all = mergeTables(...Object.values(tables));
-  assert.equal(all.size, 478);
+  assert.equal(all.size, 581);
 });
 
 test("tables: every absolute pattern is a place in the invoice schema", () => {
