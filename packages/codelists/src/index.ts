@@ -10,15 +10,16 @@ import {
   CODES,
   PREFERRED,
   COUNTRIES_ENTRIES,
+  EAS_SCHEMES_ENTRIES,
   ICD_SCHEMES_ENTRIES,
   type CodelistName,
   type CountryEntry,
-  type IcdSchemeEntry,
+  type SchemeEntry,
 } from "../generated/index.js";
 import type { CodelistOption, OptionOpts, Locale } from "./types.js";
 
 export type { CodelistOption, OptionOpts, Locale } from "./types.js";
-export type { CodelistName, CountryEntry, IcdSchemeEntry } from "../generated/index.js";
+export type { CodelistName, CountryEntry, SchemeEntry, IcdSchemeEntry } from "../generated/index.js";
 export { CODELIST_NAMES } from "../generated/index.js";
 
 function fromBucket(locale: string, bucket: string, key: string): string | undefined {
@@ -101,28 +102,82 @@ export function currencyOptions(locale: Locale, opts: OptionOpts = {}): Codelist
   return buildOptions("currencies", CODES["currencies"], locale, { preferredFirst: true, ...opts });
 }
 
-/** EAS/ICD scheme codes valid for a country (`""` = all). Country-agnostic
- *  schemes (`international`, or no country) are always included. */
-export function icdSchemesForCountry(country: string): string[] {
-  if (!country) return ICD_SCHEMES_ENTRIES.map((e) => e.code);
-  return ICD_SCHEMES_ENTRIES.filter(
-    (e) => !e.country || e.country === "international" || e.country === country,
-  ).map((e) => e.code);
+// ── identifier schemes ──────────────────────────────────────────────────────
+// Two lists: ISO 6523 ICD (identifier and registration schemes, BT-29-1,
+// BT-30-1, BT-46-1, …; EN 16931 BR-CL-10/11) and CEF EAS (electronic address
+// schemes, BT-34-1 / BT-49-1; BR-CL-25). They share many 0xxx codes but are not
+// interchangeable: EAS-only codes (99xx, EM, …) fail BR-CL-10/11.
+//
+// A country ranks, it never filters: the schemes relevant to it come first,
+// everything else follows a divider. Country tags are incomplete by nature, and
+// a scheme hidden by a wrong tag could only be typed blind.
+
+type SchemeList = "icdSchemes" | "easSchemes";
+const SCHEME_ENTRIES: Record<SchemeList, readonly SchemeEntry[]> = {
+  icdSchemes: ICD_SCHEMES_ENTRIES,
+  easSchemes: EAS_SCHEMES_ENTRIES,
+};
+
+function relevantTo(e: SchemeEntry, country: string): boolean {
+  return !!country && (e.country === country || e.country === "international");
 }
 
-/** EAS/ICD scheme picker options, optionally scoped to a country, preferred
- *  set floated above a divider. Pass `country = ""` to show every scheme. */
+/** Codes ranked first for `country`: its own and the international schemes. */
+function schemesRankedFirst(list: SchemeList, country: string): string[] {
+  return SCHEME_ENTRIES[list].filter((e) => relevantTo(e, country)).map((e) => e.code);
+}
+
+/** Every scheme, ranked: with a country, that country's and the international
+ *  schemes (preferred ones first), a divider, then the rest; without one, the
+ *  preferred set, a divider, then the rest. */
+function schemeOptions(list: SchemeList, country: string, locale: Locale, opts: OptionOpts): CodelistOption[] {
+  const preferred = new Set<string>(opts.preferred ?? PREFERRED[list] ?? []);
+  const entries = SCHEME_ENTRIES[list];
+  const top = country
+    ? entries.filter((e) => relevantTo(e, country)).map((e) => e.code)
+    : entries.filter((e) => preferred.has(e.code)).map((e) => e.code);
+  const topSet = new Set(top);
+  const rest = entries.map((e) => e.code).filter((c) => !topSet.has(c));
+  const base = { ...opts, preferredFirst: false };
+  const head = buildOptions(list, top, locale, base);
+  // Preferred first within the top group, otherwise source (code) order.
+  head.sort((a, b) => Number(!!b.preferred) - Number(!!a.preferred));
+  const tail = buildOptions(list, rest, locale, base);
+  if (!head.length || !tail.length) return [...head, ...tail];
+  return [...head, { value: "", code: "", label: "", divider: true }, ...tail];
+}
+
+/** ISO 6523 ICD scheme options (identifier and registration schemes), ranked
+ *  for `country` (`""`: preferred first). Every scheme is included. */
 export function icdSchemeOptions(country: string, locale: Locale, opts: OptionOpts = {}): CodelistOption[] {
-  const allowed = new Set(icdSchemesForCountry(country));
-  const codes = CODES["icdSchemes"].filter((c) => allowed.has(c));
-  return buildOptions("icdSchemes", codes, locale, { preferredFirst: true, ...opts });
+  return schemeOptions("icdSchemes", country, locale, opts);
+}
+
+/** CEF EAS scheme options (electronic address schemes), ranked for `country`
+ *  (`""`: preferred first). Every scheme is included. */
+export function easSchemeOptions(country: string, locale: Locale, opts: OptionOpts = {}): CodelistOption[] {
+  return schemeOptions("easSchemes", country, locale, opts);
+}
+
+/** ICD codes ranked first for `country` (its own and the international ones);
+ *  `""` returns every code. The other codes remain valid. */
+export function icdSchemesForCountry(country: string): string[] {
+  return country ? schemesRankedFirst("icdSchemes", country) : ICD_SCHEMES_ENTRIES.map((e) => e.code);
+}
+
+/** EAS codes ranked first for `country`; `""` returns every code. */
+export function easSchemesForCountry(country: string): string[] {
+  return country ? schemesRankedFirst("easSchemes", country) : EAS_SCHEMES_ENTRIES.map((e) => e.code);
 }
 
 export function countryEntries(): CountryEntry[] {
   return COUNTRIES_ENTRIES.map((e) => ({ ...e }));
 }
-export function icdSchemeEntries(): IcdSchemeEntry[] {
+export function icdSchemeEntries(): SchemeEntry[] {
   return ICD_SCHEMES_ENTRIES.map((e) => ({ ...e }));
+}
+export function easSchemeEntries(): SchemeEntry[] {
+  return EAS_SCHEMES_ENTRIES.map((e) => ({ ...e }));
 }
 export function preferredCodes(name: CodelistName): string[] {
   return [...(PREFERRED[name] ?? [])];
