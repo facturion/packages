@@ -15,7 +15,7 @@ import { mkdirSync, readFileSync, readdirSync, writeFileSync, existsSync } from 
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import yaml from "js-yaml";
-import { validateCodelist, type Family, type LocaleConfig, type ParsedCodelist } from "./schema.js";
+import { validateCodelist, validateOverlay, type Family, type LocaleConfig, type ParsedCodelist } from "./schema.js";
 
 /** Ascend from this module until we find `data/codelists/locales.json`, so the
  *  same code works whether run from `src/` (tsx) or `dist/src/` (built). */
@@ -31,6 +31,8 @@ function findPackageRoot(): string {
 const PKG_ROOT = findPackageRoot();
 const DATA_DIR = join(PKG_ROOT, "data", "codelists");
 const GEN_DIR = join(PKG_ROOT, "generated");
+/** Editorial layer over the generated scheme lists (see the file's header). */
+const OVERLAY_FILE = join(PKG_ROOT, "data", "overlays", "schemes.yaml");
 
 /** file -> family + the SCREAMING_CASE base for its generated exports. Keep
  *  alphabetical by file so the generated diff is stable. */
@@ -38,7 +40,8 @@ const FAMILIES: ReadonlyArray<{ file: string; family: Family; tsExport: string }
   { file: "classification-schemes.yaml", family: "default",     tsExport: "CLASSIFICATION_SCHEMES" },
   { file: "countries.yaml",              family: "countries",   tsExport: "COUNTRIES" },
   { file: "currencies.yaml",             family: "default",     tsExport: "CURRENCIES" },
-  { file: "icd-schemes.yaml",            family: "icd-schemes", tsExport: "ICD_SCHEMES" },
+  { file: "eas-schemes.yaml",            family: "schemes",     tsExport: "EAS_SCHEMES" },
+  { file: "icd-schemes.yaml",            family: "schemes",     tsExport: "ICD_SCHEMES" },
   { file: "invoice-types.yaml",          family: "default",     tsExport: "INVOICE_TYPES" },
   { file: "payment-means.yaml",          family: "default",     tsExport: "PAYMENT_MEANS" },
   { file: "tax-point-date.yaml",         family: "default",     tsExport: "TAX_POINT_DATE" },
@@ -69,11 +72,35 @@ function loadAll(cfg: LocaleConfig): Loaded[] {
   const expected = new Set(FAMILIES.map((f) => f.file));
   for (const f of onDisk) if (!expected.has(f)) throw new Error(`Unregistered YAML in data/codelists: ${f}`);
   for (const f of expected) if (!onDisk.has(f)) throw new Error(`Missing YAML file: data/codelists/${f}`);
-  return FAMILIES.map((spec) => {
+  const loaded = FAMILIES.map((spec) => {
     const parsed = yaml.load(readFileSync(join(DATA_DIR, spec.file), "utf8"));
     validateCodelist(spec.file, parsed, spec.family, cfg);
     return { family: spec.family, tsExport: spec.tsExport, bucket: parsed.bucket, parsed };
   });
+  applyOverlay(loaded.filter((l) => l.family === "schemes"), cfg);
+  return loaded;
+}
+
+/** Merge the editorial overlay into the generated scheme lists, by code. A
+ *  label override replaces the published name per locale; `preferred` and
+ *  `hint` are added. An overlay code that no list carries is an error: the
+ *  scheme was retired upstream and its editorial entry should go too. */
+function applyOverlay(lists: Loaded[], cfg: LocaleConfig): void {
+  const file = "data/overlays/schemes.yaml";
+  const overlay = yaml.load(readFileSync(OVERLAY_FILE, "utf8"));
+  validateOverlay(file, overlay, cfg);
+  for (const o of overlay.entries) {
+    let found = false;
+    for (const l of lists) {
+      const e = l.parsed.entries.find((x) => x.code === o.code);
+      if (!e) continue;
+      found = true;
+      if (o.label) e.label = { ...e.label, ...o.label };
+      if (o.hint) e.hint = { ...o.hint };
+      if (o.preferred) e.preferred = true;
+    }
+    if (!found) throw new Error(`${file}: code "${o.code}" is in no scheme list (retired upstream?) — remove its entry`);
+  }
 }
 
 const q = JSON.stringify;
@@ -128,7 +155,10 @@ function jsId(loc: string): string {
 function emitIndex(loaded: Loaded[]): string {
   const lines: string[] = [banner];
   lines.push("export type CountryEntry = { code: string; iso3: string };");
-  lines.push("export type IcdSchemeEntry = { code: string; country?: string };");
+  lines.push("/** A scheme and the country it belongs to (ISO-2, or \"international\"). */");
+  lines.push("export type SchemeEntry = { code: string; country?: string };");
+  lines.push("/** @deprecated Use SchemeEntry. */");
+  lines.push("export type IcdSchemeEntry = SchemeEntry;");
   lines.push("");
   lines.push(`export const CODELIST_NAMES = [${loaded.map((l) => q(l.bucket)).join(", ")}] as const;`);
   lines.push("export type CodelistName = (typeof CODELIST_NAMES)[number];");
@@ -148,8 +178,8 @@ function emitIndex(loaded: Loaded[]): string {
       for (const e of l.parsed.entries) lines.push(`  { code: ${q(e.code)}, iso3: ${q(e.iso3 ?? "")} },`);
       lines.push("];");
     }
-    if (l.family === "icd-schemes") {
-      lines.push("export const ICD_SCHEMES_ENTRIES: readonly IcdSchemeEntry[] = [");
+    if (l.family === "schemes") {
+      lines.push(`export const ${l.tsExport}_ENTRIES: readonly SchemeEntry[] = [`);
       for (const e of l.parsed.entries) {
         const c = e.country ? `, country: ${q(e.country)}` : "";
         lines.push(`  { code: ${q(e.code)}${c} },`);
@@ -179,6 +209,10 @@ function emitReadme(): string {
     "To change a list: edit the relevant `data/codelists/*.yaml`, then run",
     "`npm run generate`. The drift test fails if the committed outputs are",
     "out of sync with the YAML sources.",
+    "",
+    "The identifier-scheme lists (`icd-schemes.yaml`, `eas-schemes.yaml`) are",
+    "themselves generated from their upstreams by `npm run sync -- --schemes`;",
+    "their editorial additions live in `data/overlays/schemes.yaml`.",
     "",
   ].join("\n");
 }
