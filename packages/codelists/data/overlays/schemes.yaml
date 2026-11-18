@@ -6,6 +6,8 @@
 #   preferred  float the scheme to the top of its relevant group
 #   label      per-locale override of the published name (short, readable)
 #   hint       per-locale explanation shown with the option
+#   country    for a scheme no upstream tags with a country (ISO-2 or
+#              "international"); fails once upstream supplies one
 # A code no list carries fails `npm run generate` (stale entry).
 name: Identifier scheme overlay
 entries:
@@ -48,6 +50,7 @@ entries:
     label: { en: "ABN (Australia)", de: "ABN (Australien)" }
   - code: "0160"
     preferred: true
+    country: "international"
     label: { en: "GTIN", de: "GTIN" }
     hint:
       en: "GS1 product barcode (EAN/UPC superset). Use for retail items, not for parties or locations."
@@ -186,3 +189,10 @@ entries:
     label: { en: "Sweden VAT number", de: "USt-IdNr. Schweden" }
   - code: "9957"
     label: { en: "France VAT number", de: "USt-IdNr. Frankreich" }
+  - code: "EM"
+    preferred: true
+    country: "international"
+    label: { en: "E-mail", de: "E-Mail" }
+    hint:
+      en: "An e-mail address as the electronic address. Common for invoices sent by e-mail rather than through a network such as Peppol."
+      de: "Eine E-Mail-Adresse als elektronische Adresse. Üblich, wenn die Rechnung per E-Mail statt über ein Netzwerk wie Peppol zugestellt wird."

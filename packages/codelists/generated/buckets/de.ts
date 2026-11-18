@@ -544,7 +544,9 @@ const data: Record<string, Record<string, string>> = {
     "0246_hint": "Elektronische Geschäftsadresse für deutsches B2B-Routing. Für deutsche öffentliche Auftraggeber stattdessen 0204 (Leitweg-ID) verwenden.",
     "9914_hint": "Österreichische Umsatzsteuer-Identifikationsnummer (UID). Format \"ATU\" plus 8 Ziffern.",
     "9919_hint": "Österreichische Kennziffer des Unternehmensregisters (KUR). Nicht das deutsche Handelsregister: dafür gibt es keinen Schema-Code, die HRB-Nummer steht ohne Schema.",
-    "9930_hint": "Deutsche Umsatzsteuer-Identifikationsnummer. Für deutsche öffentliche Auftraggeber stattdessen 0204 (Leitweg-ID) verwenden."
+    "9930_hint": "Deutsche Umsatzsteuer-Identifikationsnummer. Für deutsche öffentliche Auftraggeber stattdessen 0204 (Leitweg-ID) verwenden.",
+    "EM": "E-Mail",
+    "EM_hint": "Eine E-Mail-Adresse als elektronische Adresse. Üblich, wenn die Rechnung per E-Mail statt über ein Netzwerk wie Peppol zugestellt wird."
   },
   "icdSchemes": {
     "0002_hint": "9-stellige französische Kennung der juristischen Person (SIREN). Für die etablissementbezogene Variante SIRET (0009) wählen.",

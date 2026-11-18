@@ -98,6 +98,12 @@ function applyOverlay(lists: Loaded[], cfg: LocaleConfig): void {
       if (o.label) e.label = { ...e.label, ...o.label };
       if (o.hint) e.hint = { ...o.hint };
       if (o.preferred) e.preferred = true;
+      if (o.country) {
+        // Fills a missing upstream tag only; once upstream tags the scheme,
+        // the overlay entry is stale and must go.
+        if (e.country) throw new Error(`${file}: code "${o.code}" already has country "${e.country}" upstream (${l.bucket}) — remove the overlay country`);
+        e.country = o.country;
+      }
     }
     if (!found) throw new Error(`${file}: code "${o.code}" is in no scheme list (retired upstream?) — remove its entry`);
   }

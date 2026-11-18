@@ -594,7 +594,8 @@
     "AQ": "X.400 address for mail text",
     "AS": "AS2 exchange",
     "AU": "File Transfer Protocol",
-    "EM": "Electronic mail"
+    "EM": "E-mail",
+    "EM_hint": "An e-mail address as the electronic address. Common for invoices sent by e-mail rather than through a network such as Peppol."
   },
   "icdSchemes": {
     "0002": "System Information et Repertoire des Entreprise et des Etablissements: SIRENE",

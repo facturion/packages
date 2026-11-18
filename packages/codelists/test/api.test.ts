@@ -104,3 +104,11 @@ test("locales() and defaultLocale()", () => {
   assert.deepEqual([...cl.locales()].sort(), ["de", "en"]);
   assert.equal(cl.defaultLocale(), "en");
 });
+
+test("e-mail and GTIN rank as international schemes (overlay country)", () => {
+  const eas = cl.easSchemeOptions("DE", "en");
+  const top = eas.slice(0, eas.findIndex((o) => o.divider)).map((o) => o.value);
+  assert.ok(top.includes("EM"));
+  assert.equal(eas.find((o) => o.value === "EM")?.label, "E-mail");
+  assert.ok(cl.icdSchemesForCountry("DE").includes("0160"));
+});

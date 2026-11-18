@@ -134,14 +134,16 @@ export function validateCodelist(
 }
 
 /** Editorial overlay for the generated scheme lists (data/overlays/schemes.yaml):
- *  per code, optional `preferred`, a partial per-locale `label` override and a
- *  `hint`. Unlike a list's own labels, an overlay label need not carry the
+ *  per code, optional `preferred`, a partial per-locale `label` override, a
+ *  `hint`, and a `country` for a scheme no upstream tags (it may only fill
+ *  that gap; see applyOverlay). Unlike a list's own labels, an overlay label need not carry the
  *  default locale: the published name stays the fallback. */
 export interface OverlayEntry {
   code: string;
   preferred?: boolean;
   label?: Record<string, string>;
   hint?: Record<string, string>;
+  country?: string;
 }
 
 export function validateOverlay(file: string, parsed: unknown, cfg: LocaleConfig): asserts parsed is { name: string; entries: OverlayEntry[] } {
@@ -157,7 +159,7 @@ export function validateOverlay(file: string, parsed: unknown, cfg: LocaleConfig
     if (seen.has(e.code)) throw new CodelistError(file, `${where}.code "${e.code}" duplicates an earlier entry`);
     seen.add(e.code);
     for (const k of Object.keys(e)) {
-      if (!["code", "preferred", "label", "hint"].includes(k)) throw new CodelistError(file, `${where} has unknown key "${k}"`);
+      if (!["code", "preferred", "label", "hint", "country"].includes(k)) throw new CodelistError(file, `${where} has unknown key "${k}"`);
     }
     if (e.preferred !== undefined && typeof e.preferred !== "boolean") {
       throw new CodelistError(file, `${where}.preferred must be boolean if present`);
@@ -170,5 +172,8 @@ export function validateOverlay(file: string, parsed: unknown, cfg: LocaleConfig
       }
     }
     if (e.hint !== undefined) assertLocaleMap(file, e.hint, `${where}.hint`, cfg);
+    if (e.country !== undefined && !(typeof e.country === "string" && (/^[A-Z]{2}$/.test(e.country) || e.country === "international"))) {
+      throw new CodelistError(file, `${where}.country must be an ISO-2 code or "international"`);
+    }
   });
 }
