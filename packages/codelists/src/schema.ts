@@ -5,7 +5,7 @@
  *  (runtime falls back). Also performs cross-reference checks the old .mjs
  *  schema lacked (iso3 uniqueness, icd country shape). */
 
-export type Family = "default" | "countries" | "icd-schemes" | "units";
+export type Family = "default" | "countries" | "schemes" | "units";
 
 export interface LocaleConfig {
   locales: string[];
@@ -122,13 +122,58 @@ export function validateCodelist(
       throw new CodelistError(file, `${where}.iso3 only allowed on the countries family`);
     }
 
-    // country — icd-schemes only, ISO-2 or the literal "international".
-    if (family === "icd-schemes") {
+    // country — scheme lists only, ISO-2 or the literal "international".
+    if (family === "schemes") {
       if (e.country !== undefined && !(typeof e.country === "string" && (/^[A-Z]{2}$/.test(e.country) || e.country === "international"))) {
         throw new CodelistError(file, `${where}.country must be an ISO-2 code or "international"`);
       }
     } else if (e.country !== undefined) {
-      throw new CodelistError(file, `${where}.country only allowed on the icd-schemes family`);
+      throw new CodelistError(file, `${where}.country only allowed on the scheme lists`);
+    }
+  });
+}
+
+/** Editorial overlay for the generated scheme lists (data/overlays/schemes.yaml):
+ *  per code, optional `preferred`, a partial per-locale `label` override, a
+ *  `hint`, and a `country` for a scheme no upstream tags (it may only fill
+ *  that gap; see applyOverlay). Unlike a list's own labels, an overlay label need not carry the
+ *  default locale: the published name stays the fallback. */
+export interface OverlayEntry {
+  code: string;
+  preferred?: boolean;
+  label?: Record<string, string>;
+  hint?: Record<string, string>;
+  country?: string;
+}
+
+export function validateOverlay(file: string, parsed: unknown, cfg: LocaleConfig): asserts parsed is { name: string; entries: OverlayEntry[] } {
+  if (!isObject(parsed)) throw new CodelistError(file, "root must be a YAML mapping");
+  assertString(file, parsed.name, "name");
+  if (!Array.isArray(parsed.entries)) throw new CodelistError(file, "entries must be a list");
+  const known = new Set(cfg.locales);
+  const seen = new Set<string>();
+  parsed.entries.forEach((e: unknown, i: number) => {
+    const where = `entries[${i}]`;
+    if (!isObject(e)) throw new CodelistError(file, `${where} must be a mapping`);
+    assertString(file, e.code, `${where}.code`);
+    if (seen.has(e.code)) throw new CodelistError(file, `${where}.code "${e.code}" duplicates an earlier entry`);
+    seen.add(e.code);
+    for (const k of Object.keys(e)) {
+      if (!["code", "preferred", "label", "hint", "country"].includes(k)) throw new CodelistError(file, `${where} has unknown key "${k}"`);
+    }
+    if (e.preferred !== undefined && typeof e.preferred !== "boolean") {
+      throw new CodelistError(file, `${where}.preferred must be boolean if present`);
+    }
+    if (e.label !== undefined) {
+      if (!isObject(e.label)) throw new CodelistError(file, `${where}.label must be a map of locale -> string`);
+      for (const [loc, text] of Object.entries(e.label)) {
+        if (!known.has(loc)) throw new CodelistError(file, `${where}.label has undeclared locale "${loc}"`);
+        assertString(file, text, `${where}.label.${loc}`);
+      }
+    }
+    if (e.hint !== undefined) assertLocaleMap(file, e.hint, `${where}.hint`, cfg);
+    if (e.country !== undefined && !(typeof e.country === "string" && (/^[A-Z]{2}$/.test(e.country) || e.country === "international"))) {
+      throw new CodelistError(file, `${where}.country must be an ISO-2 code or "international"`);
     }
   });
 }

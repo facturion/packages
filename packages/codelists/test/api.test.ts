@@ -48,12 +48,50 @@ test("hint text surfaces as option.description in the right locale", () => {
   assert.match(aeDe?.description ?? "", /Empfänger/);
 });
 
-test("icdSchemeOptions scopes by country; '' shows all", () => {
-  const all = cl.icdSchemeOptions("", "en").map((o) => o.value).filter(Boolean);
-  const de = cl.icdSchemeOptions("DE", "en").map((o) => o.value).filter(Boolean);
-  assert.ok(all.length >= de.length && de.length > 0);
-  // 0204 (German Leitweg-ID) must be offered in a DE context.
-  assert.ok(de.includes("0204"));
+const values = (opts: { value: string; divider?: boolean }[]) => opts.filter((o) => !o.divider).map((o) => o.value);
+
+test("icdSchemeOptions ranks by country; nothing is filtered out", () => {
+  const all = values(cl.icdSchemeOptions("", "en"));
+  const de = cl.icdSchemeOptions("DE", "en");
+  assert.equal(values(de).length, all.length, "a country ranks, it never removes schemes");
+  const divider = de.findIndex((o) => o.divider);
+  const top = values(de.slice(0, divider));
+  // 0204 (German Leitweg-ID) and international schemes rank first for DE.
+  assert.ok(top.includes("0204") && top.includes("0088"));
+  // A French scheme is still there, below the divider.
+  assert.ok(values(de.slice(divider + 1)).includes("0009"));
+  // Preferred schemes lead the top group.
+  const firstPlain = de.findIndex((o) => !o.preferred);
+  assert.ok(de.slice(0, firstPlain).every((o) => o.preferred) && de.slice(firstPlain, divider).every((o) => !o.preferred));
+});
+
+test("without a country the preferred set ranks first", () => {
+  const opts = cl.icdSchemeOptions("", "en");
+  const divider = opts.findIndex((o) => o.divider);
+  assert.ok(divider > 0 && opts.slice(0, divider).every((o) => o.preferred));
+});
+
+test("ICD carries only ISO 6523 codes; EAS carries the electronic-address ones", () => {
+  const icd = values(cl.icdSchemeOptions("", "en"));
+  const eas = values(cl.easSchemeOptions("", "en"));
+  // EAS-only codes must not be offered as identifier schemes (BR-CL-10/11).
+  for (const c of ["9930", "9913", "9918", "EM"]) {
+    assert.ok(!icd.includes(c), `${c} is not an ISO 6523 code`);
+    assert.ok(eas.includes(c), `${c} is an EAS code`);
+  }
+  assert.ok(icd.includes("0160") && !eas.includes("0160"), "GTIN identifies items, it is no address scheme");
+  assert.ok(icd.length > 200, `full ICD list, got ${icd.length}`);
+});
+
+test("overlay labels, hints and preferred flags apply to both lists", () => {
+  const leitweg = (opts: ReturnType<typeof cl.icdSchemeOptions>) => opts.find((o) => o.value === "0204");
+  for (const opts of [cl.icdSchemeOptions("DE", "de"), cl.easSchemeOptions("DE", "de")]) {
+    assert.equal(leitweg(opts)?.label, "Leitweg-ID (DE)");
+    assert.equal(leitweg(opts)?.preferred, true);
+    assert.ok(leitweg(opts)?.description);
+  }
+  // A code without an overlay keeps its published name.
+  assert.equal(cl.codelistLabel("icdSchemes", "0003", "en"), "Codification Numerique des Etablissments Financiers En Belgique");
 });
 
 test("label sort is locale-collated", () => {
@@ -65,4 +103,12 @@ test("label sort is locale-collated", () => {
 test("locales() and defaultLocale()", () => {
   assert.deepEqual([...cl.locales()].sort(), ["de", "en"]);
   assert.equal(cl.defaultLocale(), "en");
+});
+
+test("e-mail and GTIN rank as international schemes (overlay country)", () => {
+  const eas = cl.easSchemeOptions("DE", "en");
+  const top = eas.slice(0, eas.findIndex((o) => o.divider)).map((o) => o.value);
+  assert.ok(top.includes("EM"));
+  assert.equal(eas.find((o) => o.value === "EM")?.label, "E-mail");
+  assert.ok(cl.icdSchemesForCountry("DE").includes("0160"));
 });

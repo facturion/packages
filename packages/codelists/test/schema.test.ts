@@ -39,7 +39,23 @@ test("iso3 shape + uniqueness enforced", () => {
 });
 
 test("icd country accepts ISO-2 or international, rejects others", () => {
-  ok([{ code: "X", country: "international", label: { en: "x" } }], "icd-schemes", "icdSchemes");
-  ok([{ code: "Y", country: "FR", label: { en: "y" } }], "icd-schemes", "icdSchemes");
-  assert.throws(() => ok([{ code: "Z", country: "DEU", label: { en: "z" } }], "icd-schemes", "icdSchemes"), /country must be/);
+  ok([{ code: "X", country: "international", label: { en: "x" } }], "schemes", "icdSchemes");
+  ok([{ code: "Y", country: "FR", label: { en: "y" } }], "schemes", "icdSchemes");
+  assert.throws(() => ok([{ code: "Z", country: "DEU", label: { en: "z" } }], "schemes", "icdSchemes"), /country must be/);
+});
+
+test("overlay: partial labels allowed, unknown keys and locales rejected", async () => {
+  const { validateOverlay } = await import("../src/schema.js");
+  const ov = (entries: unknown[]) => validateOverlay("o.yaml", { name: "O", entries }, cfg);
+  ov([{ code: "0204", preferred: true, label: { de: "Leitweg-ID" }, hint: { en: "h" } }]);
+  assert.throws(() => ov([{ code: "1", iso3: "DEU" }]), /unknown key "iso3"/);
+  assert.throws(() => ov([{ code: "1", label: { fr: "x" } }]), /undeclared locale/);
+  assert.throws(() => ov([{ code: "1" }, { code: "1" }]), /duplicates/);
+  assert.throws(() => ov([{ code: "1", hint: { de: "only de" } }]), /default locale/);
+});
+
+test("overlay country must be ISO-2 or international", async () => {
+  const { validateOverlay } = await import("../src/schema.js");
+  validateOverlay("o.yaml", { name: "O", entries: [{ code: "EM", country: "international" }] }, cfg);
+  assert.throws(() => validateOverlay("o.yaml", { name: "O", entries: [{ code: "EM", country: "World" }] }, cfg), /country must be/);
 });

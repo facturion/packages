@@ -16,12 +16,30 @@ Unicode CLDR (Common Locale Data Repository)
             https://www.unicode.org/license.txt
 
 --------------------------------------------------------------------------------
+CEN EN 16931 validation artefacts
+  Used for: the ISO 6523 ICD and CEF EAS code sets (which codes each scheme
+            list carries), read from the codes schematron (rules BR-CL-10/11,
+            BR-CL-25).
+  Source:   https://github.com/ConnectingEurope/eInvoicing-EN16931
+  License:  European Union Public Licence 1.2 (SPDX: EUPL-1.2).
+            https://interoperable-europe.ec.europa.eu/collection/eupl
+
+--------------------------------------------------------------------------------
 OpenPEPPOL eDEC Code Lists
-  Used for: Peppol participant identifier (EAS) scheme codes, names and the
-            per-scheme country association.
+  Used for: the per-scheme country association, and names of EAS-only schemes.
   Source:   https://github.com/OpenPEPPOL/edec-codelists
   License:  Apache License 2.0.
             https://www.apache.org/licenses/LICENSE-2.0
+
+--------------------------------------------------------------------------------
+ISO/IEC 6523 ICD and CEF EAS scheme names
+  Used for: published scheme names. ISO 6523 names as distributed in
+            OpenPEPPOL's ICD code list
+            (https://github.com/OpenPEPPOL/poacc-upgrade-3); EAS-only names
+            from Peppol (above) and KoSIT's EAS code list
+            (https://www.xrepository.de, urn:xoev-de:kosit:codeliste:eas).
+  Code values and registered scheme names are published registry data. Only
+  names are taken, not the registries' descriptive text.
 
 --------------------------------------------------------------------------------
 UN/CEFACT code lists
