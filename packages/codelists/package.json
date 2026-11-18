@@ -1,6 +1,6 @@
 {
   "name": "@facturion/codelists",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Friendly, multilingual EN 16931 / UN-CEFACT e-invoicing code lists (units, VAT categories, payment means, invoice types, countries, currencies, ISO 6523 ICD and CEF EAS identifier schemes) with curated labels and explanatory hints.",
   "keywords": [
     "en16931",
